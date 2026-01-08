@@ -1,0 +1,8 @@
+# Active la réécriture d'URL
+RewriteEngine On
+
+# Assure-toi que le dossier existe
+RewriteBase /sheglam/
+
+# Réécrit les URLs du type /produits/Yeux vers categorie.php?categorie=Yeux
+RewriteRule ^produits/([^/]+)/?$ categorie.php?categorie=$1 [L,QSA]

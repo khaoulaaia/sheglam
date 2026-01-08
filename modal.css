@@ -1,0 +1,128 @@
+
+/* Overlay spécifique au modal */
+.shade-modal {
+  display: none;               /* caché par défaut */
+  position: fixed;             /* fixe à l'écran */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6); /* overlay semi-transparent */
+  z-index: 9999;              /* au-dessus de tout */
+  display: flex;               /* centrer le contenu */
+  align-items: center;         /* centrer verticalement */
+  justify-content: center;     /* centrer horizontalement */
+  padding: 20px;
+  box-sizing: border-box;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+  pointer-events: none;        /* désactiver clics tant qu'inactif */
+}
+
+.shade-modal[aria-hidden="false"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Contenu du modal */
+.shade-modal-content {
+  background-color: #fff;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 100%;
+  padding: 25px;
+  position: relative;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  max-height: 90vh;
+  overflow-y: auto; /* scroll si contenu trop grand */
+}
+
+/* Bouton fermer */
+.shade-modal-content .close-modal {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.shade-modal-content .close-modal:hover {
+  color: #e91e63;
+}
+
+/* Infos produit dans le modal */
+.modal-product-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.modal-product-img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Teintes disponibles */
+#shade-options-container,
+.shade-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.shade-option {
+  padding: 8px 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.shade-option:hover {
+  background-color: #f0f0f0;
+}
+
+.shade-option.selected {
+  background-color: #003366;
+  color: #fff;
+  border-color: #003366;
+}
+
+/* Bouton ajouter au panier dans modal */
+#confirmShadeBtn {
+  width: 100%;
+  padding: 12px;
+  background-color: #003366;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: background-color 0.3s ease;
+}
+
+#confirmShadeBtn:hover {
+  background-color: #002244;
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+  .shade-modal-content {
+    padding: 20px;
+  }
+  .modal-product-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .modal-product-img {
+    margin-bottom: 10px;
+  }
+}
