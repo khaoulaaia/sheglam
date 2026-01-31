@@ -8,6 +8,10 @@
         <p>Votre panier est vide.</p>
     </div>
     <div class="sidebar-footer">
+      <div class="cart-total">
+    <span>Total</span>
+    <strong id="cartTotal">€0.00</strong>
+  </div>
         <button class="btn checkout-btn">Passer à la caisse</button>
     </div>
 </div>
@@ -91,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function() {
             <button class="decrease">-</button>
             <span class="quantity">${qty}</span>
             <button class="increase">+</button>
-            <button class="remove-item">Supprimer</button>
+            <button class="remove-item">x</button>
           </div>
         </div>
       `;
@@ -138,7 +142,7 @@ document.addEventListener("DOMContentLoaded", function() {
         <div class="wishlist-item-info">
           <h4>${item.name}</h4>
           <p>€${price.toFixed(2)}</p>
-          <button class="remove-wishlist">Supprimer</button>
+          <button class="remove-wishlist">x</button>
         </div>
       `;
       itemHTML.querySelector('.remove-wishlist').addEventListener('click', () => {
@@ -188,63 +192,253 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 <style>
-/* ==================== STYLE SIDEBAR ==================== */
+/* =====================================================
+   SIDEBAR – LUXE MINIMAL
+===================================================== */
+
 .sidebar {
-    position: fixed;
-    right: -100%;
-    top: 0;
-    width: 350px;
-    height: 100%;
-    background: #fff;
-    transition: 0.3s;
-    z-index: 1000;
-    box-shadow: -2px 0 5px rgba(0,0,0,0.2);
-    display: flex;
-    flex-direction: column;
+  position: fixed;
+  top: 0;
+  right: -420px;
+  width: 400px;
+  height: 100vh;
+  background: #fff;
+  z-index: 5000;
+  display: flex;
+  flex-direction: column;
+  transition: right .45s cubic-bezier(.4,0,.2,1);
+  box-shadow: -12px 0 40px rgba(0,0,0,.18);
 }
-.sidebar.active { right: 0; }
+
+.sidebar.active {
+  right: 0;
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
 
 .sidebar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    border-bottom: 1px solid #ddd;
+  padding: 28px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0,0,0,.08);
 }
+
+.sidebar-header h3 {
+  font-family: "Didot", "Playfair Display", serif;
+  font-size: 18px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+#closeSidebar,
+#closeWishlist {
+  font-size: 26px;
+  font-weight: 300;
+  cursor: pointer;
+  opacity: .6;
+  transition: opacity .25s ease;
+}
+
+#closeSidebar:hover,
+#closeWishlist:hover {
+  opacity: 1;
+}
+
+/* =====================================================
+   CONTENT
+===================================================== */
+
 .sidebar-content {
-    flex: 1;
-    padding: 1rem;
-    overflow-y: auto;
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
 }
+
+.sidebar-content p {
+  font-size: 14px;
+  color: #777;
+  text-align: center;
+  margin-top: 40px;
+}
+
+/* =====================================================
+   CART / WISHLIST ITEM
+===================================================== */
+
+.cart-item,
+.wishlist-item {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.cart-item-img,
+.wishlist-item-img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;   /* 🔥 clé */
+  background: #ffff;
+  border-radius: 6px;
+}
+
+
+/* INFO */
+.cart-item-info,
+.wishlist-item-info {
+  flex: 1;
+}
+
+.cart-item-info h4,
+.wishlist-item-info h4 {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.cart-item-info p,
+.wishlist-item-info p {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* =====================================================
+   QUANTITY CONTROLS
+===================================================== */
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.quantity-controls button {
+  width: 26px;
+  height: 26px;
+  background: none;
+  border: 1px solid rgba(0,0,0,.25);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all .25s ease;
+}
+
+.quantity-controls button:hover {
+  background: #111;
+  color: #fff;
+}
+
+.quantity-controls .quantity {
+  font-size: 13px;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* REMOVE */
+.remove-item,
+.remove-wishlist {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  opacity: .6;
+  transition: opacity .25s ease;
+}
+
+.remove-item:hover,
+.remove-wishlist:hover {
+  opacity: 1;
+}
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
 .sidebar-footer {
-    padding: 1rem;
-    border-top: 1px solid #ddd;
+  padding: 24px;
+  border-top: 1px solid rgba(0,0,0,.08);
 }
+
+.checkout-btn {
+  width: 100%;
+  padding: 14px;
+  background: #111;
+  color: #fff;
+  border: none;
+  font-size: 13px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .3s ease;
+}
+
+.checkout-btn:hover {
+  background: #000;
+}
+
+/* =====================================================
+   OVERLAY
+===================================================== */
+
 .sidebar-overlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
-    opacity: 0;
-    pointer-events: none;
-    transition: 0.3s;
-    z-index: 999;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .35s ease;
+  z-index: 4800;
 }
-.sidebar-overlay.active { opacity: 1; pointer-events: all; }
 
-#closeSidebar, #closeWishlist { cursor: pointer; font-size: 1.5rem; }
+.sidebar-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
 
-.cart-item, .wishlist-item {
-    display: flex;
-    margin-bottom: 1rem;
-    gap: 0.5rem;
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    right: -100%;
+  }
 }
-.cart-item-img, .wishlist-item-img {
-    width: 70px;
-    height: 70px;
-    object-fit: cover;
+.cart-item-price {
+  font-size: 13px;
+  font-weight: 600;
+    color: #777;
+  margin-bottom: 10px;
+  letter-spacing: .02em;
 }
-.cart-item-info, .wishlist-item-info { flex: 1; }
-.quantity-controls { display: flex; align-items: center; gap: 0.5rem; }
-.quantity-controls button { padding: 0.3rem 0.6rem; }
+.cart-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px 0;
+  border-top: 1px solid rgba(0,0,0,.1);
+  margin-bottom: 12px;
+}
+
+.cart-total span {
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.cart-total strong {
+  font-size: 16px;
+}
+
+
 </style>

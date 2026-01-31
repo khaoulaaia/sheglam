@@ -35,6 +35,18 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 };
 
+const updateCartTotal = () => {
+  let total = 0;
+
+  Object.values(cart).forEach(item => {
+    total += item.price * item.quantity;
+  });
+
+  const totalEl = document.getElementById("cartTotal");
+  if (totalEl) {
+    totalEl.textContent = `€${total.toFixed(2)}`;
+  }
+};
 
   // ===============================
   // PANIER – AJOUT
@@ -85,13 +97,13 @@ window.renderCart = () => {
     div.innerHTML = `
       <img src="${imageUrl}" alt="${item.name}" class="cart-item-img">
       <div class="cart-item-info">
-        <h4>${item.name}${item.shade ? " - " + item.shade : ""}</h4>
-        <p>€${item.price.toFixed(2)}</p>
+  <h4>${item.name}${item.shade ? " - " + item.shade : ""}</h4>
+  <div class="cart-item-price">€${item.price.toFixed(2)}</div>
         <div class="quantity-controls">
           <button class="decrease">-</button>
           <span class="quantity">${item.quantity}</span>
           <button class="increase">+</button>
-          <button class="remove-item">Supprimer</button>
+          <button class="remove-item">x</button>
         </div>
       </div>
     `;
@@ -99,24 +111,33 @@ window.renderCart = () => {
     div.querySelector(".increase").onclick = () => {
       item.quantity++;
       saveCart();
+        updateCartTotal();
+
       window.renderCart();
+
     };
 
     div.querySelector(".decrease").onclick = () => {
       item.quantity--;
       if (item.quantity <= 0) delete cart[key];
       saveCart();
+        updateCartTotal();
+
       window.renderCart();
     };
 
     div.querySelector(".remove-item").onclick = () => {
       delete cart[key];
       saveCart();
+        updateCartTotal();
+
       window.renderCart();
     };
 
     cartItemsEl.appendChild(div);
   });
+  updateCartTotal();
+
 };
 
   // ===============================
@@ -170,12 +191,16 @@ if (modal) {
   increaseQtyBtn?.addEventListener("click", () => {
     currentQuantity++;
     updateQuantityUI();
+      updateCartTotal();
+
   });
 
   decreaseQtyBtn?.addEventListener("click", () => {
     if (currentQuantity > 1) {
       currentQuantity--;
       updateQuantityUI();
+        updateCartTotal();
+
     }
   });
 
@@ -225,18 +250,33 @@ if (modal) {
         shadeOptionsEl.innerHTML = "<p>Aucune teinte disponible.</p>";
       } else {
         shades.forEach(s => {
-          const div = document.createElement("div");
-          div.className = "shade-option";
-          div.innerHTML = `<span style="background:${s.code_couleur}"></span>`;
+  const option = document.createElement("div");
+  option.className = "shade-option";
 
-          div.onclick = () => {
-            shadeOptionsEl.querySelectorAll(".shade-option").forEach(o => o.classList.remove("selected"));
-            div.classList.add("selected");
-            selectedShade = s.nom_teinte;
-          };
+  const color = document.createElement("span");
+  color.className = "shade-color";
 
-          shadeOptionsEl.appendChild(div);
-        });
+  // 👉 APPLICATION DIRECTE DU CODE COULEUR
+  color.style.backgroundColor = s.code_couleur;
+
+  option.appendChild(color);
+
+  option.addEventListener("click", () => {
+    shadeOptionsEl
+      .querySelectorAll(".shade-option")
+      .forEach(o => o.classList.remove("selected"));
+
+    option.classList.add("selected");
+    selectedShade = s.nom_teinte;
+
+    // optionnel : afficher le nom
+    const label = document.getElementById("selectedShadeName");
+    if (label) label.textContent = s.nom_teinte;
+  });
+
+  shadeOptionsEl.appendChild(option);
+});
+
       }
 
       openModal();
@@ -280,7 +320,10 @@ if (modal) {
   // INIT
   // ===============================
   window.renderCart();
+    updateCartTotal();
+
 });
+
 // ===============================
 // FILTRES & TRI
 // ===============================

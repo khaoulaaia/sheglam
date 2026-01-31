@@ -185,5 +185,25 @@
   color: #111;
 }
 
+.shade-option {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,.25);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shade-option.selected {
+  border: 2px solid #111;
+}
+
+.shade-color {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
 
 </style>

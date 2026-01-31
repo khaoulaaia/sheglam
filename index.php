@@ -77,7 +77,7 @@ include_once 'includes/db.php';
 
 <div class="create-item">
 <a href="/sheglam/categorie.php?categorie=Accessoires">
-    <img src="images/17665481375e4044c7c4556c7edb131ae4c16c8460_thumbnail_3600x.webp" alt="Accessoires makeup">
+    <img src="images/placeholde.webp" alt="Accessoires makeup">
     <div class="overlay"><h3>Accessoires</h3></div>
   </a>
 </div>
@@ -246,7 +246,6 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 <script src="/sheglam/js/shop.js?v=<?= time(); ?>"></script>
-<script src="sidebar.js"></script>
 
 </body>
 </html>

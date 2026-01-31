@@ -221,6 +221,7 @@ html, body {
   transform: translateY(-100%);
   transition: transform .6s cubic-bezier(.4,0,.2,1);
   overflow-y: auto;
+  height: 50%;
 }
 
 .search-overlay.active {
@@ -297,6 +298,7 @@ html, body {
   display: grid;
   grid-template-columns: 28% 72%;
   gap: 48px;
+  
 }
 
 /* =====================================================

@@ -254,7 +254,6 @@ if ($reviews) {
 <!-- Modal teintes -->
 <?php include 'includes/product_modal.php'; ?>
 <script src="/sheglam/js/shop.js?v=<?= time(); ?>"></script>
-<script src="sidebar.js"></script>
 
 
 <script>
