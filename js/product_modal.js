@@ -24,8 +24,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       selectedProduct = card.querySelector("h3").textContent;
       selectedPrice = parseFloat(card.querySelector(".price").textContent.replace(/[^\d,.-]/g, '').replace(',', '.')) || 0;
-      selectedImage = card.querySelector("img").src;
-
+      selectedImage = card.querySelector("img").getAttribute("src");
+      
       // Remplir le contenu du modal
       productNameEl.textContent = selectedProduct;
       productPriceEl.textContent = "€" + selectedPrice.toFixed(2);
@@ -92,11 +92,12 @@ document.addEventListener("DOMContentLoaded", () => {
       window.cart[key].quantity += 1;
     } else {
       window.cart[key] = {
-        name: selectedProduct,
-        price: selectedPrice,
-        image: selectedImage,
-        shade: selectedShade,
-        quantity: 1
+  name: selectedProduct,
+  price: selectedPrice,
+  image_url: selectedImage ,
+  shade: selectedShade,
+  quantity: 1
+
       };
     }
 

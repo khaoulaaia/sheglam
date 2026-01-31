@@ -1,0 +1,492 @@
+/* ============================= */
+/* RESET & BASE */
+/* ============================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Didot", "Playfair Display", "Times New Roman", serif;
+  background-color: #ffffff;
+  color: #111;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================= */
+/* HEADER */
+/* ============================= */
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 22px 6%;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(8px);
+  z-index: 10;
+}
+
+/* TEXTE HEADER (logo + liens) */
+.header .logo,
+.header .navbar a {
+  color: #111;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ICÔNES HEADER */
+.icons i {
+  color: #111;
+  font-weight: normal;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* ============================= */
+/* FONT AWESOME – FIX DEFINITIF */
+/* ============================= */
+.fa-solid {
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 900 !important;
+}
+
+.fa-brands {
+  font-family: "Font Awesome 6 Brands" !important;
+}
+.fa-regular {
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 400 !important; /* outline */
+}
+
+.fa-solid {
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 900 !important; /* plein */
+}
+.icon-contour {
+  font-size: 18px;
+  color: white;             /* couleur intérieure */
+  -webkit-text-stroke: 1px #111; /* contour noir */
+  text-stroke: 1px #111;         /* contour noir */
+}
+.icons {
+  display: flex;
+  gap: 16px; /* espace entre les icônes */
+  align-items: center; /* centre verticalement */
+}
+
+.icons a,
+.icons button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+
+/* ============================= */
+/* LAYOUT */
+/* ============================= */
+.product-page {
+  max-width: 1280px;
+  margin: 50px auto 50px;
+  padding: 0 40px;
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 60px;
+}
+
+/* ============================= */
+/* MINIATURES */
+/* ============================= */
+.product-left {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.product-left img {
+  width: 80px;
+  height: 90px;
+  object-fit: cover;
+  border: 1px solid #e6e6e6;
+  cursor: pointer;
+  transition: all 0.35s ease;
+  filter: grayscale(20%);
+}
+
+.product-left img:hover,
+.product-left img.active {
+  filter: grayscale(0%);
+  border-color: #000;
+}
+
+/* ============================= */
+/* CONTENU PRINCIPAL */
+/* ============================= */
+.product-main {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 80px;
+}
+
+/* Image principale */
+.product-main-image img {
+  width: 100%;
+  max-height: 680px;
+  object-fit: cover;
+  border-radius: 2px;
+  transition: transform 0.6s ease;
+}
+
+.product-main-image img:hover {
+  transform: scale(1.05);
+}
+.product-left img {
+  border: 1px solid #e6e6e6;
+  transition: border 0.3s ease, transform 0.3s ease;
+}
+
+.product-left img.active {
+  border: 2px solid #000;
+}
+
+/* ============================= */
+/* INFOS PRODUIT */
+/* ============================= */
+.product-right h1 {
+  font-size: 42px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+
+/* ============================= */
+/* PRIX */
+/* ============================= */
+.price {
+  font-size: 26px;
+  font-weight: 500;
+  margin-bottom: 30px;
+  letter-spacing: 0.05em;
+}
+
+.old-price {
+  font-size: 15px;
+  text-decoration: line-through;
+  color: #777;
+  margin-right: 12px;
+}
+
+/* ============================= */
+/* DESCRIPTION */
+/* ============================= */
+.description {
+  font-size: 15px;
+  color: #333;
+  max-width: 480px;
+  margin-bottom: 40px;
+}
+
+/* ============================= */
+/* BOUTONS */
+/* ============================= */
+.add-to-cart,
+.choose-shade-btn {
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 18px 44px;
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.4s ease;
+}
+
+.add-to-cart:hover,
+.choose-shade-btn:hover {
+  background: #111;
+}
+.breadcrumb {
+  margin-top: 90px;
+  width: 100%;
+  padding: 12px 6%;
+  background-color: transparent;
+  font-family: "Didot", "Playfair Display", serif;
+  font-size: 13px;
+  color: #555;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.breadcrumb-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.breadcrumb-container a {
+  color: #111;
+  text-decoration: none;
+  font-weight: 400;
+  transition: color 0.3s ease;
+}
+
+.breadcrumb-container a:hover {
+  color: #888;
+  text-decoration: underline;
+}
+
+.breadcrumb-container span {
+  color: #333;
+  font-weight: 500;
+}
+
+.breadcrumb-container span::before,
+.breadcrumb-container a:not(:first-child)::before {
+  content: "›";
+  margin: 0 6px;
+  color: #aaa;
+  font-weight: 400;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .breadcrumb {
+    font-size: 12px;
+    padding: 10px 6%;
+  }
+  .breadcrumb-container span::before {
+    margin: 0 3px;
+  }
+}
+
+/* ============================= */
+/* QUANTITÉ */
+/* ============================= */
+.quantity-wrapper {
+  margin-bottom: 30px;
+}
+
+.quantity-wrapper label {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.quantity-wrapper input {
+  width: 90px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  margin-top: 6px;
+}
+
+/* ============================= */
+/* AVIS CLIENTS */
+/* ============================= */
+.reviews {
+  margin-top: 10px;
+  margin-bottom: 30px;
+  border-top: 1px solid #eee;
+  padding-top: 35px;
+}
+
+.reviews h3 {
+  font-size: 18px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.average-rating {
+  margin-top: 12px;
+}
+
+.average-rating i {
+  color: #000;
+  font-size: 18px;
+}
+
+/* ============================= */
+/* FORMULAIRE AVIS */
+/* ============================= */
+.review-form {
+  max-width: 780px;
+  margin: 120px auto;
+  padding: 60px;
+  background: #fff;
+  border: 1px solid #eee;
+}
+
+.review-form h3 {
+  font-size: 22px;
+  margin-bottom: 40px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.review-form label {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.review-form input,
+.review-form textarea {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #000;
+  padding: 12px 0;
+  margin-bottom: 35px;
+  font-size: 14px;
+}
+
+.review-form textarea {
+  resize: none;
+}
+
+.review-form button {
+  margin-top: 20px;
+  background: #000;
+  color: #fff;
+  padding: 16px;
+  width: 100%;
+  letter-spacing: 0.15em;
+}
+
+/* ============================= */
+/* ÉTOILES */
+/* ============================= */
+.stars i {
+  font-size: 20px;
+  cursor: pointer;
+  color: #000;
+}
+
+/* ============================= */
+/* PRODUITS SIMILAIRES */
+/* ============================= */
+.similar-products {
+  border-top: 1px solid #eee;
+  padding: 100px 40px;
+}
+
+.similar-products h2 {
+  text-align: center;
+  font-size: 28px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 60px;
+}
+
+.similar-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 40px;
+}
+
+.similar-item {
+  text-align: center;
+}
+.similar-item img {
+  width: 100%;
+  height: 300px;
+  object-fit: contain;
+  background: #ffff;
+  margin-bottom: 20px;
+}
+
+
+.similar-item h4 {
+  font-size: 14px;
+  letter-spacing: 0.1em;
+}
+
+.similar-item .price {
+  font-size: 15px;
+}
+/* ============================= */
+/* PARTAGE SOCIAL — VERSION LUXE */
+/* ============================= */
+.share-product {
+  display: flex;
+  align-items: center;              /* alignement vertical parfait */
+  justify-content: flex-end;
+  gap: 16px;                        /* espacement plus respirant */
+  margin: 48px 0 32px;
+}
+
+.share-product span {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #555;
+  margin-right: 6px;
+}
+
+.share-btn {
+  width: 40px;                      /* cercle légèrement plus grand */
+  height: 40px;
+  background: transparent;
+  border: 1px solid #000;           /* contour couture */
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.35s ease;
+}
+
+.share-btn i {
+  font-size: 15px;                  /* taille optiquement centrée */
+  line-height: 1;
+  display: block;
+  transform: translateY(0.9px);       /* ajustement optique */
+}
+
+/* ============================= */
+/* HOVER LUXE */
+/* ============================= */
+.share-btn:hover {
+  background: #000;
+  color: #fff;
+}
+
+/* ============================= */
+/* MOBILE */
+/* ============================= */
+@media (max-width: 768px) {
+  .share-product {
+    justify-content: center;
+    margin-top: 30px;
+  }
+}
+
+
+/* ============================= */
+/* RESPONSIVE */
+/* ============================= */
+@media (max-width: 992px) {
+  .product-page {
+    grid-template-columns: 1fr;
+  }
+
+  .product-left {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .product-main {
+    grid-template-columns: 1fr;
+    gap: 50px;
+  }
+
+  .product-right h1 {
+    font-size: 32px;
+  }
+}

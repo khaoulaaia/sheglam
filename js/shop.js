@@ -1,134 +1,332 @@
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("✅ shop.js chargé");
+  console.log("✅ shop.js chargé (VERSION FINALE PRO)");
 
-  // --- Initialisation globale ---
-  window.cart = JSON.parse(localStorage.getItem('cart')) || {};
-  window.wishlist = JSON.parse(localStorage.getItem('wishlist')) || {};
+  // ===============================
+  // ÉTAT GLOBAL
+  // ===============================
+  const cart = JSON.parse(localStorage.getItem("cart")) || {};
+  const wishlist = JSON.parse(localStorage.getItem("wishlist")) || {};
 
-  let selectedShade = null;
-  let selectedProduct = null;
+  const saveCart = () => localStorage.setItem("cart", JSON.stringify(cart));
+  const saveWishlist = () => localStorage.setItem("wishlist", JSON.stringify(wishlist));
 
-  function addToCart(name, price, image_url, shade = null) {
-  const key = shade ? `${name} - ${shade}` : name;
-  if (window.cart[key]) {
-    window.cart[key].quantity += 1;
+  // ===============================
+  // OUTILS
+  // ===============================
+  const buildKey = (productId, shade) =>
+    shade ? `${productId}__${shade}` : `${productId}`;
+
+  const getProductData = el => {
+  if (!el) return null;
+
+  let image = el.dataset.image_url;
+  if (!image) return null;
+
+  // 🔥 NORMALISATION ABSOLUE
+  if (!image.startsWith("http")) {
+    image = "/sheglam/images/" + image.split("/").pop();
+  }
+
+  return {
+    productId: el.dataset.productId,
+    name: el.dataset.name,
+    price: parseFloat(el.dataset.price.replace(",", ".")),
+    image
+  };
+};
+
+
+  // ===============================
+  // PANIER – AJOUT
+  // ===============================
+  function addToCart({ productId, name, price, image, quantity = 1, shade = null }) {
+  const key = buildKey(productId, shade);
+
+  if (cart[key]) {
+    cart[key].quantity += quantity;
   } else {
-    window.cart[key] = { name, price, image_url, shade, quantity: 1 };
+    cart[key] = {
+      productId,
+      name,
+      price,
+      image_url: image,
+      shade,
+      quantity
+    };
   }
-  localStorage.setItem('cart', JSON.stringify(window.cart));
-  if (typeof window.renderCart === "function") window.renderCart();
-  if (typeof window.openCart === "function") window.openCart();
+
+saveCart();
+window.openCart?.();   // ouvre la sidebar (crée le DOM)
+window.renderCart();   // maintenant #cartItems existe
 }
 
-function addToWishlist(name, price, image_url) {
-  if (!window.wishlist[name]) {
-    window.wishlist[name] = { name, price, image_url };
+  // ===============================
+  // RENDU PANIER (SIDEBAR)
+  // ===============================
+window.renderCart = () => {
+  const cartItemsEl = document.getElementById("cartItems");
+  if (!cartItemsEl) return;
+
+  cartItemsEl.innerHTML = "";
+
+  if (!Object.keys(cart).length) {
+    cartItemsEl.innerHTML = "<p>Votre panier est vide.</p>";
+    return;
   }
-  localStorage.setItem('wishlist', JSON.stringify(window.wishlist));
-  if (typeof window.renderWishlist === "function") window.renderWishlist();
-}
 
+  Object.entries(cart).forEach(([key, item]) => {
+    let imageUrl = item.image_url;
+    if (!imageUrl.startsWith("http")) {
+      imageUrl = "/sheglam/images/" + imageUrl.split("/").pop();
+    }
 
-  // --- Boutons "Ajouter au panier" (sans teinte) ---
-  document.body.addEventListener("click", e => {
-    const btn = e.target.closest(".add-to-cart");
-    if (!btn) return;
+    const div = document.createElement("div");
+    div.className = "cart-item";
+    div.innerHTML = `
+      <img src="${imageUrl}" alt="${item.name}" class="cart-item-img">
+      <div class="cart-item-info">
+        <h4>${item.name}${item.shade ? " - " + item.shade : ""}</h4>
+        <p>€${item.price.toFixed(2)}</p>
+        <div class="quantity-controls">
+          <button class="decrease">-</button>
+          <span class="quantity">${item.quantity}</span>
+          <button class="increase">+</button>
+          <button class="remove-item">Supprimer</button>
+        </div>
+      </div>
+    `;
 
-    const { name, price, image_url} = btn.dataset;
-    addToCart(name, parseFloat(price), image_url);
+    div.querySelector(".increase").onclick = () => {
+      item.quantity++;
+      saveCart();
+      window.renderCart();
+    };
+
+    div.querySelector(".decrease").onclick = () => {
+      item.quantity--;
+      if (item.quantity <= 0) delete cart[key];
+      saveCart();
+      window.renderCart();
+    };
+
+    div.querySelector(".remove-item").onclick = () => {
+      delete cart[key];
+      saveCart();
+      window.renderCart();
+    };
+
+    cartItemsEl.appendChild(div);
   });
+};
 
-  // --- Boutons "Ajouter à la wishlist" ---
-  document.body.addEventListener("click", e => {
-    const btn = e.target.closest(".add-to-wishlist");
-    if (!btn) return;
+  // ===============================
+  // MODAL TEINTES
+  // ===============================
+  // ===============================
+// MODAL PRODUIT – TEINTES + QUANTITÉ
+// ===============================
+const modal = document.getElementById("productModal");
 
-    const { name, price, image_url} = btn.dataset;
-    addToWishlist(name, parseFloat(price), image_url);
-  });
+if (modal) {
+  const productNameEl = modal.querySelector("#productName");
+  const productPriceEl = modal.querySelector("#productPrice");
+  const productImageEl = modal.querySelector("#productMainImage");
+  const shadeOptionsEl = modal.querySelector("#shadeOptions");
+  const addFromModalBtn = modal.querySelector("#addToCartFromModal");
+  const closeModalBtn = modal.querySelector(".close-product-modal");
+  const qtyEl = modal.querySelector("#quantity");
+  const increaseQtyBtn = modal.querySelector("#increaseQty");
+  const decreaseQtyBtn = modal.querySelector("#decreaseQty");
 
-  // --- Gestion du modal de teinte ---
-  const shadeModal = document.getElementById("shadeModal");
-  const shadeProductImage = document.getElementById("shadeProductImage");
-  const shadeProductName = document.getElementById("shadeProductName");
-  const shadeProductPrice = document.getElementById("shadeProductPrice");
-  const shadeOptionsContainer = document.getElementById("shade-options-container");
-  const confirmShadeBtn = document.getElementById("confirmShadeBtn");
-  const closeModalBtn = shadeModal?.querySelector(".close-modal");
+  let currentProduct = null;
+  let selectedShade = null;
+  let currentQuantity = 1;
 
-  // Ouvrir le modal
-  document.body.addEventListener("click", async e => {
-    const button = e.target.closest(".choose-shade-btn");
-    if (!button) return;
+  const updateQuantityUI = () => {
+    qtyEl.textContent = currentQuantity;
+  };
 
-    const card = button.closest(".product-card");
-    const productId = button.dataset.productId;
-    const productName = card.querySelector("h3").textContent;
-    const productPrice = card.querySelector(".price").textContent;
-    const productImage = card.querySelector("img").src;
+  const openModal = () => {
+    currentQuantity = 1;
+    updateQuantityUI();
+    modal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  };
 
-    selectedProduct = productName;
+  const closeModal = () => {
+    modal.style.display = "none";
+    document.body.style.overflow = "auto";
     selectedShade = null;
+    currentProduct = null;
+    currentQuantity = 1;
+  };
 
-    shadeProductImage.src = productImage;
-    shadeProductName.textContent = productName;
-    shadeProductPrice.textContent = productPrice;
-    shadeOptionsContainer.innerHTML = "<p>Chargement...</p>";
+  closeModalBtn?.addEventListener("click", closeModal);
+  modal.addEventListener("click", e => e.target === modal && closeModal());
+
+  // ===============================
+  // GESTION QUANTITÉ
+  // ===============================
+  increaseQtyBtn?.addEventListener("click", () => {
+    currentQuantity++;
+    updateQuantityUI();
+  });
+
+  decreaseQtyBtn?.addEventListener("click", () => {
+    if (currentQuantity > 1) {
+      currentQuantity--;
+      updateQuantityUI();
+    }
+  });
+
+  // ===============================
+  // AJOUT AU PANIER MODAL
+  // ===============================
+  addFromModalBtn.addEventListener("click", () => {
+    if (!selectedShade) {
+      alert("Veuillez choisir une teinte.");
+      return;
+    }
+    if (!currentProduct) return;
+
+    addToCart({
+      ...currentProduct,
+      quantity: currentQuantity,
+      shade: selectedShade
+    });
+
+    closeModal();
+  });
+
+  // ===============================
+  // OUVERTURE MODAL TEINTES
+  // ===============================
+  async function openShadeModal(button) {
+    const data = getProductData(button);
+    if (!data) return;
+
+    currentProduct = data;
+    selectedShade = null;
+    currentQuantity = 1;
+    updateQuantityUI();
+
+    productNameEl.textContent = data.name;
+    productPriceEl.textContent = `€${data.price.toFixed(2)}`;
+    productImageEl.src = data.image;
+    shadeOptionsEl.innerHTML = "<p>Chargement...</p>";
 
     try {
-      const res = await fetch(`includes/get_shades.php?product_id=${productId}`);
+      const res = await fetch(`/sheglam/includes/get_shades.php?product_id=${button.dataset.productId}`);
       const shades = await res.json();
 
-      shadeOptionsContainer.innerHTML = "";
+      shadeOptionsEl.innerHTML = "";
 
-      if (shades.length === 0) {
-        shadeOptionsContainer.innerHTML = "<p>Aucune teinte disponible.</p>";
+      if (!shades.length) {
+        shadeOptionsEl.innerHTML = "<p>Aucune teinte disponible.</p>";
       } else {
-        shades.forEach(shade => {
-          const span = document.createElement("span");
-          span.classList.add("shade-option");
-          span.textContent = shade.nom_teinte;
-          span.addEventListener("click", () => {
-            document.querySelectorAll(".shade-option").forEach(s => s.classList.remove("selected"));
-            span.classList.add("selected");
-            selectedShade = shade.nom_teinte;
-          });
-          shadeOptionsContainer.appendChild(span);
+        shades.forEach(s => {
+          const div = document.createElement("div");
+          div.className = "shade-option";
+          div.innerHTML = `<span style="background:${s.code_couleur}"></span>`;
+
+          div.onclick = () => {
+            shadeOptionsEl.querySelectorAll(".shade-option").forEach(o => o.classList.remove("selected"));
+            div.classList.add("selected");
+            selectedShade = s.nom_teinte;
+          };
+
+          shadeOptionsEl.appendChild(div);
         });
       }
 
-      shadeModal.style.display = "flex";
-      shadeModal.setAttribute("aria-hidden", "false");
+      openModal();
     } catch (err) {
-      console.error("Erreur de chargement des teintes :", err);
-      shadeOptionsContainer.innerHTML = "<p>Erreur de chargement des teintes.</p>";
+      console.error("Erreur teintes", err);
+      shadeOptionsEl.innerHTML = "<p>Erreur de chargement.</p>";
+    }
+  }
+
+  document.body.addEventListener("click", e => {
+    const shadeBtn = e.target.closest(".choose-shade-btn");
+    if (shadeBtn) {
+      e.preventDefault();
+      openShadeModal(shadeBtn);
     }
   });
+}
 
-  // Fermer le modal
-  closeModalBtn?.addEventListener("click", () => {
-    shadeModal.style.display = "none";
-    shadeModal.setAttribute("aria-hidden", "true");
+
+  // ===============================
+  // AJOUT PANIER (SANS TEINTE)
+  // ===============================
+  document.body.addEventListener("click", e => {
+    const addBtn = e.target.closest(".add-to-cart");
+    if (!addBtn) return;
+
+    e.preventDefault();
+
+    const data = getProductData(addBtn);
+    if (!data) return;
+
+    const wrapper = addBtn.closest(".add-to-cart-wrapper");
+    const qtyInput = wrapper?.querySelector("input[name='quantity']");
+    const quantity = qtyInput ? Math.max(1, parseInt(qtyInput.value)) : 1;
+
+    addToCart({ ...data, quantity });
+    if (qtyInput) qtyInput.value = 1;
   });
-  shadeModal?.addEventListener("click", e => {
-    if (e.target === shadeModal) {
-      shadeModal.style.display = "none";
-      shadeModal.setAttribute("aria-hidden", "true");
-    }
-  });
 
-  // Ajouter au panier depuis le modal
-  confirmShadeBtn?.addEventListener("click", () => {
-    if (!selectedShade) {
-      alert("Veuillez choisir une teinte avant d’ajouter au panier !");
-      return;
-    }
-
-    const price = parseFloat(shadeProductPrice.textContent.replace(/[^\d,.-]/g, '').replace(',', '.')) || 0;
-    const image = shadeProductImage.src;
-    addToCart(selectedProduct, price, image, selectedShade);
-
-    shadeModal.style.display = "none";
-    shadeModal.setAttribute("aria-hidden", "true");
-  });
+  // ===============================
+  // INIT
+  // ===============================
+  window.renderCart();
 });
+// ===============================
+// FILTRES & TRI
+// ===============================
+const cards = [...document.querySelectorAll(".product-card")];
+const grid = document.querySelector(".products-grid");
+
+const sortPrice = document.getElementById("sortPrice");
+const filterSale = document.getElementById("filterSale");
+const filterBrand = document.getElementById("filterBrand");
+
+// REMPLIR LES MARQUES
+const brands = [...new Set(cards.map(c => c.dataset.brand).filter(Boolean))];
+brands.forEach(b => {
+  const opt = document.createElement("option");
+  opt.value = b;
+  opt.textContent = b;
+  filterBrand.appendChild(opt);
+});
+
+function applyFilters() {
+  let visibleCards = cards.filter(card => {
+    const price = parseFloat(card.dataset.price);
+    const brand = card.dataset.brand;
+    const isSale = card.dataset.sale === "1";
+
+    if (filterSale.checked && !isSale) return false;
+    if (filterBrand.value && filterBrand.value !== brand) return false;
+
+    return true;
+  });
+
+  // TRI PRIX
+  if (sortPrice.value) {
+    visibleCards.sort((a, b) => {
+      const pa = parseFloat(a.dataset.price);
+      const pb = parseFloat(b.dataset.price);
+      return sortPrice.value === "asc" ? pa - pb : pb - pa;
+    });
+  }
+
+  // RENDER
+  grid.innerHTML = "";
+  visibleCards.forEach(card => grid.appendChild(card));
+}
+
+// EVENTS
+[sortPrice, filterSale, filterBrand].forEach(el =>
+  el.addEventListener("change", applyFilters)
+);

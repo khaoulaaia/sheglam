@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const itemEl = document.createElement("div");
       itemEl.className = "wishlist-item-page";
       itemEl.innerHTML = `
-        <img src="${item.image_url}" alt="${item.name}" class="wishlist-img">
+        <img src="${item.image}" alt="${item.name}" class="wishlist-img">
         <div class="wishlist-info">
           <h4>${item.name}</h4>
           <p>€${item.price.toFixed(2)}</p>

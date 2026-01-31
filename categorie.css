@@ -1,0 +1,741 @@
+/* ============================= */
+/* RESET & BASE */
+/* ============================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Didot", "Playfair Display", "Times New Roman", serif;
+  background-color: #ffffff;
+  color: #111;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================= */
+/* HEADER */
+/* ============================= */
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 22px 6%;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(8px);
+  z-index: 10;
+}
+
+/* TEXTE HEADER (logo + liens) */
+.header .logo,
+.header .navbar a {
+  color: #111;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ICÔNES HEADER */
+.icons i {
+  color: #111;
+  font-weight: normal;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* ============================= */
+/* FONT AWESOME – FIX DEFINITIF */
+/* ============================= */
+.fa-solid {
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 900 !important;
+}
+
+.fa-brands {
+  font-family: "Font Awesome 6 Brands" !important;
+}
+.fa-regular {
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 400 !important; /* outline */
+}
+
+.fa-solid {
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 900 !important; /* plein */
+}
+.icon-contour {
+  font-size: 18px;
+  color: white;             /* couleur intérieure */
+  -webkit-text-stroke: 1px #111; /* contour noir */
+  text-stroke: 1px #111;         /* contour noir */
+}
+.icons {
+  display: flex;
+  gap: 16px; /* espace entre les icônes */
+  align-items: center; /* centre verticalement */
+}
+
+.icons a,
+.icons button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* ============================= */
+/* SIDEBAR FILTRES */
+/* ============================= */
+.filter-sidebar {
+  width: 280px;
+  padding: 40px 20px;
+  background: #fff;
+  border-right: 1px solid #eee;
+  font-family: "Didot", "Playfair Display", serif;
+  position: fixed;
+  top: 90px; /* header height */
+  bottom: 0;
+  overflow-y: auto;
+}
+
+.filter-sidebar h3 {
+  font-size: 16px;
+  letter-spacing: 0.1em;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.filter-group {
+  margin-bottom: 30px;
+}
+
+.filter-group label,
+.filter-group span {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #111;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.filter-group select,
+.filter-group input[type="checkbox"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+/* ============================= */
+/* TOGGLE NOIR & BLANC */
+/* ============================= */
+.toggle-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.toggle-group span {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #111;
+}
+
+/* Switch container */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 22px;
+}
+
+/* Hide default checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Slider background */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #fff; /* fond blanc */
+  border: 1px solid #111; /* contour noir */
+  transition: 0.4s;
+  border-radius: 22px;
+}
+
+/* Circle */
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: -2.5px;
+  background-color: #111; /* curseur noir */
+  border: 1px solid #fff; /* contour blanc */
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+/* Toggle ON state */
+input:checked + .slider {
+  background-color: #111; /* fond noir */
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px);
+  background-color: #fff; /* curseur blanc */
+  border: 1px solid #111;
+}/* ============================= */
+/* Produits populaires raffinés */
+/* ============================= */
+
+.best-sellers h4 {
+  font-family: "Didot", "Playfair Display", serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  color: #111; /* noir */
+  padding-bottom: 8px;
+}
+
+.best-sellers ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* espace entre produits */
+}
+
+.best-sellers li {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  background-color: #fff; /* fond très clair */
+  border-radius: 6px; /* coins doux */
+  transition: all 0.3s ease;
+  /* border supprimé */
+}
+
+.best-sellers li:hover {
+  background-color: #f9f9f9; /* léger hover plus subtil */
+  transform: translateY(0); /* plus de translation si tu veux */
+}
+
+.best-sellers li img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #e6e6e6; /* garder un petit cadre subtil sur image */
+  transition: transform 0.3s ease;
+}
+
+.best-sellers li img:hover {
+  transform: scale(1.05);
+}
+
+.best-seller-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-family: "Didot", "Playfair Display", serif;
+}
+
+/* titre produit */
+.best-seller-info .name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #111;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+/* si le titre est un lien <a>, enlever style lien */
+.best-seller-info .name a {
+  color: #111;
+  text-decoration: none;
+  cursor: default;
+}
+
+.best-seller-info .price {
+  font-size: 12px;
+  font-weight: 600;
+  color: #111;
+}
+
+/* Supprime bordure / ligne du dernier produit */
+.best-sellers li:last-child {
+  border-bottom: none;
+}
+.best-sellers li a {
+  text-decoration: none; /* pas de soulignement */
+  color: inherit;        /* prend la couleur du parent (#111) */
+  display: flex;          /* conserver la mise en page */
+  gap: 12px;
+}
+
+/* ============================= */
+/* SECTION PRODUITS */
+/* ============================= */
+.products-section {
+  margin-left: 320px; /* sidebar width + padding */
+  padding: 120px 60px 60px;
+}
+
+.products-section h1 {
+  font-size: 36px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 40px;
+}
+
+/* Grille de produits */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 40px;
+}
+
+/* Carte produit */
+.product-card {
+  background: #fff;
+  border: 1px solid #eee;
+  padding: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+  text-align: center;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+}
+
+.product-card img {
+  width: 100%;
+  height: 300px;
+  object-fit: contain;
+  border: 1px solid #e6e6e6;
+  transition: all 0.35s ease;
+}
+
+.product-card img:hover {
+  transform: scale(1.05);
+  border-color: #000;
+}
+
+/* Infos produit */
+.product-info h3 {
+  font-size: 16px;
+  margin: 16px 0 12px;
+  letter-spacing: 0.08em;
+}
+
+.price {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.old-price {
+  font-size: 13px;
+  text-decoration: line-through;
+  color: #777;
+  margin-right: 8px;
+}
+
+/* Boutons */
+.add-to-cart,
+.choose-shade-btn {
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.35s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.add-to-cart:hover,
+.choose-shade-btn:hover {
+  background: #111;
+}
+
+/* Wishlist */
+.add-to-wishlist {
+  position: absolute;
+  top: 30px;
+  right: 35px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #111;
+  transition: all 0.3s ease;
+}
+
+.add-to-wishlist:hover {
+  color: #e60023; /* rouge subtil style luxe */
+}
+
+/* ============================= */
+/* FOOTER / PARTAGE SOCIAL */
+.share-product {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  margin: 32px 0;
+}
+
+.share-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #000;
+  border-radius: 50%;
+  background: transparent;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.35s ease;
+}
+
+.share-btn:hover {
+  background: #000;
+  color: #fff;
+}
+
+/* ============================= */
+/* RESPONSIVE */
+/* ============================= */
+@media (max-width: 992px) {
+  .filter-sidebar {
+    position: relative;
+    width: 100%;
+    border-right: none;
+    padding: 20px;
+  }
+
+  .products-section {
+    margin-left: 0;
+    padding: 140px 20px 60px;
+  }
+}
+
+@media (max-width: 768px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .product-card img {
+    height: auto;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .share-product {
+    justify-content: center;
+  }
+}
+/* ============================= */
+/* GRILLE DES PRODUITS */
+/* ============================= */
+.products-grid {
+  display: grid;
+  gap: 40px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.products-grid.cols-1 { grid-template-columns: 1fr; }
+.products-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.products-grid.cols-5 { grid-template-columns: repeat(5, 1fr); }
+
+/* Responsive */
+@media (max-width: 992px) {
+  .products-grid, 
+  .products-grid.cols-5, 
+  .products-grid.cols-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .products-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================= */
+/* BOUTONS DE VUE */
+/* ============================= */
+.view-toggle {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.view-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #111;
+  background: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+  padding: 3px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.view-btn.active,
+.view-btn:hover {
+  background: #111;
+}
+
+.view-btn span {
+  display: block;
+  background: #111;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+
+.view-btn[data-view="grid"] span {
+  width: 8px;
+  height: 8px;
+}
+
+.view-btn[data-view="list"] span {
+  width: 16px;
+  height: 2px;
+}
+
+.view-btn[data-view="list-detailed"] span {
+  width: 20px;
+  height: 2px;
+}
+
+.view-btn.active span {
+  background: #fff;
+}
+/* Conteneur des boutons aligné à droite */
+.view-toggle {
+  display: flex;
+  justify-content: flex-end; /* aligne tout à droite */
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap; /* pour le responsive si nécessaire */
+}
+
+/* Boutons de vue */
+.view-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #111;
+  background: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+  padding: 3px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.view-btn.active,
+.view-btn:hover {
+  background: #111;
+}
+
+.view-btn span {
+  display: block;
+  background: #111;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+
+.view-btn[data-view="grid"] span {
+  width: 8px;
+  height: 8px;
+}
+
+.view-btn[data-view="list"] span {
+  width: 16px;
+  height: 2px;
+}
+
+.view-btn[data-view="list-detailed"] span {
+  width: 20px;
+  height: 2px;
+}
+
+.view-btn.active span {
+  background: #fff;
+}
+
+/* Boutons colonnes */
+.cols-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cols-btn {
+  padding: 5px 10px;
+  border: 1px solid #111;
+  background: #fff;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.cols-btn.active,
+.cols-btn:hover {
+  background: #111;
+  color: #fff;
+}
+/* Grille de produits par défaut */
+.products-grid {
+  display: grid;
+  gap: 40px;
+  grid-template-columns: repeat(3, 1fr); /* 3 colonnes par défaut */
+}
+
+/* Classes pour modifier le nombre de colonnes */
+.products-grid.cols-1 { grid-template-columns: 1fr; }
+.products-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.products-grid.cols-5 { grid-template-columns: repeat(5, 1fr); }
+
+/* Responsive */
+@media (max-width: 992px) {
+  .products-grid,
+  .products-grid.cols-5,
+  .products-grid.cols-3 {
+    grid-template-columns: repeat(2, 1fr); /* 2 colonnes tablette */
+  }
+}
+
+@media (max-width: 768px) {
+  .products-grid {
+    grid-template-columns: 1fr !important; /* 1 colonne mobile */
+  }
+}
+/* Liste compacte */
+.products-grid.products-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.products-grid.products-list .product-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+  text-align: left;
+}
+
+.products-grid.products-list .product-card img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+}
+
+/* Liste détaillée */
+.products-grid.products-list-detailed {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.products-grid.products-list-detailed .product-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+  border: 1px solid #eee;
+  background-color: #fafafa;
+  text-align: left;
+}
+
+.products-grid.products-list-detailed .product-card img {
+  width: 100%;
+  height: auto;
+}
+/* ============================= */
+/* BREADCRUMB – STYLE LUXE */
+/* ============================= */
+.breadcrumb {
+  font-family: "Didot", "Playfair Display", "Times New Roman", serif;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: #555;       /* gris subtil */
+  margin-bottom: 25px;
+  text-transform: uppercase;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.breadcrumb a {
+  color: #111;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.breadcrumb a:hover {
+  color: #000;       /* foncé au survol */
+}
+
+.breadcrumb .separator {
+  color: #aaa;       /* séparateur discret */
+}
+
+.breadcrumb .current {
+  font-weight: 500;
+  color: #111;       /* couleur principale */
+}
+.product-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.product-card-link:hover .product-card {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+}

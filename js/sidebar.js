@@ -11,10 +11,10 @@ document.addEventListener("DOMContentLoaded", () => {
   window.cart = JSON.parse(localStorage.getItem('cart')) || {};
   window.wishlist = JSON.parse(localStorage.getItem('wishlist')) || {};
 
-  function saveCart() { localStorage.setItem('cart', JSON.stringify(window.cart)); }
-  function saveWishlist() { localStorage.setItem('wishlist', JSON.stringify(window.wishlist)); }
+  const saveCart = () => localStorage.setItem('cart', JSON.stringify(window.cart));
+  const saveWishlist = () => localStorage.setItem('wishlist', JSON.stringify(window.wishlist));
 
-  // --- Fonctions d'ouverture ---
+  // --- Fonctions ouverture ---
   window.openCart = () => { sidebar.classList.add('active'); overlay.classList.add('active'); };
   window.openWishlist = () => { wishlistSidebar.classList.add('active'); overlay.classList.add('active'); };
 
@@ -30,35 +30,38 @@ document.addEventListener("DOMContentLoaded", () => {
       cartItems.innerHTML = '<p>Votre panier est vide.</p>';
       return;
     }
-    for (const key in window.cart) {
-  const item = window.cart[key];
-  if (!item || !item.image_url) {
-    console.warn("⚠️ Élément panier invalide supprimé :", key, item);
-    delete window.cart[key]; // on nettoie les entrées corrompues
-    continue; // on passe à l'item suivant
-  }
 
-  const div = document.createElement('div');
-  div.className = 'cart-item';
-  div.innerHTML = `
-    <img src="${item.image_url || '/images/placeholder.jpg'}" alt="${item.name}" class="cart-item-img">
-    <div class="cart-item-info">
-      <h4>${item.name}${item.shade ? ' - ' + item.shade : ''}</h4>
-      <p>€${parseFloat(item.price).toFixed(2)}</p>
-      <div class="quantity-controls">
-        <button class="decrease">-</button>
-        <span class="quantity">${item.quantity}</span>
-        <button class="increase">+</button>
-        <button class="remove-item">Supprimer</button>
-      </div>
-    </div>
-  `;
+    Object.entries(window.cart).forEach(([key, item]) => {
+      if (!item || !item.image_url) {
+        delete window.cart[key]; 
+        return;
+      }
+
+      let image_url = item.image_url;
+      if (!image_url.startsWith('http')) image_url = '/sheglam/images/' + image_url.split('/').pop();
+
+      const div = document.createElement('div');
+      div.className = 'cart-item';
+      div.innerHTML = `
+        <img src="${image_url}" alt="${item.name}" class="cart-item-img">
+        <div class="cart-item-info">
+          <h4>${item.name}${item.shade ? ' - ' + item.shade : ''}</h4>
+          <p>€${parseFloat(item.price).toFixed(2)}</p>
+          <div class="quantity-controls">
+            <button class="decrease">-</button>
+            <span class="quantity">${item.quantity}</span>
+            <button class="increase">+</button>
+            <button class="remove-item">Supprimer</button>
+          </div>
+        </div>
+      `;
 
       div.querySelector('.increase').addEventListener('click', () => { item.quantity += 1; saveCart(); renderCart(); });
       div.querySelector('.decrease').addEventListener('click', () => { item.quantity -= 1; if(item.quantity<=0) delete window.cart[key]; saveCart(); renderCart(); });
       div.querySelector('.remove-item').addEventListener('click', () => { delete window.cart[key]; saveCart(); renderCart(); });
+
       cartItems.appendChild(div);
-    }
+    });
   };
 
   // --- Rendu wishlist ---
@@ -68,36 +71,45 @@ document.addEventListener("DOMContentLoaded", () => {
       wishlistItems.innerHTML = '<p>Votre liste de souhaits est vide.</p>';
       return;
     }
-    for (const key in window.wishlist) {
-      const item = window.wishlist[key];
+
+    Object.entries(window.wishlist).forEach(([key, item]) => {
+      if (!item || !item.image_url) return;
+
+      let image_url = item.image_url;
+      if (!image_url.startsWith('http')) image_url = '/sheglam/images/' + image_url.split('/').pop();
+
       const div = document.createElement('div');
       div.className = 'wishlist-item';
       div.innerHTML = `
-        <img src="${item.image_url}" alt="${item.name}" class="wishlist-item-img">
+        <img src="${image_url}" alt="${item.name}" class="wishlist-item-img">
         <div class="wishlist-item-info">
           <h4>${item.name}</h4>
           <p>€${parseFloat(item.price).toFixed(2)}</p>
           <button class="remove-wishlist">Supprimer</button>
         </div>
       `;
+
       div.querySelector('.remove-wishlist').addEventListener('click', () => { delete window.wishlist[key]; saveWishlist(); renderWishlist(); });
       wishlistItems.appendChild(div);
-    }
+    });
   };
 
-  // --- Ajouter au panier (depuis tous les boutons) ---
+  // --- Ajouter au panier ---
   document.body.addEventListener('click', e => {
     const btn = e.target.closest('.add-to-cart');
     if (!btn) return;
 
     const name = btn.dataset.name;
     const price = parseFloat(btn.dataset.price?.replace(',', '.')) || 0;
-    const image_url = btn.dataset.image_url || '/images/placeholder.jpg';
+    let image_url = btn.dataset.image || '';
+    if (!image_url) return;
+    if (!image_url.startsWith('http')) image_url = '/sheglam/images/' + image_url.split('/').pop();
+
     const shade = btn.dataset.shade || null;
     const key = shade ? `${name} - ${shade}` : name;
 
     if (window.cart[key]) window.cart[key].quantity += 1;
-    else window.cart[key] = { name, price, image_url, quantity: 1, shade };
+    else window.cart[key] = { name, price, image_url, shade, quantity: 1 };
 
     saveCart();
     renderCart();
@@ -111,7 +123,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const name = btn.dataset.name;
     const price = parseFloat(btn.dataset.price?.replace(',', '.')) || 0;
-    const image_url = btn.dataset.image_url || '/images/placeholder.jpg';
+    let image_url = btn.dataset.image || '';
+    if (!image_url) return;
+    if (!image_url.startsWith('http')) image_url = '/sheglam/images/' + image_url.split('/').pop();
 
     if (!window.wishlist[name]) window.wishlist[name] = { name, price, image_url };
     saveWishlist();
