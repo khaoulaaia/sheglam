@@ -22,7 +22,7 @@ h1 { font-family: 'Playfair Display', serif; text-align:center; margin:30px 0; f
 <body>
 <h1>Votre Panier</h1>
 <div id="cartItems"></div>
-<div id="cartTotal">€0.00</div>
+<div id="cartTotal">DA0.00</div>
 
 <script>
 // ======= Panier =======
@@ -33,7 +33,7 @@ function saveCart() { localStorage.setItem("cart", JSON.stringify(cart)); }
 function updateCartTotal() {
     let total = 0;
     Object.values(cart).forEach(item => total += item.price * item.quantity);
-    document.getElementById("cartTotal").textContent = `€${total.toFixed(2)}`;
+    document.getElementById("cartTotal").textContent = `DA${total.toFixed(2)}`;
 }
 
 function renderCart() {
@@ -50,7 +50,7 @@ function renderCart() {
             <img src="${img}" alt="${item.name}" class="cart-item-img">
             <div class="cart-item-info">
                 <h4>${item.name}${item.shade? " - "+item.shade : ""}</h4>
-                <div class="cart-item-price">€${item.price.toFixed(2)}</div>
+                <div class="cart-item-price">DA${item.price.toFixed(2)}</div>
                 <div class="quantity-controls">
                     <button class="decrease">-</button>
                     <span class="quantity">${item.quantity}</span>

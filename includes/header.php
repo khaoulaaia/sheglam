@@ -14,7 +14,7 @@
 
   <nav class="navbar" id="navbar">
     <a href="/">Accueil</a>
-    <a href="/sheglam/products">Boutique</a>
+    <a href="/sheglam/products">Marques</a>
     <a href="#">Nouveautés</a>
     <a href="#">Contact</a>
   </nav>
@@ -587,7 +587,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="search-product">
               <img src="${p.image_url}" alt="${p.name}">
               <p>${p.name}</p>
-              <strong>€${parseFloat(p.price).toFixed(2)}</strong>
+              <strong>DA${parseFloat(p.price).toFixed(2)}</strong>
             </div>
           `).join("")
           : "<p>Aucun produit trouvé.</p>";

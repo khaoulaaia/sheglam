@@ -143,7 +143,7 @@ include_once 'includes/db.php';
           </h3>
 
           <p class="price">
-            €<?= number_format($product['price'], 2, ',', ' ') ?>
+            DA<?= number_format($product['price'], 2, ',', ' ') ?>
           </p>
 
           <?php if ($hasShades): ?>
@@ -246,6 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 <script src="/sheglam/js/shop.js?v=<?= time(); ?>"></script>
+<?php include 'includes/footer.php'; ?>
 
 </body>
 </html>

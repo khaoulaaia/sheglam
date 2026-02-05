@@ -27,6 +27,7 @@ if ($categorie === 'Tous') {
 
 <?php include 'includes/sidebar.php'; ?>
 <?php include 'includes/header.php'; ?>
+<div class="page-layout">
 
 <aside class="filter-sidebar" id="filterSidebar">
   <h3>Filtres</h3>
@@ -74,7 +75,7 @@ if ($categorie === 'Tous') {
         <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($item['name']) ?>">
         <div class="best-seller-info">
           <span class="name"><?= htmlspecialchars($item['name']) ?></span>
-          <span class="price">€<?= number_format($item['price'], 2, ',', ' ') ?></span>
+          <span class="price">DA<?= number_format($item['price'], 2, ',', ' ') ?></span>
         </div>
       </a>
     </li>
@@ -160,13 +161,13 @@ if ($categorie === 'Tous') {
             <p class="price">
                 <?php if (!empty($product['old_price']) && $product['old_price'] > $product['price']): ?>
                     <span class="old-price">
-                        €<?= number_format($product['old_price'], 2, ',', ' ') ?>
+                        DA<?= number_format($product['old_price'], 2, ',', ' ') ?>
                     </span>
                     <span class="sale-price">
-                        €<?= number_format($product['price'], 2, ',', ' ') ?>
+                        DA<?= number_format($product['price'], 2, ',', ' ') ?>
                     </span>
                 <?php else: ?>
-                    €<?= number_format($product['price'], 2, ',', ' ') ?>
+                    DA<?= number_format($product['price'], 2, ',', ' ') ?>
                 <?php endif; ?>
             </p>
 
@@ -197,6 +198,7 @@ if ($categorie === 'Tous') {
 
 <?php endwhile; ?>
 
+</div>
 </div>
 
 </section>
@@ -268,6 +270,8 @@ document.addEventListener("click", e => {
 </script>
 
 <!-- Modal teintes -->
+ <?php include 'includes/footer.php'; ?>
+
 <?php include 'includes/product_modal.php'; ?>
 
 <script src="/sheglam/js/shop.js?v=<?= time(); ?>"></script>

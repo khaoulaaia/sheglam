@@ -10,7 +10,7 @@
     <div class="sidebar-footer">
       <div class="cart-total">
     <span>Total</span>
-    <strong id="cartTotal">€0.00</strong>
+    <strong id="cartTotal">DA0.00</strong>
   </div>
         <button class="btn checkout-btn">Passer à la caisse</button>
     </div>
@@ -32,8 +32,6 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  console.log("✅ Sidebar panier/wishlist chargée");
-
   const sidebar = document.getElementById('sidebar');
   const wishlistSidebar = document.getElementById('wishlistSidebar');
   const overlay = document.getElementById('sidebarOverlay');
@@ -90,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function() {
         <img src="${imageSrc}" alt="${item.name}" class="cart-item-img">
         <div class="cart-item-info">
           <h4>${item.name}${item.shade ? ' - ' + item.shade : ''}</h4>
-          <p>€${price.toFixed(2)}</p>
+          <p>DA${price.toFixed(2)}</p>
           <div class="quantity-controls">
             <button class="decrease">-</button>
             <span class="quantity">${qty}</span>
@@ -138,13 +136,16 @@ document.addEventListener("DOMContentLoaded", function() {
       const itemHTML = document.createElement('div');
       itemHTML.classList.add('wishlist-item');
       itemHTML.innerHTML = `
-        <img src="${imageSrc}" alt="${item.name}" class="wishlist-item-img">
-        <div class="wishlist-item-info">
-          <h4>${item.name}</h4>
-          <p>€${price.toFixed(2)}</p>
-          <button class="remove-wishlist">x</button>
-        </div>
-      `;
+  <img src="${imageSrc}" alt="${item.name}" class="wishlist-item-img">
+  <div class="wishlist-item-info">
+    <h4>${item.name}</h4>
+    <div class="wishlist-meta">
+      <p>DA${price.toFixed(2)}</p>
+      <button class="remove-wishlist">x</button>
+    </div>
+  </div>
+`;
+
       itemHTML.querySelector('.remove-wishlist').addEventListener('click', () => {
         delete window.wishlist[key];
         saveWishlist(); renderWishlist();
@@ -440,5 +441,34 @@ document.addEventListener("DOMContentLoaded", function() {
   font-size: 16px;
 }
 
+/* Wishlist meta row */
+.wishlist-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Price */
+.wishlist-meta p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Remove button */
+.remove-wishlist {
+  background: none;
+  border: none;
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  opacity: .6;
+  transition: opacity .25s ease;
+}
+
+.remove-wishlist:hover {
+  opacity: 1;
+}
 
 </style>

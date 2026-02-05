@@ -139,7 +139,7 @@ if ($reviews) {
 </div>
 <p class="price">
     <?php if (!empty($product['old_price']) && $product['old_price'] > $product['price']): ?>
-        <span class="old-price">€<?= number_format($product['old_price'], 2, ',', ' ') ?></span>
+        <span class="old-price">DA<?= number_format($product['old_price'], 2, ',', ' ') ?></span>
     <?php endif; ?>
     €<?= number_format($product['price'], 2, ',', ' ') ?>
 </p>
@@ -254,6 +254,7 @@ if ($reviews) {
 <!-- Modal teintes -->
 <?php include 'includes/product_modal.php'; ?>
 <script src="/sheglam/js/shop.js?v=<?= time(); ?>"></script>
+<?php include 'includes/footer.php'; ?>
 
 
 <script>
@@ -280,7 +281,7 @@ document.querySelectorAll(".share-btn:not(.native)").forEach(btn => {
     if (!network) return;
 
     const productName = "<?= addslashes($product['name']) ?>";
-    const productPrice = "<?= number_format($product['price'], 2, ',', ' ') ?> €";
+    const productPrice = "<?= number_format($product['price'], 2, ',', ' ') ?> DA";
     const url = encodeURIComponent(window.location.href);
 
     const message = encodeURIComponent(

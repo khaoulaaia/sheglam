@@ -94,12 +94,20 @@ body {
   padding: 40px 20px;
   background: #fff;
   border-right: 1px solid #eee;
-  font-family: "Didot", "Playfair Display", serif;
-  position: fixed;
-  top: 90px; /* header height */
-  bottom: 0;
+
+  position: sticky;
+  top: 90px;
+
+  height: fit-content;
+  max-height: calc(100vh - 90px);
   overflow-y: auto;
 }
+.page-layout {
+  top: 90px;
+  display: flex;
+  align-items: flex-start;
+}
+
 
 .filter-sidebar h3 {
   font-size: 16px;
@@ -292,9 +300,11 @@ input:checked + .slider:before {
 /* SECTION PRODUITS */
 /* ============================= */
 .products-section {
-  margin-left: 320px; /* sidebar width + padding */
+  flex: 1;              /* 🔥 PREND TOUT L’ESPACE APRÈS LA SIDEBAR */
   padding: 120px 60px 60px;
+  min-width: 0;         /* évite les bugs flex */
 }
+
 
 .products-section h1 {
   font-size: 36px;
@@ -738,4 +748,26 @@ input:checked + .slider:before {
 .product-card-link:hover .product-card {
   transform: translateY(-4px);
   box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+}
+
+/* ============================= */
+/* VUE LISTE – PLEINE LARGEUR */
+/* ============================= */
+.products-grid.products-list,
+.products-grid.products-list-detailed {
+  display: flex;
+  flex-direction: column;
+}
+
+/* le lien doit prendre toute la largeur */
+.products-grid.products-list .product-card-link,
+.products-grid.products-list-detailed .product-card-link {
+  width: 100%;
+  display: block;
+}
+
+/* la carte aussi */
+.products-grid.products-list .product-card,
+.products-grid.products-list-detailed .product-card {
+  width: 100%;
 }
