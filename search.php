@@ -9,6 +9,8 @@ $q = trim($_GET['q'] ?? '');
 <title>Recherche : <?= htmlspecialchars($q) ?> – SheGlamour</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="index.css?v=<?php echo time(); ?>">
+
 
 <style>
 /* ============================= */
@@ -139,7 +141,8 @@ a:active {
 </head>
 
 <body>
-
+ <?php include 'includes/header.php'; ?>
+ 
 <h1 class="search-title">
   Résultats pour <span>“<?= htmlspecialchars($q) ?>”</span>
 </h1>

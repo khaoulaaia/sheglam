@@ -9,8 +9,7 @@
   <button class="menu-toggle" id="menuToggle" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
-
-  <div class="logo">SheGlamour</div>
+ <div class="logo">SheGlamour</div>
 
   <nav class="navbar" id="navbar">
     <a href="/">Accueil</a>

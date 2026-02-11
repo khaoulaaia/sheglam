@@ -349,11 +349,23 @@ input:checked + .slider:before {
 }
 
 /* Infos produit */
+/* TITRE PRODUIT – ALIGNEMENT PARFAIT */
 .product-info h3 {
   font-size: 16px;
-  margin: 16px 0 12px;
   letter-spacing: 0.08em;
+  margin: 16px 0 12px;
+  text-transform: uppercase;
+
+  /* 🔥 FIX DÉCALAGE */
+  min-height: 3.2em;           /* hauteur fixe (2 lignes) */
+  line-height: 1.6em;
+  overflow: hidden;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;       /* max 2 lignes */
+  -webkit-box-orient: vertical;
 }
+
 
 .price {
   font-size: 15px;
@@ -400,13 +412,20 @@ input:checked + .slider:before {
   border: none;
   cursor: pointer;
   font-size: 16px;
-  color: #111;
+  transition: all 0.3s ease;
+}
+.add-to-wishlist {
+  color: transparent;
+  -webkit-text-stroke: 1.4px #111;
   transition: all 0.3s ease;
 }
 
 .add-to-wishlist:hover {
-  color: #e60023; /* rouge subtil style luxe */
+  color: #fff;
+  -webkit-text-stroke: 1.6px #000;
+  transform: scale(1.1);
 }
+
 
 /* ============================= */
 /* FOOTER / PARTAGE SOCIAL */
@@ -682,7 +701,7 @@ input:checked + .slider:before {
 .products-grid.products-list .product-card img {
   width: 120px;
   height: 120px;
-  object-fit: cover;
+  object-fit: conain;
 }
 
 /* Liste détaillée */
