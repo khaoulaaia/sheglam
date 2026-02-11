@@ -410,6 +410,12 @@ body {
 .similar-item .price {
   font-size: 15px;
 }
+.similar-item {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
 /* ============================= */
 /* PARTAGE SOCIAL — VERSION LUXE */
 /* ============================= */

@@ -22,7 +22,7 @@
       <!-- SHADES -->
       <div id="shadeSection">
         <strong>Couleur :</strong>
-        <span id="selectedShadeName">—</span>
+        <span id="selectedShadeName"></span>
 
         <div id="shadeOptions" class="shade-options"></div>
       </div>

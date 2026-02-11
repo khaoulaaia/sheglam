@@ -242,12 +242,13 @@ if ($reviews) {
   <h2>Produits similaires</h2>
   <div class="similar-container">
     <?php foreach($similarProducts as $sp): ?>
-      <div class="similar-item">
-        <img src="<?= htmlspecialchars($sp['image_url']) ?>" alt="<?= htmlspecialchars($sp['name']) ?>">
-        <h4><?= htmlspecialchars($sp['name']) ?></h4>
-        <p class="price"><?= number_format($sp['price'], 2, ',', ' ') ?> DA</p>
-      </div>
-    <?php endforeach; ?>
+  <a href="/sheglam/product.php?id=<?= $sp['id'] ?>" class="similar-item">
+    <img src="<?= htmlspecialchars($sp['image_url']) ?>" alt="<?= htmlspecialchars($sp['name']) ?>">
+    <h4><?= htmlspecialchars($sp['name']) ?></h4>
+    <p class="price"><?= number_format($sp['price'], 2, ',', ' ') ?> DA</p>
+  </a>
+<?php endforeach; ?>
+
   </div>
 </section>
 

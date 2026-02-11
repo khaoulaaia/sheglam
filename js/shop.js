@@ -44,7 +44,7 @@ const updateCartTotal = () => {
 
   const totalEl = document.getElementById("cartTotal");
   if (totalEl) {
-    totalEl.textContent = `€${total.toFixed(2)}`;
+    totalEl.textContent = `${total.toFixed(2)}DA`;
   }
 };
 
@@ -98,7 +98,7 @@ window.renderCart = () => {
       <img src="${imageUrl}" alt="${item.name}" class="cart-item-img">
       <div class="cart-item-info">
   <h4>${item.name}${item.shade ? " - " + item.shade : ""}</h4>
-  <div class="cart-item-price">€${item.price.toFixed(2)}</div>
+  <div class="cart-item-price">${item.price.toFixed(2)}DA</div>
         <div class="quantity-controls">
           <button class="decrease">-</button>
           <span class="quantity">${item.quantity}</span>
@@ -231,12 +231,17 @@ if (modal) {
     if (!data) return;
 
     currentProduct = data;
+    const viewLink = document.getElementById("viewFullDetails");
+if (viewLink) {
+  viewLink.href = `/sheglam/product.php?id=${data.productId}`;
+}
+
     selectedShade = null;
     currentQuantity = 1;
     updateQuantityUI();
 
     productNameEl.textContent = data.name;
-    productPriceEl.textContent = `€${data.price.toFixed(2)}`;
+    productPriceEl.textContent = `${data.price.toFixed(2)}DA`;
     productImageEl.src = data.image;
     shadeOptionsEl.innerHTML = "<p>Chargement...</p>";
 
@@ -373,3 +378,24 @@ function applyFilters() {
 [sortPrice, filterSale, filterBrand].forEach(el =>
   el.addEventListener("change", applyFilters)
 );
+document.body.addEventListener("click", e => {
+  const btn = e.target.closest(".add-to-wishlist");
+  if (!btn) return;
+
+  const productId = btn.dataset.productId;
+  const name = btn.dataset.name;
+  const price = parseFloat(btn.dataset.price.replace(",", "."));
+  const image = btn.dataset.image_url;
+  const hasShades = btn.dataset.hasShades === "1"; // <-- ici
+
+  wishlist[productId] = {
+    productId,
+    name,
+    price,
+    image_url: image,
+    hasShades
+  };
+
+  localStorage.setItem("wishlist", JSON.stringify(wishlist));
+  alert("Produit ajouté à la wishlist !");
+});

@@ -129,6 +129,7 @@ include_once 'includes/db.php';
             data-name="<?= htmlspecialchars($product['name']) ?>"
             data-price="<?= htmlspecialchars($product['price']) ?>"
             data-image_url="<?= htmlspecialchars($image) ?>"
+             data-has-shades="<?= $hasShades ? 1 : 0 ?>"
           >
             <i class="fas fa-heart"></i>
           </button>
