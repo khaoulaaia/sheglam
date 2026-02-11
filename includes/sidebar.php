@@ -10,7 +10,7 @@
     <div class="sidebar-footer">
       <div class="cart-total">
     <span>Total</span>
-    <strong id="cartTotal">DA0.00</strong>
+    <strong id="cartTotal">0.00DA</strong>
   </div>
         <button class="btn checkout-btn">Passer à la caisse</button>
     </div>
@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function() {
         <img src="${imageSrc}" alt="${item.name}" class="cart-item-img">
         <div class="cart-item-info">
           <h4>${item.name}${item.shade ? ' - ' + item.shade : ''}</h4>
-          <p>DA${price.toFixed(2)}</p>
+          <p>${price.toFixed(2)}DA</p>
           <div class="quantity-controls">
             <button class="decrease">-</button>
             <span class="quantity">${qty}</span>
@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", function() {
   <div class="wishlist-item-info">
     <h4>${item.name}</h4>
     <div class="wishlist-meta">
-      <p>DA${price.toFixed(2)}</p>
+      <p>${price.toFixed(2)}DA</p>
       <button class="remove-wishlist">x</button>
     </div>
   </div>

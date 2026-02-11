@@ -143,7 +143,7 @@ include_once 'includes/db.php';
           </h3>
 
           <p class="price">
-            DA<?= number_format($product['price'], 2, ',', ' ') ?>
+            <?= number_format($product['price'], 2, ',', ' ') ?>DA
           </p>
 
           <?php if ($hasShades): ?>

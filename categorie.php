@@ -75,7 +75,7 @@ if ($categorie === 'Tous') {
         <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($item['name']) ?>">
         <div class="best-seller-info">
           <span class="name"><?= htmlspecialchars($item['name']) ?></span>
-          <span class="price">DA<?= number_format($item['price'], 2, ',', ' ') ?></span>
+          <span class="price"><?= number_format($item['price'], 2, ',', ' ') ?>DA</span>
         </div>
       </a>
     </li>
@@ -161,13 +161,13 @@ if ($categorie === 'Tous') {
             <p class="price">
                 <?php if (!empty($product['old_price']) && $product['old_price'] > $product['price']): ?>
                     <span class="old-price">
-                        DA<?= number_format($product['old_price'], 2, ',', ' ') ?>
+                        <?= number_format($product['old_price'], 2, ',', ' ') ?>DA
                     </span>
                     <span class="sale-price">
-                        DA<?= number_format($product['price'], 2, ',', ' ') ?>
+                        <?= number_format($product['price'], 2, ',', ' ') ?>DA
                     </span>
                 <?php else: ?>
-                    DA<?= number_format($product['price'], 2, ',', ' ') ?>
+                    <?= number_format($product['price'], 2, ',', ' ') ?>DA
                 <?php endif; ?>
             </p>
 

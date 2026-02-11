@@ -164,7 +164,7 @@ fetch("/sheglam/includes/search_products.php?query=<?= urlencode($q) ?>")
       <a href="/sheglam/product.php?id=${p.id}" class="search-card">
         <img src="${p.image_url}" alt="${p.name}">
         <h3>${p.name}</h3>
-        <div class="search-price">DA${parseFloat(p.price).toFixed(2)}</div>
+        <div class="search-price">${parseFloat(p.price).toFixed(2)}DA</div>
         <span class="search-btn">Voir le produit</span>
       </a>
     `).join("");

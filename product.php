@@ -139,9 +139,9 @@ if ($reviews) {
 </div>
 <p class="price">
     <?php if (!empty($product['old_price']) && $product['old_price'] > $product['price']): ?>
-        <span class="old-price">DA<?= number_format($product['old_price'], 2, ',', ' ') ?></span>
+        <span class="old-price"><?= number_format($product['old_price'], 2, ',', ' ') ?>DA</span>
     <?php endif; ?>
-    €<?= number_format($product['price'], 2, ',', ' ') ?>
+    <?= number_format($product['price'], 2, ',', ' ') ?>DA
 </p>
       <p class="description"><?= htmlspecialchars($product['description']) ?></p>
 
@@ -245,7 +245,7 @@ if ($reviews) {
       <div class="similar-item">
         <img src="<?= htmlspecialchars($sp['image_url']) ?>" alt="<?= htmlspecialchars($sp['name']) ?>">
         <h4><?= htmlspecialchars($sp['name']) ?></h4>
-        <p class="price">€<?= number_format($sp['price'], 2, ',', ' ') ?></p>
+        <p class="price"><?= number_format($sp['price'], 2, ',', ' ') ?> DA</p>
       </div>
     <?php endforeach; ?>
   </div>
