@@ -116,3 +116,139 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </div>
 </body>
 </html>
+<style>
+  /* signup.css */
+
+/* ======= Base ======= */
+body {
+  font-family: 'Roboto', sans-serif;
+  background: #f9f8f7; /* beige subtil */
+  color: #1a1a1a;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* ======= Container ======= */
+.signup-container {
+  background: #fff;
+  padding: 40px 50px;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  max-width: 450px;
+  width: 90%;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* ======= Titre ======= */
+.signup-container h2 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 500;
+  font-size: 2em;
+  margin-bottom: 30px;
+  letter-spacing: 0.5px;
+  color: #111;
+}
+
+/* ======= Messages ======= */
+.error {
+  color: #d32f2f;
+  margin-bottom: 20px;
+  font-size: 0.95em;
+}
+
+.success {
+  color: #388e3c;
+  margin-bottom: 20px;
+  font-size: 0.95em;
+}
+
+/* ======= Formulaire ======= */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+label {
+  text-align: left;
+  font-weight: 400;
+  font-size: 0.95em;
+  color: #333;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1em;
+  font-family: 'Roboto', sans-serif;
+  transition: all 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #111;
+  outline: none;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+/* ======= Bouton ======= */
+button {
+  background: #111;
+  color: #fff;
+  border: none;
+  padding: 10px 0;
+  font-weight: 500;
+  font-size: 1em;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+button:hover {
+  background: #333;
+}
+
+/* ======= Lien ======= */
+p a {
+  color: #111;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+p a:hover {
+  color: #555;
+}
+
+/* ======= Responsive ======= */
+@media (max-width: 480px) {
+  .signup-container {
+    padding: 30px 20px;
+  }
+
+  h2 {
+    font-size: 1.8em;
+  }
+
+  input, textarea, button {
+    font-size: 0.95em;
+    padding: 8px 10px;
+  }
+}
+
+</style>

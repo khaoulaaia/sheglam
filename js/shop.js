@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("✅ shop.js chargé (VERSION FINALE PRO)");
 
   // ===============================
   // ÉTAT GLOBAL
@@ -139,6 +138,27 @@ window.renderCart = () => {
   updateCartTotal();
 
 };
+document.body.addEventListener("click", e => {
+  const btn = e.target.closest(".add-to-wishlist");
+  if (!btn) return;
+
+  const productId = btn.dataset.productId;
+  const name = btn.dataset.name;
+  const price = parseFloat(btn.dataset.price.replace(",", "."));
+  const image = btn.dataset.image_url;
+  const hasShades = btn.dataset.hasShades === "1";
+
+  wishlist[productId] = {
+    productId,
+    name,
+    price,
+    image_url: image,
+    hasShades
+  };
+
+  saveWishlist(); // 🔥 utilise ta fonction
+  alert("Produit ajouté à la wishlist !");
+});
 
   // ===============================
   // MODAL TEINTES
@@ -203,25 +223,74 @@ if (modal) {
 
     }
   });
+  function renderWishlist() {
+  const container = document.getElementById("wishlistItems");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  const wishlistData = JSON.parse(localStorage.getItem("wishlist")) || {};
+
+  if (!Object.keys(wishlistData).length) {
+    container.innerHTML = "<p>Votre wishlist est vide.</p>";
+    return;
+  }
+
+  Object.values(wishlistData).forEach(item => {
+    const div = document.createElement("div");
+    div.className = "wishlist-item";
+    div.innerHTML = `
+      <img src="${item.image_url}" alt="${item.name}" class="wishlist-item-img">
+      <h4>${item.name}${item.shade ? " - " + item.shade : ""}</h4>
+      <p>${item.price.toFixed(2)}DA</p>
+      <button class="remove-wishlist" data-product-id="${item.productId}">Supprimer</button>
+      <button class="add-to-cart-wishlist" 
+              data-product-id="${item.productId}"
+              data-name="${item.name}"
+              data-price="${item.price}"
+              data-image_url="${item.image_url}"
+              data-has-shades="${item.hasShades ? 1 : 0}"
+      >Ajouter au panier</button>
+    `;
+    container.appendChild(div);
+  });
+}
 
   // ===============================
   // AJOUT AU PANIER MODAL
   // ===============================
-  addFromModalBtn.addEventListener("click", () => {
-    if (!selectedShade) {
-      alert("Veuillez choisir une teinte.");
-      return;
-    }
-    if (!currentProduct) return;
+ addFromModalBtn.addEventListener("click", () => {
+  if (!selectedShade) {
+    alert("Veuillez choisir une teinte.");
+    return;
+  }
+  if (!currentProduct) return;
 
-    addToCart({
-      ...currentProduct,
-      quantity: currentQuantity,
-      shade: selectedShade
-    });
-
-    closeModal();
+  addToCart({
+    ...currentProduct,
+    quantity: currentQuantity,
+    shade: selectedShade
   });
+
+  // 🔥 SI PROVIENT DE LA WISHLIST → SUPPRIMER
+  if (modal.dataset.fromWishlist === "1") {
+    const wishlist = JSON.parse(localStorage.getItem("wishlist")) || {};
+    const key = modal.dataset.wishlistKey;
+
+    if (wishlist[key]) {
+      delete wishlist[key];
+      localStorage.setItem("wishlist", JSON.stringify(wishlist));
+    }
+
+    // ✅ Mise à jour visuelle sans refresh
+    if (typeof renderWishlist === "function") {
+      renderWishlist();
+    }
+  }
+
+  closeModal();
+});
+
 
   // ===============================
   // OUVERTURE MODAL TEINTES
@@ -283,6 +352,8 @@ if (viewLink) {
 });
 
       }
+      modal.dataset.fromWishlist = button.dataset.fromWishlist || "";
+      modal.dataset.wishlistKey = button.dataset.wishlistKey || "";
 
       openModal();
     } catch (err) {
@@ -378,24 +449,3 @@ function applyFilters() {
 [sortPrice, filterSale, filterBrand].forEach(el =>
   el.addEventListener("change", applyFilters)
 );
-document.body.addEventListener("click", e => {
-  const btn = e.target.closest(".add-to-wishlist");
-  if (!btn) return;
-
-  const productId = btn.dataset.productId;
-  const name = btn.dataset.name;
-  const price = parseFloat(btn.dataset.price.replace(",", "."));
-  const image = btn.dataset.image_url;
-  const hasShades = btn.dataset.hasShades === "1"; // <-- ici
-
-  wishlist[productId] = {
-    productId,
-    name,
-    price,
-    image_url: image,
-    hasShades
-  };
-
-  localStorage.setItem("wishlist", JSON.stringify(wishlist));
-  alert("Produit ajouté à la wishlist !");
-});

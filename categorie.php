@@ -28,7 +28,9 @@ if ($categorie === 'Tous') {
 <?php include 'includes/sidebar.php'; ?>
 <?php include 'includes/header.php'; ?>
 <div class="page-layout">
+  
 
+<!-- SIDEBAR FILTRES -->
 <aside class="filter-sidebar" id="filterSidebar">
   <h3>Filtres</h3>
 
@@ -42,7 +44,7 @@ if ($categorie === 'Tous') {
     </select>
   </div>
 
-  <!-- FILTRE PRODUITS EN SOLDE (toggle moderne) -->
+  <!-- FILTRE PRODUITS EN SOLDE -->
   <div class="filter-group toggle-group">
     <span>Produits en solde</span>
     <label class="switch">
@@ -62,30 +64,57 @@ if ($categorie === 'Tous') {
 
   <!-- PRODUITS POPULAIRES -->
   <div class="filter-group best-sellers">
-  <h4>Produits populaires</h4>
-  <ul>
-    <?php
-      // Récupérer les 3 derniers produits ajoutés
-      $bestSellers = $pdo->query("SELECT * FROM products ORDER BY id DESC LIMIT 3");
-      while ($item = $bestSellers->fetch(PDO::FETCH_ASSOC)):
-        $img = $item['image_url'] ? 'images/' . basename($item['image_url']) : '/images/placeholder.jpg';
-    ?>
-    <li>
-      <a href="/sheglam/product.php?id=<?= $item['id'] ?>">
-        <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($item['name']) ?>">
-        <div class="best-seller-info">
-          <span class="name"><?= htmlspecialchars($item['name']) ?></span>
-          <span class="price"><?= number_format($item['price'], 2, ',', ' ') ?>DA</span>
-        </div>
-      </a>
-    </li>
-    <?php endwhile; ?>
-  </ul>
-</div>
-
+    <h4>Produits populaires</h4>
+    <ul>
+      <?php
+        $bestSellers = $pdo->query("SELECT * FROM products ORDER BY id DESC LIMIT 3");
+        while ($item = $bestSellers->fetch(PDO::FETCH_ASSOC)):
+          $img = $item['image_url'] ? 'images/' . basename($item['image_url']) : '/images/placeholder.jpg';
+      ?>
+      <li>
+        <a href="/sheglam/product.php?id=<?= $item['id'] ?>">
+          <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($item['name']) ?>">
+          <div class="best-seller-info">
+            <span class="name"><?= htmlspecialchars($item['name']) ?></span>
+            <span class="price"><?= number_format($item['price'], 2, ',', ' ') ?>DA</span>
+          </div>
+        </a>
+      </li>
+      <?php endwhile; ?>
+    </ul>
+  </div>
 </aside>
+<div class="filter-overlay"></div>
 
+<!-- ============================= -->
+<!-- SCRIPT SIDEBAR MOBILE -->
+<!-- ============================= -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const sidebar = document.getElementById('filterSidebar');
+  const toggleBtn = document.querySelector('.filter-toggle-btn');
+  const overlay = document.querySelector('.filter-overlay');
 
+  // Ouvrir la sidebar
+  toggleBtn.addEventListener('click', () => {
+    sidebar.classList.add('active');
+    overlay.classList.add('active');
+  });
+
+  // Fermer sidebar via overlay
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('active');
+    overlay.classList.remove('active');
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === "Escape") {
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+    }
+  });
+});
+</script>
 
 <section class="products-section">
   
@@ -101,17 +130,22 @@ if ($categorie === 'Tous') {
   <?php endif; ?>
 </nav>
 
-    <!-- Choix du nombre de produits par ligne -->
-<div class="view-toggle">
-  <!-- Vues seulement -->
-  <button class="view-btn active" data-view="grid" title="Grille complète">
-    <span></span><span></span><span></span><span></span>
-  </button>
-  <button class="view-btn" data-view="list" title="Liste compacte">
-    <span></span><span></span><span></span>
-  </button>
-  
+<!-- CONTENEUR BOUTON FILTRES + VUE / COLONNES -->
+<div class="filter-controls">
+  <!-- Bouton Filtres -->
+  <button class="filter-toggle-btn">Filtres</button>
+
+  <!-- Choix du nombre de produits par ligne / vue -->
+  <div class="view-toggle">
+    <button class="view-btn active" data-view="grid" title="Grille complète">
+      <span></span><span></span><span></span><span></span>
+    </button>
+    <button class="view-btn" data-view="list" title="Liste compacte">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
 </div>
+
 
 
 
@@ -151,6 +185,7 @@ if ($categorie === 'Tous') {
                     data-name="<?= htmlspecialchars($product['name']) ?>"
                     data-price="<?= htmlspecialchars($product['price']) ?>"
                     data-image_url="<?= htmlspecialchars($imagePath) ?>"
+                    data-has-shades="<?= $hasShades ? 1 : 0 ?>"
                     type="button">
                 <i class="fas fa-heart"></i>
             </button>

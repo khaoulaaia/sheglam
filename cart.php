@@ -5,18 +5,152 @@
 <title>Panier</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 <style>
-body { font-family: 'Roboto', sans-serif; background:#f8f8f8; margin:0; padding:0; color:#111; }
-h1 { font-family: 'Playfair Display', serif; text-align:center; margin:30px 0; font-weight:700; letter-spacing:1px; }
-#cartItems { max-width:900px; margin:0 auto; background:#fff; padding:30px; box-shadow:0 4px 20px rgba(0,0,0,0.1); border-radius:8px; }
-.cart-item { display:flex; align-items:center; border-bottom:1px solid #eee; padding:20px 0; }
-.cart-item:last-child { border-bottom:none; }
-.cart-item-img { width:100px; height:100px; object-fit:cover; border-radius:8px; margin-right:20px; }
-.cart-item-info { flex:1; }
-.cart-item-info h4 { margin:0 0 5px; font-family:'Playfair Display', serif; font-weight:500; font-size:1.1em; }
-.cart-item-price { font-weight:500; margin-bottom:10px; color:#333; }
-.quantity-controls button { background:#111; color:#fff; border:none; padding:5px 12px; margin-right:5px; cursor:pointer; font-weight:500; border-radius:4px; transition:0.3s; }
-.quantity-controls button:hover { background:#444; }
-#cartTotal { text-align:right; font-size:1.5em; font-weight:700; margin-top:20px; font-family:'Playfair Display', serif; }
+
+/* ======== Base ======== */
+body {
+  font-family: 'Roboto', sans-serif;
+  background: #f9f8f7; /* subtil beige */
+  color: #1a1a1a;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 500;
+  text-align: center;
+  margin: 40px 0 20px 0;
+  font-size: 2em;
+  letter-spacing: 0.5px;
+  color: #111;
+}
+
+/* ======== Container ======== */
+#cartItems {
+  max-width: 850px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+/* ======== Items ======== */
+.cart-item {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding: 15px 0;
+}
+
+.cart-item:last-child {
+  border-bottom: none;
+}
+
+.cart-item-img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-right: 20px;
+}
+
+.cart-item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.cart-item-info h4 {
+  margin: 0 0 5px;
+  font-family: 'Playfair Display', serif;
+  font-weight: 400;
+  font-size: 1.1em;
+  color: #111;
+}
+
+.cart-item-price {
+  font-weight: 300;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+/* ======== Contrôles de quantité ======== */
+.quantity-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.quantity-controls button {
+  background: transparent;
+  border: 1px solid #111;
+  color: #111;
+  font-weight: 400;
+  padding: 4px 10px;
+  border-radius: none;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: all 0.2s;
+}
+
+.quantity-controls button:hover {
+  background: #111;
+  color: #fff;
+}
+
+.quantity-controls span.quantity {
+  font-weight: 400;
+  font-size: 1em;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* ======== Total ======== */
+#cartTotal {
+  text-align: right;
+  font-size: 1.5em;
+  font-weight: 500;
+  margin-top: 25px;
+  font-family: 'Playfair Display', serif;
+  color: #111;
+}
+
+/* ======== Responsive ======== */
+@media (max-width: 768px) {
+  #cartItems {
+    padding: 20px 15px;
+  }
+
+  .cart-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .cart-item-img {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 10px;
+  }
+
+  .cart-item-info {
+    width: 100%;
+    align-items: center;
+  }
+
+  .quantity-controls {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 { font-size: 1.8em; margin: 25px 0 15px 0; }
+  .cart-item-img { width: 70px; height: 70px; }
+  .quantity-controls button { padding: 3px 8px; font-size: 0.85em; }
+}
 </style>
 </head>
 <body>

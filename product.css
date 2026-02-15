@@ -496,3 +496,146 @@ body {
     font-size: 32px;
   }
 }
+/* ============================= */
+/* TABLETTE (≤992px) */
+/* ============================= */
+@media (max-width: 992px) {
+
+  /* Page produit en colonne */
+  .product-page {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 0 20px;
+  }
+
+  /* Miniatures sous l'image principale */
+  .product-left {
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .product-left img {
+    width: 60px;
+    height: 70px;
+  }
+
+  /* Image principale */
+  .product-main {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .product-main-image img {
+    max-height: 500px;
+  }
+
+  /* Titre produit */
+  .product-right h1 {
+    font-size: 32px;
+  }
+
+  /* Boutons et prix */
+  .add-to-cart,
+  .choose-shade-btn {
+    padding: 14px 36px;
+    font-size: 12px;
+  }
+
+  .price {
+    font-size: 22px;
+  }
+
+  /* Partage social centré */
+  .share-product {
+    justify-content: center;
+    margin-top: 30px;
+  }
+
+  /* Produits similaires : 3 colonnes tablette */
+  .similar-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ============================= */
+/* MOBILE (≤768px) */
+/* ============================= */
+@media (max-width: 768px) {
+
+  /* Miniatures plus petites */
+  .product-left img {
+    width: 50px;
+    height: 60px;
+  }
+
+  /* Image principale plus compacte */
+  .product-main-image img {
+    max-height: 350px;
+  }
+
+  /* Titre produit réduit */
+  .product-right h1 {
+    font-size: 26px;
+  }
+
+  /* Boutons adaptatifs */
+  .add-to-cart,
+  .choose-shade-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 12px;
+  }
+
+  /* Prix plus petit */
+  .price {
+    font-size: 18px;
+  }
+
+  /* Description plus lisible */
+  .description {
+    max-width: 100%;
+    font-size: 14px;
+  }
+
+  /* Formulaire avis */
+  .review-form {
+    padding: 30px;
+    margin: 60px 10px;
+  }
+
+  /* Produits similaires : 2 colonnes */
+  .similar-container {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  /* Partage social centré */
+  .share-product {
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  /* Filter + view toggle alignés */
+  .filter-view-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+  }
+
+  .filter-toggle-btn {
+    flex-shrink: 0;
+    padding: 8px 20px;
+    font-size: 11px;
+  }
+
+  .view-toggle {
+    justify-content: flex-start;
+    gap: 6px;
+  }
+}

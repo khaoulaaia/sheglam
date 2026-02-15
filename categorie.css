@@ -84,30 +84,18 @@ body {
   align-items: center;
   justify-content: center;
 }
-
-
 /* ============================= */
-/* SIDEBAR FILTRES */
+/* SIDEBAR FILTRES - BASE */
 /* ============================= */
 .filter-sidebar {
-  width: 280px;
-  padding: 40px 20px;
   background: #fff;
-  border-right: 1px solid #eee;
-
-  position: sticky;
   top: 90px;
-
-  height: fit-content;
+  border-right: 1px solid #eee;
+  padding: 40px 20px;
+  width: 280px;
   max-height: calc(100vh - 90px);
   overflow-y: auto;
 }
-.page-layout {
-  top: 90px;
-  display: flex;
-  align-items: flex-start;
-}
-
 
 .filter-sidebar h3 {
   font-size: 16px;
@@ -136,6 +124,109 @@ body {
   padding: 10px;
   border: 1px solid #ccc;
 }
+
+/* ============================= */
+/* SIDEBAR DESKTOP (≥ 993px) */
+/* ============================= */
+@media (min-width: 993px) {
+ 
+  .filter-sidebar {
+    position: sticky;  /* reste fixe lors du scroll */
+    top: 90px;         /* espace pour le header */
+    max-height: calc(100vh - 90px);
+    z-index: 500;      /* sous le header */
+  }
+  .filter-toggle-btn {
+    display: none; /* boutons et overlay invisibles sur desktop */
+  }
+
+  .page-layout {
+    display: flex;
+    align-items: flex-start;
+    padding-left: 0;
+  }
+}
+/* ============================= */
+/* MOBILE SIDEBAR (≤ 992px) */
+/* ============================= */
+
+@media (max-width: 992px) {
+
+  .filter-sidebar {
+    position: fixed;
+    top: 90px;
+    left: -280px;
+    width: 260px;
+    height: 100vh;
+    padding: 30px 25px;
+    background: #fff;
+    overflow-y: auto;
+    z-index: 2000;
+    box-shadow: 6px 0 25px rgba(0,0,0,0.15);
+    transition: left 0.35s cubic-bezier(.77,0,.18,1);
+  }
+
+  .filter-sidebar.active {
+    left: 0;
+  }
+  
+/* ============================= */
+/* BOUTON FILTRE – OUTLINE DIOR */
+/* ============================= */
+
+.filter-toggle-btn {
+  background: #fff;
+  color: #111;
+  border: 1px solid #111;
+  padding: 10px 24px;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  border-radius: 0px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(.77,0,.18,1);
+  white-space: nowrap;
+}
+
+/* Hover luxe */
+.filter-toggle-btn:hover {
+  background: #111;
+  color: #fff;
+}
+
+/* Focus accessible */
+.filter-toggle-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.15);
+}
+
+  .filter-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(2px);
+    z-index: 1500;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+  }
+
+  .filter-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .products-section {
+    padding: 140px 20px 60px;
+  }
+
+  .products-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
 /* ============================= */
 /* TOGGLE NOIR & BLANC */
 /* ============================= */
@@ -406,7 +497,7 @@ input:checked + .slider:before {
 /* Wishlist */
 .add-to-wishlist {
   position: absolute;
-  top: 30px;
+  top: 25px;
   right: 35px;
   background: transparent;
   border: none;
@@ -459,19 +550,6 @@ input:checked + .slider:before {
 /* ============================= */
 /* RESPONSIVE */
 /* ============================= */
-@media (max-width: 992px) {
-  .filter-sidebar {
-    position: relative;
-    width: 100%;
-    border-right: none;
-    padding: 20px;
-  }
-
-  .products-section {
-    margin-left: 0;
-    padding: 140px 20px 60px;
-  }
-}
 
 @media (max-width: 768px) {
   .products-grid {
@@ -483,14 +561,11 @@ input:checked + .slider:before {
     height: auto;
   }
 
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
 
   .share-product {
     justify-content: center;
   }
+  
 }
 /* ============================= */
 /* GRILLE DES PRODUITS */
@@ -523,13 +598,6 @@ input:checked + .slider:before {
 /* ============================= */
 /* BOUTONS DE VUE */
 /* ============================= */
-.view-toggle {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-}
 
 .view-btn {
   width: 28px;
@@ -543,7 +611,6 @@ input:checked + .slider:before {
   gap: 2px;
   cursor: pointer;
   padding: 3px;
-  border-radius: 4px;
   transition: all 0.3s ease;
 }
 
@@ -587,53 +654,6 @@ input:checked + .slider:before {
   flex-wrap: wrap; /* pour le responsive si nécessaire */
 }
 
-/* Boutons de vue */
-.view-btn {
-  width: 28px;
-  height: 28px;
-  border: 1px solid #111;
-  background: #fff;
-  display: flex;
-  flex-wrap: wrap;
-  align-content: center;
-  justify-content: center;
-  gap: 2px;
-  cursor: pointer;
-  padding: 3px;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-}
-
-.view-btn.active,
-.view-btn:hover {
-  background: #111;
-}
-
-.view-btn span {
-  display: block;
-  background: #111;
-  transition: all 0.3s ease;
-  border-radius: 1px;
-}
-
-.view-btn[data-view="grid"] span {
-  width: 8px;
-  height: 8px;
-}
-
-.view-btn[data-view="list"] span {
-  width: 16px;
-  height: 2px;
-}
-
-.view-btn[data-view="list-detailed"] span {
-  width: 20px;
-  height: 2px;
-}
-
-.view-btn.active span {
-  background: #fff;
-}
 
 /* Boutons colonnes */
 .cols-toggle {
@@ -789,4 +809,53 @@ input:checked + .slider:before {
 .products-grid.products-list .product-card,
 .products-grid.products-list-detailed .product-card {
   width: 100%;
+}
+
+
+/* ============================= */
+/* MOBILE (≤ 768px) – 2 colonnes et filtres alignés */
+/* ============================= */
+@media (max-width: 768px) {
+
+  /* ============================= */
+  /* SECTION PRODUITS */
+  /* ============================= */
+  .products-section {
+    padding: 120px 20px 60px;
+  }
+
+  /* Grille produits – 2 colonnes */
+  .products-grid,
+  .products-grid.cols-3,
+  .products-grid.cols-5 {
+    grid-template-columns: repeat(2, 1fr) !important; /* 2 colonnes */
+    gap: 16px;
+  }
+
+  /* Liste compacte */
+  .products-grid.products-list .product-card {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .products-grid.products-list .product-card img {
+    width: 100px;
+    height: 100px;
+  }
+
+  /* Liste détaillée mobile */
+  .products-grid.products-list-detailed .product-card {
+    padding: 12px;
+    gap: 8px;
+  }
+
+
+  /* ============================= */
+  /* PRODUIT IMAGE */
+  /* ============================= */
+  .product-card img {
+    height: auto;
+  }
+
 }

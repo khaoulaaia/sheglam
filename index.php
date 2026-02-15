@@ -21,17 +21,32 @@ include_once 'includes/db.php';
  ?>
  <?php include 'includes/header.php'; ?>
 
-
 <section class="hero-slider">
-  <div class="slide active" style="background-image: url('images/1766567932171684802b501201ae09c27d1f505da0_thumbnail_3600x.webp');">
-    <div class="hero-content">
-      <h1>Brillez avec SheGlamour</h1>
-      <p>Découvrez notre nouvelle collection de maquillage glamour.</p>
-      <a href="#" class="btn">Découvrir maintenant</a>
-    </div>
+
+  <!-- SLIDE 1 -->
+  <div class="slide active">
+    <picture>
+      <!-- Image mobile -->
+      <source media="(max-width: 600px)" 
+              srcset="images/17665480944dd41369b657c8fc3cb68f38ca70b4a9_thumbnail_3600x.webp">
+      
+      <!-- Image desktop -->
+      <img src="images/1766567932171684802b501201ae09c27d1f505da0_thumbnail_3600x.webp" 
+           alt="Nouvelle collection beauté">
+    </picture>
   </div>
 
-  <div class="slide" style="background-image: url('images/1766568099187bc63d385f046b820f583208e51c5c_thumbnail_3600x.webp');">
+
+  <!-- SLIDE 2 -->
+  <div class="slide">
+    <picture>
+      <source media="(max-width: 600px)" 
+              srcset="images/17665480556f948b43e0330036a390fb039f3cf7fc_thumbnail_3600x.webp">
+      
+      <img src="images/banner_3600x1740_optimized.webp" 
+           alt="Couleurs éclatantes">
+    </picture>
+
     <div class="hero-content">
       <h1>Couleurs éclatantes</h1>
       <p>Des teintes audacieuses pour révéler votre beauté unique.</p>
@@ -39,7 +54,17 @@ include_once 'includes/db.php';
     </div>
   </div>
 
-  <div class="slide" style="background-image: url('images/17627683847b4f5dafc00e2b5d9b78b5921d37525e_thumbnail_3600x.webp');">
+
+  <!-- SLIDE 3 -->
+  <div class="slide">
+    <picture>
+      <source media="(max-width: 600px)" 
+              srcset="images/1766548121f695d7aa476d1661e3329edbdd09418a_thumbnail_3600x.webp">
+      
+      <img src="images/banner_desktop_3600x1740_sharp.jpg" 
+           alt="Makeup professionnel">
+    </picture>
+
     <div class="hero-content">
       <h1>Makeup professionnel</h1>
       <p>Des produits haut de gamme à prix doux.</p>
@@ -47,49 +72,70 @@ include_once 'includes/db.php';
     </div>
   </div>
 
-  <!-- Boutons de navigation -->
+
+  <!-- Navigation -->
   <div class="navigation">
-    <span class="prev"><i class="fas fa-chevron-left"></i></span>
-    <span class="next"><i class="fas fa-chevron-right"></i></span>
+    <span class="prev">
+      <i class="fas fa-chevron-left"></i>
+    </span>
+    <span class="next">
+      <i class="fas fa-chevron-right"></i>
+    </span>
   </div>
-</section>
-<section class="create-look">
-  <div class="create-item">
-<a href="/sheglam/categorie.php?categorie=Yeux">
-    <img src="images/17665480556f948b43e0330036a390fb039f3cf7fc_thumbnail_3600x.webp" alt="Maquillage des yeux">
-    <div class="overlay"><h3>Yeux</h3></div>
-  </a>
-</div>
-
-<div class="create-item">
-<a href="/sheglam/categorie.php?categorie=Lèvres">
-    <img src="images/17665480944dd41369b657c8fc3cb68f38ca70b4a9_thumbnail_3600x.webp" alt="Maquillage des lèvres">
-    <div class="overlay"><h3>Lèvres</h3></div>
-  </a>
-</div>
-
-<div class="create-item">
-<a href="/sheglam/categorie.php?categorie=Teint">
-    <img src="images/1766548121f695d7aa476d1661e3329edbdd09418a_thumbnail_3600x.webp" alt="Maquillage du teint">
-    <div class="overlay"><h3>Teint</h3></div>
-  </a>
-</div>
-
-<div class="create-item">
-<a href="/sheglam/categorie.php?categorie=Accessoires">
-    <img src="images/placeholde.webp" alt="Accessoires makeup">
-    <div class="overlay"><h3>Accessoires</h3></div>
-  </a>
-</div>
 
 </section>
+
+<section class="create-look-section">
+
+  <h2 class="section-title">Create Your Look</h2>
+
+  <div class="create-look">
+
+    <div class="create-item">
+      <a href="/sheglam/categorie.php?categorie=Yeux">
+        <img src="images/17665480556f948b43e0330036a390fb039f3cf7fc_thumbnail_3600x.webp" alt="Maquillage des yeux">
+        <div class="overlay"><h3>Yeux</h3></div>
+      </a>
+    </div>
+
+    <div class="create-item">
+      <a href="/sheglam/categorie.php?categorie=Lèvres">
+        <img src="images/17665480944dd41369b657c8fc3cb68f38ca70b4a9_thumbnail_3600x.webp" alt="Maquillage des lèvres">
+        <div class="overlay"><h3>Lèvres</h3></div>
+      </a>
+    </div>
+
+    <div class="create-item">
+      <a href="/sheglam/categorie.php?categorie=Teint">
+        <img src="images/1766548121f695d7aa476d1661e3329edbdd09418a_thumbnail_3600x.webp" alt="Maquillage du teint">
+        <div class="overlay"><h3>Teint</h3></div>
+      </a>
+    </div>
+
+    <div class="create-item">
+      <a href="/sheglam/categorie.php?categorie=Accessoires">
+        <img src="images/placeholde.webp" alt="Accessoires makeup">
+        <div class="overlay"><h3>Accessoires</h3></div>
+      </a>
+    </div>
+
+  </div>
+
+</section>
+
 <!-- WORTH THE HYPE -->
 <section class="worth-hype">
   <div class="hype-left">
-    <img
-      src="/sheglam/images/174125510358a1215ecd9f25fdbf5165c9993d62fb_thumbnail_3600x.webp"
-      alt="Worth the Hype SheGlamour"
-    >
+
+    <div class="hype-image-wrapper">
+      <img
+        src="/sheglam/images/174125510358a1215ecd9f25fdbf5165c9993d62fb_thumbnail_3600x.webp"
+        alt="Worth the Hype SheGlamour"
+      >
+
+      <span class="best-seller-badge">Best Seller</span>
+    </div>
+
   </div>
 
   <div class="hype-right">
@@ -129,8 +175,7 @@ include_once 'includes/db.php';
             data-name="<?= htmlspecialchars($product['name']) ?>"
             data-price="<?= htmlspecialchars($product['price']) ?>"
             data-image_url="<?= htmlspecialchars($image) ?>"
-             data-has-shades="<?= $hasShades ? 1 : 0 ?>"
-          >
+            data-has-shades="<?= $hasShades ? 1 : 0 ?>"          >
             <i class="fas fa-heart"></i>
           </button>
         </div>

@@ -102,34 +102,30 @@ body {
   transition: background 0.3s ease;
 }
 
-
 /* ==============================
    HERO SLIDER
 ============================== */
+
 .hero-slider {
-  top: -50px;
   position: relative;
   width: 100%;
-  height: 100vh; /* prend toute la hauteur de l’écran */
+  height: 100vh; /* pleine hauteur écran */
   overflow: hidden;
-  padding-top: 0px;
+  top: -50px; /* si header fixed */
 }
 
+/* ==============================
+   SLIDES
+============================== */
 
 .hero-slider .slide {
-  width: 100%;
-  height: 100%;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
   position: absolute;
   top: 0;
   left: 100%;
+  width: 100%;
+  height: 100%;
   opacity: 0;
-  transition: all 0.6s ease-in-out;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  transition: left 0.6s ease-in-out, opacity 0.6s ease-in-out;
 }
 
 .hero-slider .slide.active {
@@ -138,8 +134,34 @@ body {
   z-index: 1;
 }
 
+/* ==============================
+   IMAGES RESPONSIVE
+============================== */
+
+.hero-slider picture {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.hero-slider img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* remplit sans déformer */
+  display: block;
+}
+
+/* ==============================
+   CONTENU HERO (TEXTE)
+============================== */
+
 .hero-slider .hero-content {
-  background: rgba(0,0,0,0.35);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+  background: rgba(0, 0, 0, 0.35);
   color: #fff;
   padding: 20px 40px;
   border-radius: 10px;
@@ -157,26 +179,35 @@ body {
   margin-bottom: 20px;
 }
 
+/* ==============================
+   NAVIGATION
+============================== */
 
-/* Navigation arrows */
 .hero-slider .navigation {
   position: absolute;
   top: 50%;
+  left: 0;
   width: 100%;
+  transform: translateY(-50%);
   display: flex;
   justify-content: space-between;
-  transform: translateY(-50%);
   padding: 0 20px;
   z-index: 3;
 }
 
 .hero-slider .navigation span {
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   padding: 10px;
   border-radius: 50%;
   cursor: pointer;
   color: #fff;
+  transition: background 0.3s ease;
 }
+
+.hero-slider .navigation span:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
 
 /* ==============================
    RESPONSIVE
@@ -198,13 +229,6 @@ body {
     cursor: pointer;
   }
 
-  .hero-slider .hero-content h1 {
-    font-size: 1.8rem;
-  }
-
-  .hero-slider .hero-content p {
-    font-size: 1rem;
-  }
 }
 /* ==============================
    SECTION CRÉE TON LOOK (Style SheGlam)
@@ -216,7 +240,15 @@ body {
   height: 80vh;
   overflow: hidden;
 }
-
+.section-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 40px;
+  color: #111;
+}
 .create-item {
   position: relative;
   width: 100%;
@@ -293,7 +325,7 @@ body {
 
 @media (max-width: 600px) {
   .create-look {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .create-item {
@@ -336,7 +368,7 @@ body {
   letter-spacing: 0.8px;
   margin-bottom: 20px;
   text-transform: uppercase;
-  color: #111;
+  color: rgb(207, 58, 82);
 }
 
 /* =========================
@@ -369,12 +401,11 @@ body {
 }
 
 .product-card {
-  background: #fafafa;
+  background: #fff;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
   height: 100%;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -404,7 +435,7 @@ body {
   height: 30px;
   border-radius: 50%;
   background: #fff;
-  color: #111;
+  color: rgb(207, 58, 82);
   border: none;
   display: flex;
   align-items: center;
@@ -475,7 +506,7 @@ body {
   font-size: 0.8rem;
   text-align: center;
 
-  border: 1px solid #ddd;
+  border: 1px solid rgb(207, 58, 82);
   border-radius: 5px;
   background: #fff;
   outline: none;
@@ -489,8 +520,12 @@ body {
 .quantity-wrapper input::-webkit-inner-spin-button,
 .quantity-wrapper input::-webkit-outer-spin-button {
   opacity: 1;
+  color: rgb(207, 58, 82);
 }
-
+.quantity-wrapper{
+  opacity: 1;
+  color: rgb(207, 58, 82);
+}
 /* Bouton panier */
 .choose-shade-btn,
 .add-to-cart {
@@ -498,8 +533,8 @@ body {
   height: 30px;
   font-size: 0.75rem;
   border-radius: 5px;
-  background: #111;
-  color: #fff;
+  background: rgba(224, 138, 151, 0.31);
+  color: rgb(207, 58, 82);
   border: none;
   cursor: pointer;
 
@@ -516,8 +551,8 @@ body {
 /* Aligner le bouton "Choisir une teinte" en bas */
 .choose-shade-btn {
   margin-top: auto;
-  background: #111;
-  color: #fff;
+  background: rgba(224, 138, 151, 0.31);
+  color: rgb(207, 58, 82);
   display: flex;
   gap: 6px;
 }
@@ -539,15 +574,75 @@ body {
   }
 }
 
+
+/* =========================
+   RESPONSIVE
+========================= */
 @media (max-width: 600px) {
-  .hype-products {
-    grid-template-columns: 1fr;
+  .worth-hype {
+    flex-direction: column;
   }
 
-  .product-card img {
-    height: 150px;
+  .hype-left,
+  .hype-right {
+    max-width: 100%;
+  }
+
+  .hype-products {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
+:root {
+  --sheglam-pink: #d63384;
+}
+
+/* Wrapper image */
+.hype-image-wrapper {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 3px solid var(--sheglam-pink); /* contour rose */
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Effet premium au hover */
+.hype-image-wrapper:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 25px rgba(214, 51, 132, 0.3);
+}
+
+/* Image */
+.hype-image-wrapper img {
+  width: 100%;
+  display: block;
+  border-radius: 12px;
+}
+
+/* Badge Best Seller */
+.best-seller-badge {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: var(--sheglam-pink);
+  color: #fff;
+  padding: 6px 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 20px;
+  letter-spacing: 1px;
+
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+}
+
+/* Apparition au hover */
+.hype-image-wrapper:hover .best-seller-badge {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* =====================
    MENU HAMBURGER MOBILE
 ===================== */

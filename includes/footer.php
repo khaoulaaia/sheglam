@@ -118,5 +118,60 @@
   border-top: 1px solid rgba(255,255,255,0.1);
   padding-top: 20px;
 }
+/* --- Responsive pour tablettes --- */
+@media (max-width: 1024px) {
+  .footer-container {
+    gap: 35px;
+    padding: 0 20px;
+    justify-items: center; /* centre horizontalement les colonnes */
+    text-align: center;    /* centre le texte à l’intérieur */
+  }
+
+  .footer-col h4 {
+    font-size: 13px;
+  }
+
+  .footer-col p,
+  .footer-col ul li a {
+    font-size: 13px;
+  }
+
+  .footer-socials {
+    justify-content: center; /* centre les icônes sociales */
+  }
+}
+
+/* --- Responsive pour mobiles --- */
+@media (max-width: 768px) {
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    padding: 0 15px;
+    justify-items: center; /* centre les colonnes */
+    text-align: center;    /* centre le texte */
+  }
+
+  .footer-col h4 {
+    font-size: 12px;
+    margin-bottom: 15px;
+  }
+
+  .footer-col p,
+  .footer-col ul li a {
+    font-size: 12px;
+  }
+
+  .footer-socials {
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center; /* centre les icônes sociales */
+  }
+
+  .footer-bottom {
+    font-size: 12px;
+    padding-top: 15px;
+    text-align: center; /* s’assurer que le copyright est centré */
+  }
+}
 
 </style>
