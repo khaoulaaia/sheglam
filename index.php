@@ -289,6 +289,15 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("scroll", onScroll);
   onScroll(); // état initial
 });
+window.addEventListener("scroll", () => {
+    const header = document.querySelector(".header");
+    if (window.scrollY > 20 && !document.body.classList.contains("menu-open")) {
+        header.classList.add("scrolled");
+    } else {
+        header.classList.remove("scrolled");
+    }
+});
+
 </script>
 
 <script src="/sheglam/js/shop.js?v=<?= time(); ?>"></script>

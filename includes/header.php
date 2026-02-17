@@ -6,46 +6,71 @@
 <body>
 
 <header class="header">
-  <button class="menu-toggle" id="menuToggle" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
- <div class="logo">SheGlamour</div>
+  <!-- LOGO -->
+  <div class="logo">SheGlamour</div>
 
-  <nav class="navbar" id="navbar">
-    <a href="/">Accueil</a>
-    <a href="/sheglam/products">Marques</a>
-    <a href="#">Nouveautés</a>
-    <a href="#">Contact</a>
+  <!-- NAVBAR DESKTOP -->
+  <nav class="navbar-desktop">
+    <a href="/sheglam/categorie.php?categorie=Yeux">Yeux</a>
+    <a href="/sheglam/categorie.php?categorie=Lèvres">Lèvres</a>
+    <a href="/sheglam/categorie.php?categorie=Teint">Teint</a>
+    <a href="/sheglam/categorie.php?categorie=Accessoires">Accessoires</a>
   </nav>
-<div class="icons">
-  <button class="icon-btn" id="openSearch">
-    <i class="fa-solid fa-magnifying-glass"></i>
+
+  <!-- ICONS -->
+  <div class="icons">
+    <button class="icon-btn" id="openSearch">
+      <i class="fa-solid fa-magnifying-glass"></i>
+    </button>
+    <a href="/sheglam/wishlist.php"><i class="fas fa-heart"></i></a>
+    <a href="/sheglam/cart.php">
+      <svg class="icon-shopping-bag" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="transparent" stroke="#111" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 8c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V8z"/>
+        <path d="M8 8V6a4 4 0 0 1 8 0v2"/>
+      </svg>
+    </a>
+    <a href="/sheglam/login.php"><i class="fas fa-user"></i></a>
+  </div>
+
+  <!-- HAMBURGER MOBILE -->
+  <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+    <span></span>
+    <span></span>
+    <span></span>
   </button>
 
-  <a href="/sheglam/wishlist.php">
-    <i class="fas fa-heart"></i>
-  </a>
-
-  <!-- SVG sac shopping -->
-  <a href="/sheglam/cart.php">
-  <svg class="icon-shopping-bag" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="transparent" stroke="#111" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-    <!-- Corps du sac plus arrondi -->
-    <path d="M5 8c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V8z"/>
-    <!-- Anses fines et arrondies -->
-    <path d="M8 8V6a4 4 0 0 1 8 0v2"/>
-  </svg>
-</a>
-
-
-  <a href="/sheglam/login.php">
-    <i class="fas fa-user"></i>
-  </a>
+  <!-- MENU MOBILE -->
+  <nav class="navbar-mobile" id="navbar">
+    <div class="mobile-menu-header">
+  <div class="mobile-logo">SheGlamour</div>
+  <button class="mobile-close" id="mobileClose">&times;</button>
 </div>
 
-</header>
+    <div class="mobile-tabs">
+      <button class="tab-btn active" data-tab="categories">Catégories</button>
+      <button class="tab-btn" data-tab="brands">Marques</button>
+    </div>
 
-<div class="menu-overlay" id="menuOverlay"></div>
-</section>
+    <!-- CATEGORIES PANEL -->
+    <div class="tab-content active" id="categories">
+      <a href="/sheglam/categorie.php?categorie=Blush" class="menu-item"><img src="images/blush.jpg" alt=""><span>Blush</span></a>
+      <a href="/sheglam/categorie.php?categorie=Lèvres" class="menu-item"><img src="images/lips.jpg" alt=""><span>Lèvres</span></a>
+      <a href="/sheglam/categorie.php?categorie=Yeux" class="menu-item"><img src="images/eyes.jpg" alt=""><span>Yeux</span></a>
+    </div>
+
+    <!-- BRANDS PANEL -->
+    <div class="tab-content" id="brands">
+  <a href="/sheglam/marque.php?marque=VelvetLab">VelvetLab</a>
+  <a href="/sheglam/marque.php?marque=Rare%20Beauty">Rare Beauty</a>
+  <a href="/sheglam/marque.php?marque=Maybelline">Maybelline</a>
+  <a href="/sheglam/marque.php?marque=Huda%20Beauty">Huda Beauty</a>
+</div>
+
+  </nav>
+
+  <!-- OVERLAY MOBILE -->
+  <div class="menu-overlay" id="menuOverlay"></div>
+</header>
 
 <!-- SEARCH OVERLAY -->
 <div class="search-overlay" id="searchOverlay">
@@ -76,18 +101,25 @@
 </div>
 
 </body>
-<style>/* =====================================================
+<style>
+/* =====================================================
    RESET
 ===================================================== */
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
-html, body {
-  font-family: Inter, sans-serif;
+body {
+  font-family: "Inter", sans-serif;
   color: #111;
+  line-height: 1.6;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
 /* =====================================================
@@ -108,33 +140,47 @@ html, body {
   transition: all .35s ease;
 }
 
-.header a,
-.header .logo,
-.header .icon-btn {
-  color: #000;
-  text-decoration: none;
-}
-
 .header.scrolled {
-  background: rgba(255,255,255,.92);
+  background: rgba(255,255,255,.95);
   backdrop-filter: blur(12px);
   box-shadow: 0 4px 20px rgba(0,0,0,.08);
 }
 
-.header.search-open {
-  pointer-events: none;
+
+/* LOGO */
+.logo {
+  font-size: 20px;
+  font-weight: bold;
 }
 
 /* =====================================================
    NAVBAR DESKTOP
 ===================================================== */
-.navbar {
+.navbar-desktop {
   display: flex;
-  gap: 22px;
+  gap: 25px;
 }
 
-.navbar a {
-  font-size: .9rem;
+.navbar-desktop a {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 0;
+  position: relative;
+}
+
+.navbar-desktop a::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background: #111;
+  transition: width .3s;
+}
+
+.navbar-desktop a:hover::after {
+  width: 100%;
 }
 
 /* =====================================================
@@ -143,6 +189,7 @@ html, body {
 .icons {
   display: flex;
   gap: 16px;
+  align-items: center;
 }
 
 .icon-btn {
@@ -192,7 +239,78 @@ html, body {
 }
 
 /* =====================================================
-   MENU OVERLAY
+   MENU MOBILE
+===================================================== */
+.navbar-mobile {
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 80%;
+  max-width: 320px;
+  height: 100vh;
+  background: #fff;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  transition: left .35s ease;
+  z-index: 2600;
+  box-shadow: 8px 0 30px rgba(0,0,0,.12);
+}
+
+.navbar-mobile.active {
+  left: 0;
+}
+
+/* Mobile Tabs */
+.mobile-tabs {
+  display: flex;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 16px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 14px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: .25s;
+}
+
+.tab-btn.active {
+  border-bottom: 2px solid #111;
+}
+
+.tab-content {
+  display: none;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tab-content.active {
+  display: flex;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+}
+
+.menu-item img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* =====================================================
+   OVERLAY
 ===================================================== */
 .menu-overlay {
   position: fixed;
@@ -207,6 +325,46 @@ html, body {
 .menu-overlay.active {
   opacity: 1;
   pointer-events: auto;
+}
+
+/* =====================================================
+   MOBILE LAYOUT
+===================================================== */
+@media (max-width: 1024px) {
+
+  /* cacher menu desktop */
+  .navbar-desktop {
+    display: none;
+  }
+
+  .header {
+    justify-content: center;
+    padding: 0 16px;
+  }
+
+  /* logo parfaitement centré */
+  .logo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* hamburger à gauche */
+  .menu-toggle {
+    display: block;
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  /* icons à droite */
+  .icons {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
 }
 
 /* =====================================================
@@ -394,37 +552,23 @@ html, body {
   display: none;
 }
 
-/* =====================================================
-   MOBILE
-===================================================== */
-@media (max-width: 768px) {
-
-  .menu-toggle {
-    display: block;
+  /* ======================
+     BRANDS LIST
+  ====================== */
+  #brands a {
+    text-decoration: none;
+    color: #111;
+    font-size: 15px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f1f1;
   }
-
-  .navbar {
-    position: fixed;
-    top: 64px;
-    left: -100%;
-    width: 80%;
-    max-width: 320px;
-    height: calc(100vh - 64px);
-    background: #fff;
-    flex-direction: column;
-    padding: 24px;
-    gap: 18px;
-    transition: left .35s ease;
-    z-index: 2600;
-    box-shadow: 8px 0 30px rgba(0,0,0,.12);
-  }
-
-  .navbar.active {
-    left: 0;
-  }
+/* ======================
+   SEARCH MOBILE FIX
+====================== */
+@media (max-width: 1024px) {
 
   .search-container {
-    padding: 70px 24px 40px;
+    padding: 70px 20px 40px;
     gap: 32px;
   }
 
@@ -436,29 +580,73 @@ html, body {
     display: none;
   }
 
-  .search-mobile-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-    margin: 12px 0;
-  }
-
   .search-results-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 14px;
   }
 
   .search-input-wrapper {
-    max-width: 90%;
+    max-width: 100%;
     padding: 12px 18px;
   }
 
   .search-input-wrapper input {
     font-size: 20px;
   }
+
 }
 
+  /* ======================
+     ANIMATION
+  ====================== */
+  @keyframes slideFade {
+    from {
+      opacity: 0;
+      transform: translateX(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+/* ======================
+   SEARCH MOBILE DISPLAY
+====================== */
+@media (max-width: 1024px) {
+
+  .search-mobile-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+}
+.mobile-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.mobile-logo {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.mobile-close {
+  background: none;
+  border: none;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+/* Header blanc quand menu ouvert */
+body.menu-open .header {
+  box-shadow: 0 4px 20px rgba(0,0,0,.08);
+  backdrop-filter: none !important;
+}
 </style>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -472,6 +660,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const results = document.getElementById("searchResults");
   const recentBox = document.querySelector(".recent-tags");
   const mobileTagsBox = document.querySelector(".search-mobile-tags");
+  
 
   /* ==========================
        MENU MOBILE
@@ -480,17 +669,16 @@ document.addEventListener("DOMContentLoaded", () => {
     menuToggle.classList.toggle("active");
     navbar.classList.toggle("active");
     menuOverlay.classList.toggle("active");
-          console.log("Menu hamburger ouvert ?", menuToggle.classList.contains("active"));
+    document.body.classList.toggle("menu-open"); // <-- ajoute ça
+});
 
-  });
-
-  menuOverlay.addEventListener("click", () => {
+menuOverlay.addEventListener("click", () => {
     menuToggle.classList.remove("active");
     navbar.classList.remove("active");
     menuOverlay.classList.remove("active");
-          console.log("Menu hamburger fermé");
+    document.body.classList.remove("menu-open"); // <-- et ici
+});
 
-  });
 
   /* ==========================
        RECHERCHES RÉCENTES
@@ -607,4 +795,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+</script>
+<script>
+  /* ==========================
+   SWITCH TABS MOBILE MENU
+========================== */
+const tabButtons = document.querySelectorAll(".tab-btn");
+const tabContents = document.querySelectorAll(".tab-content");
+
+tabButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+
+    // remove active
+    tabButtons.forEach(b => b.classList.remove("active"));
+    tabContents.forEach(c => c.classList.remove("active"));
+
+    // add active
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab).classList.add("active");
+
+  });
+});
+const mobileClose = document.getElementById("mobileClose");
+
+mobileClose.addEventListener("click", () => {
+  menuToggle.classList.remove("active");
+  navbar.classList.remove("active");
+  menuOverlay.classList.remove("active");
+  document.body.classList.remove("menu-open");
+});
+
 </script>

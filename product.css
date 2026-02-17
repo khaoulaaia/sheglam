@@ -527,10 +527,6 @@ body {
     gap: 30px;
   }
 
-  .product-main-image img {
-    max-height: 500px;
-  }
-
   /* Titre produit */
   .product-right h1 {
     font-size: 32px;
@@ -573,6 +569,8 @@ body {
   /* Image principale plus compacte */
   .product-main-image img {
     max-height: 350px;
+      object-fit: contain;
+
   }
 
   /* Titre produit réduit */
