@@ -12,7 +12,7 @@
     <span>Total</span>
     <strong id="cartTotal">0.00DA</strong>
   </div>
-        <button class="btn checkout-btn">Passer à la caisse</button>
+        <button class="checkoutBtn">Passer à la caisse</button>
     </div>
 </div>
 
@@ -29,6 +29,7 @@
 
 <!-- Overlay -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
+<script src="/sheglam/js/checkout.js" defer></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {

@@ -301,6 +301,8 @@ window.addEventListener("scroll", () => {
 </script>
 
 <script src="/sheglam/js/shop.js?v=<?= time(); ?>"></script>
+<script src="/sheglam/js/checkout.js" defer></script>
+
 <?php include 'includes/footer.php'; ?>
 
 </body>
