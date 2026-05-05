@@ -29,7 +29,7 @@
 
 <!-- Overlay -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
-<script src="/sheglam/js/checkout.js" defer></script>
+<script src="/js/checkout.js" defer></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -471,5 +471,44 @@ document.addEventListener("DOMContentLoaded", function() {
 .remove-wishlist:hover {
   opacity: 1;
 }
+.checkout-btn,
+.checkoutBtn {
+  position: relative;
+  width: 100%;
+  padding: 17px 24px;
+  background: #111;
+  color: #fff;
+  border: none;
+  font-family: "Didot", "Playfair Display", serif;
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  cursor: pointer;
+  overflow: hidden;
+  transition: color 0.45s ease;
+  isolation: isolate; /* crée un nouveau contexte d'empilement */
+}
 
+/* Slide blanc */
+.checkout-btn::before,
+.checkoutBtn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  transform: translateX(-101%);
+  transition: transform 0.45s cubic-bezier(0.77, 0, 0.18, 1);
+  z-index: -1; /* DERRIÈRE le texte, pas devant */
+}
+
+.checkout-btn:hover::before,
+.checkoutBtn:hover::before {
+  transform: translateX(0);
+}
+
+.checkout-btn:hover,
+.checkoutBtn:hover {
+  color: #111;
+  outline: 1px solid #111;
+}
 </style>

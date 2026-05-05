@@ -1,47 +1,54 @@
+/**
+ * shop.js — SheGlamour
+ * BASE_URL est injecté par PHP dans chaque page via :
+ *   <script>const BASE_URL = "<?= $b ?>";</script>
+ * avant ce fichier. Valeur : "" (production) ou "/sheglam" (local).
+ */
+
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ===============================
-  // ÉTAT GLOBAL
-  // ===============================
-  const cart = JSON.parse(localStorage.getItem("cart")) || {};
+  // BASE_URL défini globalement par PHP, fallback vide
+  const B = (typeof BASE_URL !== "undefined") ? BASE_URL : "";
+
+  // ─── ÉTAT GLOBAL ─────────────────────────────────────
+  const cart     = JSON.parse(localStorage.getItem("cart"))     || {};
   const wishlist = JSON.parse(localStorage.getItem("wishlist")) || {};
 
-  const saveCart = () => localStorage.setItem("cart", JSON.stringify(cart));
+  const saveCart     = () => localStorage.setItem("cart",     JSON.stringify(cart));
   const saveWishlist = () => localStorage.setItem("wishlist", JSON.stringify(wishlist));
 
-  // ===============================
-  // OUTILS
-  // ===============================
-  const buildKey = (productId, shade) =>
-    shade ? `${productId}__${shade}` : `${productId}`;
+  // ─── UTILS ───────────────────────────────────────────
+  const buildKey = (productId, shade) => shade ? `${productId}__${shade}` : `${productId}`;
 
-  const getProductData = el => {
+  /** Normalise une URL image vers un chemin absolu */
+  const normalizeImage = (url) => {
+    if (!url) return B + "/images/placeholder.jpg";
+    if (url.startsWith("http")) return url;
+    // Retire tout préfixe /sheglam/images/ ou images/ existant
+    const filename = url.split("/").pop();
+    return B + "/images/" + filename;
+  };
+
+  const getProductData = (el) => {
     if (!el) return null;
-    let image = el.dataset.image_url;
-    if (!image) return null;
-    if (!image.startsWith("http")) {
-      image = "/sheglam/images/" + image.split("/").pop();
-    }
+    const raw = el.dataset.image_url;
+    if (!raw) return null;
     return {
       productId: el.dataset.productId,
-      name: el.dataset.name,
-      price: parseFloat(el.dataset.price.replace(",", ".")),
-      image
+      name:      el.dataset.name,
+      price:     parseFloat(el.dataset.price.replace(",", ".")),
+      image:     normalizeImage(raw)
     };
   };
 
   const updateCartTotal = () => {
     let total = 0;
-    Object.values(cart).forEach(item => {
-      total += item.price * item.quantity;
-    });
-    const totalEl = document.getElementById("cartTotal");
-    if (totalEl) totalEl.textContent = `${total.toFixed(2)}DA`;
+    Object.values(cart).forEach(item => { total += item.price * item.quantity; });
+    const el = document.getElementById("cartTotal");
+    if (el) el.textContent = `${total.toFixed(2)} DA`;
   };
 
-  // ===============================
-  // PANIER – AJOUT
-  // ===============================
+  // ─── PANIER — AJOUT ──────────────────────────────────
   function addToCart({ productId, name, price, image, quantity = 1, shade = null }) {
     const key = buildKey(productId, shade);
     if (cart[key]) {
@@ -54,9 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.renderCart();
   }
 
-  // ===============================
-  // RENDU PANIER (SIDEBAR)
-  // ===============================
+  // ─── PANIER — RENDU ──────────────────────────────────
   window.renderCart = () => {
     const cartItemsEl = document.getElementById("cartItems");
     if (!cartItemsEl) return;
@@ -70,47 +75,36 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     Object.entries(cart).forEach(([key, item]) => {
-      let imageUrl = item.image_url || "";
-      if (imageUrl && !imageUrl.startsWith("http")) {
-        imageUrl = "/sheglam/images/" + imageUrl.split("/").pop();
-      }
+      const imgUrl = normalizeImage(item.image_url);
 
       const div = document.createElement("div");
       div.className = "cart-item";
       div.innerHTML = `
-        <img src="${imageUrl}" alt="${item.name}" class="cart-item-img">
+        <img src="${imgUrl}" alt="${item.name}" class="cart-item-img">
         <div class="cart-item-info">
-          <h4>${item.name}${item.shade ? " - " + item.shade : ""}</h4>
-          <div class="cart-item-price">${item.price.toFixed(2)}DA</div>
+          <h4>${item.name}${item.shade ? " — " + item.shade : ""}</h4>
+          <div class="cart-item-price">${item.price.toFixed(2)} DA</div>
           <div class="quantity-controls">
-            <button class="decrease">-</button>
+            <button class="decrease">−</button>
             <span class="quantity">${item.quantity}</span>
             <button class="increase">+</button>
-            <button class="remove-item">x</button>
+            <button class="remove-item">✕</button>
           </div>
         </div>
       `;
 
       div.querySelector(".increase").onclick = () => {
         item.quantity++;
-        saveCart();
-        updateCartTotal();
-        window.renderCart();
+        saveCart(); updateCartTotal(); window.renderCart();
       };
-
       div.querySelector(".decrease").onclick = () => {
         item.quantity--;
         if (item.quantity <= 0) delete cart[key];
-        saveCart();
-        updateCartTotal();
-        window.renderCart();
+        saveCart(); updateCartTotal(); window.renderCart();
       };
-
       div.querySelector(".remove-item").onclick = () => {
         delete cart[key];
-        saveCart();
-        updateCartTotal();
-        window.renderCart();
+        saveCart(); updateCartTotal(); window.renderCart();
       };
 
       cartItemsEl.appendChild(div);
@@ -119,27 +113,54 @@ document.addEventListener("DOMContentLoaded", () => {
     updateCartTotal();
   };
 
-  // ===============================
-  // WISHLIST – AJOUT
-  // ===============================
+  // ─── WISHLIST — AJOUT ────────────────────────────────
   document.body.addEventListener("click", e => {
     const btn = e.target.closest(".add-to-wishlist");
     if (!btn) return;
 
     const productId = btn.dataset.productId;
-    const name = btn.dataset.name;
-    const price = parseFloat(btn.dataset.price.replace(",", "."));
-    const image = btn.dataset.image_url;
-    const hasShades = btn.dataset.hasShades === "1";
-
-    wishlist[productId] = { productId, name, price, image_url: image, hasShades };
+    wishlist[productId] = {
+      productId,
+      name:      btn.dataset.name,
+      price:     parseFloat(btn.dataset.price.replace(",", ".")),
+      image_url: normalizeImage(btn.dataset.image_url),
+      hasShades: btn.dataset.hasShades === "1"
+    };
     saveWishlist();
     alert("Produit ajouté à la wishlist !");
   });
 
-  // ===============================
-  // MODAL TEINTES + QUANTITÉ
-  // ===============================
+  // ─── WISHLIST — RENDU ────────────────────────────────
+  function renderWishlist() {
+    const container = document.getElementById("wishlistItems");
+    if (!container) return;
+    container.innerHTML = "";
+    const wl = JSON.parse(localStorage.getItem("wishlist")) || {};
+    if (!Object.keys(wl).length) {
+      container.innerHTML = "<p>Votre wishlist est vide.</p>";
+      return;
+    }
+    Object.values(wl).forEach(item => {
+      const div = document.createElement("div");
+      div.className = "wishlist-item";
+      div.innerHTML = `
+        <img src="${normalizeImage(item.image_url)}" alt="${item.name}" class="wishlist-item-img">
+        <h4>${item.name}${item.shade ? " — " + item.shade : ""}</h4>
+        <p>${item.price.toFixed(2)} DA</p>
+        <button class="remove-wishlist"       data-product-id="${item.productId}">Supprimer</button>
+        <button class="add-to-cart-wishlist"
+          data-product-id="${item.productId}"
+          data-name="${item.name}"
+          data-price="${item.price}"
+          data-image_url="${item.image_url}"
+          data-has-shades="${item.hasShades ? 1 : 0}"
+        >Ajouter au panier</button>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  // ─── MODAL TEINTES ───────────────────────────────────
   const modal = document.getElementById("productModal");
 
   if (modal) {
@@ -165,58 +186,22 @@ document.addEventListener("DOMContentLoaded", () => {
       modal.style.display = "flex";
       document.body.style.overflow = "hidden";
     };
-
     const closeModal = () => {
       modal.style.display = "none";
       document.body.style.overflow = "auto";
-      selectedShade  = null;
-      currentProduct = null;
-      currentQuantity = 1;
+      selectedShade = null; currentProduct = null; currentQuantity = 1;
     };
 
     closeModalBtn?.addEventListener("click", closeModal);
     modal.addEventListener("click", e => e.target === modal && closeModal());
-
     increaseQtyBtn?.addEventListener("click", () => { currentQuantity++; updateQuantityUI(); });
     decreaseQtyBtn?.addEventListener("click", () => {
       if (currentQuantity > 1) { currentQuantity--; updateQuantityUI(); }
     });
 
-    // Wishlist render (utilisé dans la modal)
-    function renderWishlist() {
-      const container = document.getElementById("wishlistItems");
-      if (!container) return;
-      container.innerHTML = "";
-      const wishlistData = JSON.parse(localStorage.getItem("wishlist")) || {};
-      if (!Object.keys(wishlistData).length) {
-        container.innerHTML = "<p>Votre wishlist est vide.</p>";
-        return;
-      }
-      Object.values(wishlistData).forEach(item => {
-        const div = document.createElement("div");
-        div.className = "wishlist-item";
-        div.innerHTML = `
-          <img src="${item.image_url}" alt="${item.name}" class="wishlist-item-img">
-          <h4>${item.name}${item.shade ? " - " + item.shade : ""}</h4>
-          <p>${item.price.toFixed(2)}DA</p>
-          <button class="remove-wishlist" data-product-id="${item.productId}">Supprimer</button>
-          <button class="add-to-cart-wishlist"
-            data-product-id="${item.productId}"
-            data-name="${item.name}"
-            data-price="${item.price}"
-            data-image_url="${item.image_url}"
-            data-has-shades="${item.hasShades ? 1 : 0}"
-          >Ajouter au panier</button>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    // Ajout depuis modal
     addFromModalBtn?.addEventListener("click", () => {
-      if (!selectedShade) { alert("Veuillez choisir une teinte."); return; }
-      if (!currentProduct) return;
-
+      if (!selectedShade)   { alert("Veuillez choisir une teinte."); return; }
+      if (!currentProduct)  return;
       addToCart({ ...currentProduct, quantity: currentQuantity, shade: selectedShade });
 
       if (modal.dataset.fromWishlist === "1") {
@@ -228,26 +213,23 @@ document.addEventListener("DOMContentLoaded", () => {
       closeModal();
     });
 
-    // Ouverture modal teintes
     async function openShadeModal(button) {
       const data = getProductData(button);
       if (!data) return;
 
       currentProduct = data;
-      const viewLink = document.getElementById("viewFullDetails");
-      if (viewLink) viewLink.href = `/sheglam/product.php?id=${data.productId}`;
+      selectedShade = null; currentQuantity = 1; updateQuantityUI();
 
-      selectedShade   = null;
-      currentQuantity = 1;
-      updateQuantityUI();
+      const viewLink = document.getElementById("viewFullDetails");
+      if (viewLink) viewLink.href = `${B}/product.php?id=${data.productId}`;
 
       if (productNameEl)  productNameEl.textContent  = data.name;
-      if (productPriceEl) productPriceEl.textContent = `${data.price.toFixed(2)}DA`;
+      if (productPriceEl) productPriceEl.textContent = `${data.price.toFixed(2)} DA`;
       if (productImageEl) productImageEl.src          = data.image;
-      if (shadeOptionsEl) shadeOptionsEl.innerHTML   = "<p>Chargement...</p>";
+      if (shadeOptionsEl) shadeOptionsEl.innerHTML   = "<p>Chargement…</p>";
 
       try {
-        const res    = await fetch(`/sheglam/includes/get_shades.php?product_id=${button.dataset.productId}`);
+        const res    = await fetch(`${B}/includes/get_shades.php?product_id=${button.dataset.productId}`);
         const shades = await res.json();
 
         shadeOptionsEl.innerHTML = "";
@@ -278,7 +260,7 @@ document.addEventListener("DOMContentLoaded", () => {
         openModal();
       } catch (err) {
         console.error("Erreur teintes", err);
-        shadeOptionsEl.innerHTML = "<p>Erreur de chargement.</p>";
+        if (shadeOptionsEl) shadeOptionsEl.innerHTML = "<p>Erreur de chargement.</p>";
       }
     }
 
@@ -288,9 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ===============================
-  // AJOUT PANIER (SANS TEINTE)
-  // ===============================
+  // ─── AJOUT PANIER DIRECT (sans teinte) ───────────────
   document.body.addEventListener("click", e => {
     const addBtn = e.target.closest(".add-to-cart");
     if (!addBtn) return;
@@ -299,14 +279,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!data) return;
     const wrapper  = addBtn.closest(".add-to-cart-wrapper");
     const qtyInput = wrapper?.querySelector("input[name='quantity']");
-    const quantity = qtyInput ? Math.max(1, parseInt(qtyInput.value)) : 1;
+    const quantity = qtyInput ? Math.max(1, parseInt(qtyInput.value) || 1) : 1;
     addToCart({ ...data, quantity });
     if (qtyInput) qtyInput.value = 1;
   });
 
-  // ===============================
-  // CHECKOUT — BOUTON PASSER COMMANDE
-  // ===============================
+  // ─── CHECKOUT ────────────────────────────────────────
   document.body.addEventListener("click", e => {
     if (e.target.closest(".checkoutBtn, #checkoutBtn, [data-action='checkout']")) {
       e.preventDefault();
@@ -319,58 +297,53 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ===============================
-  // INIT
-  // ===============================
+  // ─── INIT ────────────────────────────────────────────
   window.renderCart();
   updateCartTotal();
 
-});
+}); // DOMContentLoaded
 
-// ===============================
-// FILTRES & TRI  — guard: page catalogue uniquement
-// ===============================
-const sortPrice  = document.getElementById("sortPrice");
-const filterSale = document.getElementById("filterSale");
-const filterBrand = document.getElementById("filterBrand");
-const grid = document.querySelector(".products-grid");
+// ─── FILTRES (page catalogue uniquement) ──────────────
+document.addEventListener("DOMContentLoaded", () => {
+  const sortPrice   = document.getElementById("sortPrice");
+  const filterSale  = document.getElementById("filterSale");
+  const filterBrand = document.getElementById("filterBrand");
+  const grid        = document.querySelector(".products-grid");
 
-if (sortPrice && filterSale && filterBrand && grid) {
+  if (!sortPrice || !filterSale || !filterBrand || !grid) return;
 
   const cards = [...document.querySelectorAll(".product-card")];
 
-  // Remplir les marques
+  // Remplir marques dynamiquement
   const brands = [...new Set(cards.map(c => c.dataset.brand).filter(Boolean))];
   brands.forEach(b => {
     const opt = document.createElement("option");
-    opt.value = b;
-    opt.textContent = b;
+    opt.value = b; opt.textContent = b;
     filterBrand.appendChild(opt);
   });
 
   function applyFilters() {
-    let visibleCards = cards.filter(card => {
-      const brand  = card.dataset.brand;
-      const isSale = card.dataset.sale === "1";
-      if (filterSale.checked && !isSale) return false;
-      if (filterBrand.value && filterBrand.value !== brand) return false;
+    let visible = cards.filter(card => {
+      if (filterSale.checked && card.dataset.sale !== "1") return false;
+      if (filterBrand.value && card.dataset.brand !== filterBrand.value) return false;
       return true;
     });
 
     if (sortPrice.value) {
-      visibleCards.sort((a, b) => {
+      visible.sort((a, b) => {
         const pa = parseFloat(a.dataset.price);
         const pb = parseFloat(b.dataset.price);
         return sortPrice.value === "asc" ? pa - pb : pb - pa;
       });
     }
 
+    // Réafficher dans la grille (via les liens parents)
     grid.innerHTML = "";
-    visibleCards.forEach(card => grid.appendChild(card));
+    visible.forEach(card => {
+      const link = card.closest("a") || card;
+      grid.appendChild(link);
+    });
   }
 
-  [sortPrice, filterSale, filterBrand].forEach(el =>
-    el.addEventListener("change", applyFilters)
-  );
-
-}
+  [sortPrice, filterSale, filterBrand].forEach(el => el.addEventListener("change", applyFilters));
+});

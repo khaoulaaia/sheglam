@@ -9,7 +9,7 @@
 
 body {
   font-family: "Didot", "Playfair Display", "Times New Roman", serif;
-  background-color: #ffffff;
+  background-color: #ffffff !important;
   color: #111;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;

@@ -23,7 +23,7 @@
   // ===================================================
   // 2. SERVICE WORKER + PUSH NOTIFICATIONS
   // ===================================================
-  const SW_PATH = "/sheglam/sw.js";
+  const SW_PATH = "/sw.js";
 
   async function registerSW() {
     if (!("serviceWorker" in navigator)) return null;
@@ -44,7 +44,7 @@
     return await Notification.requestPermission();
   }
 
-  function sendNativeNotif(title, body, icon = "/sheglam/images/logo.png") {
+  function sendNativeNotif(title, body, icon = "/images/logo.png") {
     if (Notification.permission === "granted") {
       new Notification(title, {
         body, icon, badge: icon,
@@ -345,7 +345,7 @@
     const itemsHTML = items.map((item) => {
       total += item.price * item.quantity;
       let img = item.image_url || "";
-      if (img && !img.startsWith("http")) img = "/sheglam/images/" + img.split("/").pop();
+      if (img && !img.startsWith("http")) img = "/images/" + img.split("/").pop();
       return `
         <div class="sg-summary-item">
           <img src="${img}" alt="${item.name}" onerror="this.style.display='none'">
@@ -571,7 +571,7 @@
     };
 
     try {
-      const res = await fetch("/sheglam/includes/place_order.php", {
+      const res = await fetch("/includes/place_order.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(order),
