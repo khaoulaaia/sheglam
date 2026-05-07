@@ -16,8 +16,8 @@ $b = BASE_URL;                       // raccourci
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="<?= $b ?>/sidebar.css?v=<?= time() ?>">
   <link rel="stylesheet" href="<?= $b ?>/index.css?v=<?= time() ?>">
+<link rel="stylesheet" href="<?= $b ?>/sidebar.css?v=<?= time() ?>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
