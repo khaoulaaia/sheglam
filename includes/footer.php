@@ -2,9 +2,14 @@
   <div class="footer-container">
 
     <!-- COLONNE 1 -->
-    <div class="footer-col">
-      <h4>SheGlamour</h4>
-      <p>L’élégance du maquillage.<br>Le luxe au quotidien.</p>
+    <div class="footer-col footer-brand">
+      <h3 class="footer-logo">SheGlamour</h3>
+      <p>L'élégance du maquillage.<br>Le luxe au quotidien.</p>
+      <div class="footer-socials">
+        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+      </div>
     </div>
 
     <!-- COLONNE 2 -->
@@ -24,154 +29,211 @@
       <ul>
         <li><a href="#">Livraison & retours</a></li>
         <li><a href="#">Conditions générales</a></li>
-        <li><a href="#">Politique de confidentialité</a></li>
+        <li><a href="#">Confidentialité</a></li>
+        <li><a href="#">FAQ</a></li>
       </ul>
     </div>
 
     <!-- COLONNE 4 -->
     <div class="footer-col">
-      <h4>Suivez-nous</h4>
-      <div class="footer-socials">
-        <a href="#"><i class="fab fa-instagram"></i></a>
-        <a href="#"><i class="fab fa-facebook-f"></i></a>
-        <a href="#"><i class="fab fa-tiktok"></i></a>
-      </div>
+      <h4>Contact</h4>
+      <ul class="footer-contact">
+        <li><i class="fab fa-whatsapp"></i> WhatsApp</li>
+        <li><i class="fab fa-instagram"></i> Instagram DM</li>
+        <li><i class="fa-solid fa-location-dot"></i> Algérie</li>
+      </ul>
     </div>
 
   </div>
 
+  <!-- Séparateur décoratif -->
+  <div class="footer-divider">
+    <span></span><span class="footer-diamond">◆</span><span></span>
+  </div>
+
   <div class="footer-bottom">
-    <p>© <?= date('Y'); ?> SheGlamour — Tous droits réservés</p>
+    <p>© <?= date('Y') ?> SheGlamour — Tous droits réservés</p>
   </div>
 </footer>
 <style>
-    .luxury-footer {
-  background: #000;
-  color: #fff;
-  padding: 70px 0 30px;
-  font-family: 'Poppins', sans-serif;
+  /* ══ FOOTER — OLD MONEY PALETTE ════════════════════════════ */
+.luxury-footer {
+  background: #2E1A0A;
+  color: #d9d0b4;
+  padding: 72px 0 0;
+  font-family: 'DM Sans', Georgia, sans-serif;
+  position: relative;
 }
 
+/* Trait décoratif en haut */
+.luxury-footer::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: #d9d0b4;
+}
+
+/* ── Grille ─────────────────────────────────────────────── */
 .footer-container {
   max-width: 1200px;
-  margin: auto;
+  margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 50px;
-  padding: 0 30px;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: 48px;
+  padding: 0 5%;
 }
 
-.footer-col h4 {
-  font-size: 14px;
-  letter-spacing: 2px;
-  margin-bottom: 20px;
-  text-transform: uppercase;
+/* ── Colonne brand ──────────────────────────────────────── */
+.footer-logo {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 26px;
+  font-weight: 300;
+  letter-spacing: .08em;
+  color: #ece8db;
+  margin: 0 0 14px;
 }
 
-.footer-col p {
-  font-size: 14px;
-  color: #bbb;
+.footer-brand p {
+  font-size: 13.5px;
+  color: rgba(217, 208, 180, .6);
   line-height: 1.8;
+  margin: 0 0 24px;
+}
+
+/* ── Réseaux sociaux ────────────────────────────────────── */
+.footer-socials {
+  display: flex;
+  gap: 12px;
+}
+
+.footer-socials a {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(217, 208, 180, .3);
+  color: #d9d0b4;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background .25s, border-color .25s, color .25s, transform .25s;
+}
+
+.footer-socials a:hover {
+  background: #d9d0b4;
+  border-color: #d9d0b4;
+  color: #2E1A0A;
+  transform: translateY(-3px);
+}
+
+/* ── Colonnes liens ─────────────────────────────────────── */
+.footer-col h4 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: #ece8db;
+  margin: 0 0 20px;
 }
 
 .footer-col ul {
   list-style: none;
   padding: 0;
-}
-
-.footer-col ul li {
-  margin-bottom: 12px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .footer-col ul li a {
-  color: #bbb;
-  font-size: 14px;
+  color: rgba(217, 208, 180, .6);
+  font-size: 13.5px;
   text-decoration: none;
-  transition: color 0.3s;
+  transition: color .2s, padding-left .2s;
+  display: inline-block;
 }
 
 .footer-col ul li a:hover {
-  color: #fff;
+  color: #ece8db;
+  padding-left: 4px;
 }
 
-.footer-socials {
+/* ── Contact ────────────────────────────────────────────── */
+.footer-contact {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
-  gap: 18px;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.footer-socials a {
-  color: #fff;
-  font-size: 18px;
-  transition: transform 0.3s, opacity 0.3s;
+.footer-contact li {
+  color: rgba(217, 208, 180, .6);
+  font-size: 13.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.footer-socials a:hover {
-  transform: translateY(-3px);
-  opacity: 0.7;
+.footer-contact li i {
+  color: #d9d0b4;
+  font-size: 15px;
+  width: 16px;
 }
 
+/* ── Séparateur décoratif ───────────────────────────────── */
+.footer-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 52px 5% 0;
+  opacity: .25;
+}
+
+.footer-divider span:not(.footer-diamond) {
+  flex: 1;
+  height: 1px;
+  background: #d9d0b4;
+}
+
+.footer-diamond {
+  font-size: 8px;
+  color: #d9d0b4;
+}
+
+/* ── Copyright ──────────────────────────────────────────── */
 .footer-bottom {
-  margin-top: 60px;
   text-align: center;
-  font-size: 13px;
-  color: #777;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  padding-top: 20px;
+  font-size: 12px;
+  color: rgba(217, 208, 180, .35);
+  letter-spacing: .06em;
+  padding: 20px 5% 28px;
 }
-/* --- Responsive pour tablettes --- */
+
+/* ══ RESPONSIVE ════════════════════════════════════════════ */
 @media (max-width: 1024px) {
   .footer-container {
-    gap: 35px;
-    padding: 0 20px;
-    justify-items: center; /* centre horizontalement les colonnes */
-    text-align: center;    /* centre le texte à l’intérieur */
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
   }
-
-  .footer-col h4 {
-    font-size: 13px;
-  }
-
-  .footer-col p,
-  .footer-col ul li a {
-    font-size: 13px;
-  }
-
-  .footer-socials {
-    justify-content: center; /* centre les icônes sociales */
-  }
+  .footer-brand { grid-column: 1 / -1; }
+  .footer-brand p { max-width: 360px; }
 }
 
-/* --- Responsive pour mobiles --- */
-@media (max-width: 768px) {
+@media (max-width: 600px) {
+  .luxury-footer { padding-top: 52px; }
   .footer-container {
     grid-template-columns: 1fr;
-    gap: 25px;
-    padding: 0 15px;
-    justify-items: center; /* centre les colonnes */
-    text-align: center;    /* centre le texte */
+    gap: 28px;
+    text-align: center;
   }
-
-  .footer-col h4 {
-    font-size: 12px;
-    margin-bottom: 15px;
-  }
-
-  .footer-col p,
-  .footer-col ul li a {
-    font-size: 12px;
-  }
-
-  .footer-socials {
-    gap: 15px;
-    flex-wrap: wrap;
-    justify-content: center; /* centre les icônes sociales */
-  }
-
-  .footer-bottom {
-    font-size: 12px;
-    padding-top: 15px;
-    text-align: center; /* s’assurer que le copyright est centré */
-  }
+  .footer-brand p { max-width: 100%; }
+  .footer-socials  { justify-content: center; }
+  .footer-contact li { justify-content: center; }
+  .footer-col ul li a:hover { padding-left: 0; }
 }
-
 </style>
