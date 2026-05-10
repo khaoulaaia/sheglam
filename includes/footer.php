@@ -55,23 +55,23 @@
     <p>© <?= date('Y') ?> SheGlamour — Tous droits réservés</p>
   </div>
 </footer>
+
 <style>
-  /* ══ FOOTER — OLD MONEY PALETTE ════════════════════════════ */
+/* ══ FOOTER — Blanc & Bordeaux ════════════════════════════ */
 .luxury-footer {
-  background: #2E1A0A;
-  color: #d9d0b4;
+  background: #440B19;
+  color: #ffffff;
   padding: 72px 0 0;
   font-family: 'DM Sans', Georgia, sans-serif;
   position: relative;
 }
 
-/* Trait décoratif en haut */
 .luxury-footer::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 3px;
-  background: #d9d0b4;
+  background: #6e1a2e;
 }
 
 /* ── Grille ─────────────────────────────────────────────── */
@@ -90,13 +90,13 @@
   font-size: 26px;
   font-weight: 300;
   letter-spacing: .08em;
-  color: #ece8db;
+  color: #ffffff;
   margin: 0 0 14px;
 }
 
 .footer-brand p {
   font-size: 13.5px;
-  color: rgba(217, 208, 180, .6);
+  color: rgba(255, 255, 255, .55);
   line-height: 1.8;
   margin: 0 0 24px;
 }
@@ -108,11 +108,10 @@
 }
 
 .footer-socials a {
-  width: 36px;
-  height: 36px;
+  width: 36px; height: 36px;
   border-radius: 50%;
-  border: 1.5px solid rgba(217, 208, 180, .3);
-  color: #d9d0b4;
+  border: 1.5px solid rgba(255, 255, 255, .25);
+  color: #ffffff;
   font-size: 14px;
   display: flex;
   align-items: center;
@@ -122,9 +121,9 @@
 }
 
 .footer-socials a:hover {
-  background: #d9d0b4;
-  border-color: #d9d0b4;
-  color: #2E1A0A;
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #440B19;
   transform: translateY(-3px);
 }
 
@@ -135,21 +134,20 @@
   font-weight: 600;
   letter-spacing: .3em;
   text-transform: uppercase;
-  color: #ece8db;
+  color: #ffffff;
   margin: 0 0 20px;
 }
 
 .footer-col ul {
   list-style: none;
-  padding: 0;
-  margin: 0;
+  padding: 0; margin: 0;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
 .footer-col ul li a {
-  color: rgba(217, 208, 180, .6);
+  color: rgba(255, 255, 255, .55);
   font-size: 13.5px;
   text-decoration: none;
   transition: color .2s, padding-left .2s;
@@ -157,22 +155,21 @@
 }
 
 .footer-col ul li a:hover {
-  color: #ece8db;
+  color: #ffffff;
   padding-left: 4px;
 }
 
 /* ── Contact ────────────────────────────────────────────── */
 .footer-contact {
   list-style: none;
-  padding: 0;
-  margin: 0;
+  padding: 0; margin: 0;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
 .footer-contact li {
-  color: rgba(217, 208, 180, .6);
+  color: rgba(255, 255, 255, .55);
   font-size: 13.5px;
   display: flex;
   align-items: center;
@@ -180,7 +177,7 @@
 }
 
 .footer-contact li i {
-  color: #d9d0b4;
+  color: rgba(255, 255, 255, .75);
   font-size: 15px;
   width: 16px;
 }
@@ -191,25 +188,24 @@
   align-items: center;
   gap: 16px;
   margin: 52px 5% 0;
-  opacity: .25;
+  opacity: .2;
 }
 
 .footer-divider span:not(.footer-diamond) {
-  flex: 1;
-  height: 1px;
-  background: #d9d0b4;
+  flex: 1; height: 1px;
+  background: #ffffff;
 }
 
 .footer-diamond {
   font-size: 8px;
-  color: #d9d0b4;
+  color: #ffffff;
 }
 
 /* ── Copyright ──────────────────────────────────────────── */
 .footer-bottom {
   text-align: center;
   font-size: 12px;
-  color: rgba(217, 208, 180, .35);
+  color: rgba(255, 255, 255, .30);
   letter-spacing: .06em;
   padding: 20px 5% 28px;
 }

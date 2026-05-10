@@ -17,33 +17,35 @@ $b = BASE_URL;
   <link rel="stylesheet" href="<?= $b ?>/sidebar.css?v=<?= time() ?>">
 
   <style>
-   /* ══════════════════════════════════════════════════════════
-   PANIER — Modern Old Money · Palette Beige & Marron
+/* ══════════════════════════════════════════════════════════
+   PANIER — Blanc & Bordeaux
    ══════════════════════════════════════════════════════════ */
 
 :root {
-  --beige:      #d9d0b4;
-  --beige-l:    #FAF6F0;
-  --beige-d:    #D6C4A8;
-  --beige-mid:  #EDE5D8;
-  --marron:     #2E1A0A;
-  --marron-mid: #5C3A1E;
-  --gold:       #B8924A;
-  --gold-l:     rgba(184, 146, 74, 0.15);
-  --border:     #D6C4A8;
-  --border-s:   rgba(214, 196, 168, 0.5);
-  --text:       #2E1A0A;
-  --muted:      #9a8a76;
-  --dark:       #2E1A0A;
-  --dark-80:    rgba(46, 26, 10, .80);
-  --dark-60:    rgba(46, 26, 10, .60);
-  --dark-40:    rgba(46, 26, 10, .40);
-  --dark-20:    rgba(46, 26, 10, .20);
-  --dark-12:    rgba(46, 26, 10, .12);
-  --dark-06:    rgba(46, 26, 10, .06);
-  --glass:      rgba(250, 246, 240, 0.72);
-  --glass-s:    rgba(250, 246, 240, 0.88);
+  --bordeaux:   #440B19;
+  --bordeaux-s: #5c1022;
+  --bordeaux-l: #6e1a2e;
+  --bordeaux-xl:#8a2a3e;
+
   --white:      #ffffff;
+
+  --border:     rgba(68, 11, 25, 0.15);
+  --border-s:   rgba(68, 11, 25, 0.10);
+
+  --text:       #440B19;
+  --muted:      #6e1a2e;
+
+  --dark:       #440B19;
+  --dark-80:    rgba(68, 11, 25, .80);
+  --dark-60:    rgba(68, 11, 25, .60);
+  --dark-40:    rgba(68, 11, 25, .40);
+  --dark-20:    rgba(68, 11, 25, .20);
+  --dark-12:    rgba(68, 11, 25, .12);
+  --dark-06:    rgba(68, 11, 25, .06);
+
+  --glass:      rgba(255, 255, 255, 0.72);
+  --glass-s:    rgba(255, 255, 255, 0.88);
+
   --serif:      'Cormorant Garamond', Georgia, serif;
   --sans:       'Jost', system-ui, sans-serif;
   --ease:       cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -54,11 +56,7 @@ $b = BASE_URL;
 
 body {
   font-family: var(--sans);
-  background-color: var(--beige-l);
-  background-image: url('/images/0059376_betina-white-damask-wallpaper.jpeg');
-  background-repeat: repeat;
-  background-size: 420px auto;
-  background-attachment: fixed;
+  background: var(--white);
   color: var(--text);
   min-height: 100vh;
   display: flex;
@@ -71,8 +69,6 @@ body {
 .page-hero {
   margin-top: 90px;
   background: var(--glass-s);
-  backdrop-filter: blur(16px) saturate(160%);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
   border-bottom: 1px solid var(--border-s);
   padding: 56px 6% 46px;
   text-align: center;
@@ -83,14 +79,14 @@ body {
 .page-hero::before {
   content: "✦  ✦  ✦";
   position: absolute; top: 22px; left: 6%;
-  font-size: 9px; color: var(--gold);
-  letter-spacing: 8px; opacity: .4;
+  font-size: 9px; color: var(--bordeaux);
+  letter-spacing: 8px; opacity: .25;
 }
 .page-hero::after {
   content: "✦  ✦  ✦";
   position: absolute; top: 22px; right: 6%;
-  font-size: 9px; color: var(--gold);
-  letter-spacing: 8px; opacity: .4;
+  font-size: 9px; color: var(--bordeaux);
+  letter-spacing: 8px; opacity: .25;
 }
 
 .page-hero h1 {
@@ -101,10 +97,10 @@ body {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   line-height: 1.1;
-  color: var(--dark);
+  color: var(--bordeaux);
 }
 
-.page-hero h1 em { font-style: normal; color: var(--gold); }
+.page-hero h1 em { font-style: normal; color: var(--bordeaux-l); }
 
 .page-hero .count {
   display: inline-block;
@@ -137,7 +133,7 @@ body {
 
 .empty-state .empty-icon {
   font-size: 48px;
-  color: var(--beige-d);
+  color: var(--bordeaux-l);
   margin-bottom: 24px;
   display: block;
   animation: pulse 2.5s ease-in-out infinite;
@@ -160,28 +156,26 @@ body {
   display: inline-block;
   padding: 13px 38px;
   background: transparent;
-  color: var(--marron);
-  border: 1px solid var(--marron);
+  color: var(--bordeaux);
+  border: 1px solid var(--bordeaux);
   font-family: var(--sans);
   font-size: 9px;
   letter-spacing: 0.28em;
   text-transform: uppercase;
   text-decoration: none;
-  border-radius: 100px;
+  border-radius: 0;
   transition: background .3s var(--ease), color .3s var(--ease), box-shadow .3s;
 }
 
 .empty-state a:hover {
-  background: var(--marron);
-  color: var(--beige-l);
+  background: var(--bordeaux);
+  color: var(--white);
   box-shadow: 0 8px 28px var(--dark-20);
 }
 
 /* ── Liste articles ── */
 .cart-list-wrap {
   background: var(--glass);
-  backdrop-filter: blur(12px) saturate(160%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
   border: 1px solid var(--border-s);
 }
 
@@ -212,19 +206,20 @@ body {
 }
 
 .cart-item:last-child { border-bottom: none; }
-.cart-item:hover { background: rgba(250, 246, 240, 0.5); }
+.cart-item:hover { background: rgba(68, 11, 25, .03); }
 
 .cart-item-img {
   width: 100px;
   height: 100px;
   object-fit: contain;
-  background: var(--glass-s);
+  background: var(--white);
   border: 1px solid var(--border-s);
+  border-radius: 0;
   display: block;
   transition: border-color .3s;
 }
 
-.cart-item:hover .cart-item-img { border-color: var(--beige-d); }
+.cart-item:hover .cart-item-img { border-color: var(--border); }
 
 .cart-item-info {
   display: flex;
@@ -241,7 +236,7 @@ body {
   text-transform: uppercase;
   line-height: 1.3;
   margin-bottom: 4px;
-  color: var(--dark);
+  color: var(--bordeaux);
 }
 
 .cart-item-shade {
@@ -254,7 +249,7 @@ body {
 
 .cart-item-shade i {
   font-size: 8px;
-  color: var(--gold);
+  color: var(--bordeaux-l);
   margin-right: 5px;
 }
 
@@ -262,7 +257,7 @@ body {
   font-family: var(--sans);
   font-size: 12px;
   font-weight: 500;
-  color: var(--gold);
+  color: var(--bordeaux-l);
   letter-spacing: 0.06em;
 }
 
@@ -281,9 +276,10 @@ body {
 .qty-controls button {
   width: 30px;
   height: 30px;
-  background: var(--glass-s);
+  background: var(--white);
   border: 1px solid var(--border-s);
-  color: var(--dark);
+  border-radius: 0;
+  color: var(--bordeaux);
   font-size: 15px;
   cursor: pointer;
   display: flex;
@@ -293,9 +289,9 @@ body {
 }
 
 .qty-controls button:hover {
-  background: var(--marron);
-  color: var(--beige-l);
-  border-color: var(--marron);
+  background: var(--bordeaux);
+  color: var(--white);
+  border-color: var(--bordeaux);
 }
 
 .qty-controls .qty-display {
@@ -309,8 +305,8 @@ body {
   font-family: var(--sans);
   font-size: 12px;
   font-weight: 500;
-  color: var(--dark);
-  background: var(--glass);
+  color: var(--bordeaux);
+  background: var(--white);
 }
 
 /* Total ligne */
@@ -318,7 +314,7 @@ body {
   font-family: var(--serif);
   font-size: 16px;
   font-weight: 600;
-  color: var(--dark);
+  color: var(--bordeaux);
   margin-left: auto;
   letter-spacing: 0.04em;
 }
@@ -346,8 +342,6 @@ body {
 /* ── Récapitulatif ── */
 .cart-summary {
   background: var(--glass-s);
-  backdrop-filter: blur(16px) saturate(160%);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
   border: 1px solid var(--border-s);
   padding: 32px 26px;
   position: sticky;
@@ -361,7 +355,7 @@ body {
   font-style: italic;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--dark);
+  color: var(--bordeaux);
   margin-bottom: 24px;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--border-s);
@@ -375,7 +369,7 @@ body {
   left: 0;
   width: 24px;
   height: 1px;
-  background: var(--gold);
+  background: var(--bordeaux);
 }
 
 .summary-row {
@@ -395,14 +389,14 @@ body {
   border-top: 1px solid var(--border-s);
   font-size: 12px;
   font-weight: 600;
-  color: var(--dark);
+  color: var(--bordeaux);
 }
 
 .summary-row.total span:last-child {
   font-family: var(--serif);
   font-size: 22px;
   font-weight: 400;
-  color: var(--gold);
+  color: var(--bordeaux-l);
   letter-spacing: 0.04em;
 }
 
@@ -412,16 +406,16 @@ body {
   width: 100%;
   margin-top: 22px;
   padding: 16px 24px;
-  background: var(--marron);
-  color: var(--beige-l);
-  border: 1px solid var(--marron);
+  background: var(--bordeaux);
+  color: var(--white);
+  border: 1px solid var(--bordeaux);
   font-family: var(--sans);
   font-size: 9px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
   cursor: pointer;
   overflow: hidden;
-  border-radius: 100px;
+  border-radius: 0;
   transition: color .45s, box-shadow .3s;
   isolation: isolate;
 }
@@ -430,11 +424,11 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: var(--marron-mid);
+  background: var(--bordeaux-s);
   transform: translateX(-101%);
   transition: transform .45s cubic-bezier(.77,0,.18,1);
   z-index: -1;
-  border-radius: 100px;
+  border-radius: 0;
 }
 
 .btn-caisse:hover::before { transform: translateX(0); }
@@ -454,7 +448,7 @@ body {
   text-underline-offset: 3px;
   transition: color .25s;
 }
-.continue-link:hover { color: var(--dark); text-decoration: underline; }
+.continue-link:hover { color: var(--bordeaux); text-decoration: underline; }
 
 /* Code promo */
 .promo-wrap {
@@ -480,28 +474,26 @@ body {
   padding: 10px 14px;
   border: 1px solid var(--border-s);
   border-right: none;
+  border-radius: 0;
   font-family: var(--sans);
   font-size: 11px;
   font-weight: 300;
   outline: none;
-  background: var(--glass);
-  color: var(--dark);
+  background: var(--white);
+  color: var(--bordeaux);
   letter-spacing: 0.04em;
-  transition: border-color .25s, background .25s;
+  transition: border-color .25s;
 }
 
-.promo-row input:focus {
-  border-color: var(--gold);
-  background: var(--glass-s);
-}
-
+.promo-row input:focus { border-color: var(--bordeaux); }
 .promo-row input::placeholder { color: var(--muted); }
 
 .promo-row button {
   padding: 10px 16px;
-  background: var(--marron);
-  color: var(--beige-l);
+  background: var(--bordeaux);
+  color: var(--white);
   border: none;
+  border-radius: 0;
   font-family: var(--sans);
   font-size: 9px;
   letter-spacing: 0.18em;
@@ -510,7 +502,7 @@ body {
   transition: background .3s;
   white-space: nowrap;
 }
-.promo-row button:hover { background: var(--marron-mid); }
+.promo-row button:hover { background: var(--bordeaux-s); }
 
 /* Badges sécurité */
 .secure-badges {
@@ -533,7 +525,7 @@ body {
   letter-spacing: 0.1em;
 }
 
-.secure-badge i { color: var(--gold); font-size: 10px; }
+.secure-badge i { color: var(--bordeaux-l); font-size: 10px; }
 
 /* ── Responsive ── */
 @media (max-width: 940px) {
@@ -594,7 +586,7 @@ body {
         <input type="text" id="promoInput" placeholder="ex : BEAUTE20">
         <button id="promoBtn">Appliquer</button>
       </div>
-      <div id="promoMsg" style="font-size:11px;color:var(--rose-dark);margin-top:8px;letter-spacing:.08em;"></div>
+      <div id="promoMsg" style="font-size:11px;color:var(--bordeaux-l);margin-top:8px;letter-spacing:.08em;"></div>
     </div>
 
     <!-- Badges -->
@@ -611,11 +603,6 @@ body {
 <script>const BASE_URL = "<?= $b ?>";</script>
 
 <script>
-/*
- * La page panier gère son propre rendu via #pageCartList.
- * shop.js gère uniquement la SIDEBAR (#cartItems dans sidebar).
- * On évite tout conflit en utilisant des IDs différents.
- */
 document.addEventListener("DOMContentLoaded", function () {
 
   const B         = BASE_URL;
@@ -778,7 +765,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const msg  = document.getElementById("promoMsg");
     if (PROMOS[code]) {
       msg.textContent = `✓ Code "${code}" appliqué — ${PROMOS[code]}% de remise`;
-      msg.style.color = "var(--rose-dark)";
+      msg.style.color = "var(--bordeaux-l)";
     } else {
       msg.textContent = "Code invalide ou expiré.";
       msg.style.color = "#c00";
@@ -796,17 +783,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
   window.__pageRenderCart = renderPage;
 
-  /* Stocke l'original de shop.js après son chargement */
   const origRender = window.renderCart;
   window.renderCart = function (...args) {
-    if (typeof origRender === "function") origRender(...args); // sidebar
-    renderPage(); // notre page
+    if (typeof origRender === "function") origRender(...args);
+    renderPage();
   };
   window.__sidebarRenderCart = () => {
     if (typeof origRender === "function") origRender();
   };
 
-  /* Sync si l'utilisateur a le panier ouvert dans un autre onglet */
   window.addEventListener("storage", renderPage);
 
   /* ── Init ── */

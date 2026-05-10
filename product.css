@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════
-   PRODUCT — Modern Old Money · Palette Beige & Marron
+   PRODUCT — Blanc & Bordeaux
    Fonts :
    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
    ══════════════════════════════════════════════════════════ */
@@ -8,28 +8,30 @@
 /* ══ VARIABLES ══════════════════════════════════════════════ */
 
 :root {
-  --beige:      #d9d0b4;
-  --beige-l:    #FAF6F0;
-  --beige-d:    #D6C4A8;
-  --beige-mid:  #EDE5D8;
-  --marron:     #2E1A0A;
-  --marron-mid: #5C3A1E;
-  --gold:       #B8924A;
-  --gold-l:     rgba(184, 146, 74, 0.15);
-  --border:     #D6C4A8;
-  --border-s:   rgba(214, 196, 168, 0.5);
-  --text:       #2E1A0A;
-  --muted:      #9a8a76;
-  --dark:       #2E1A0A;
-  --dark-80:    rgba(46, 26, 10, .80);
-  --dark-60:    rgba(46, 26, 10, .60);
-  --dark-40:    rgba(46, 26, 10, .40);
-  --dark-20:    rgba(46, 26, 10, .20);
-  --dark-12:    rgba(46, 26, 10, .12);
-  --dark-06:    rgba(46, 26, 10, .06);
-  --glass:      rgba(250, 246, 240, 0.72);
-  --glass-s:    rgba(250, 246, 240, 0.88);
-  --white:      #ffffff;
+  --bordeaux:   #440B19;
+  --bordeaux-s: #5c1022;
+  --bordeaux-l: #6e1a2e;
+  --bordeaux-xl:#8a2a3e;
+
+  --white:      #F5F1EE;
+
+  --border:     rgba(68, 11, 25, 0.15);
+  --border-s:   rgba(68, 11, 25, 0.10);
+
+  --text:       #440B19;
+  --muted:      #6e1a2e;
+
+  --dark:       #440B19;
+  --dark-80:    rgba(68, 11, 25, .80);
+  --dark-60:    rgba(68, 11, 25, .60);
+  --dark-40:    rgba(68, 11, 25, .40);
+  --dark-20:    rgba(68, 11, 25, .20);
+  --dark-12:    rgba(68, 11, 25, .12);
+  --dark-06:    rgba(68, 11, 25, .06);
+
+  --glass:      #F5F1EE;
+  --glass-s:    #F5F1EE;
+
   --serif:      'Cormorant Garamond', Georgia, serif;
   --sans:       'Jost', system-ui, sans-serif;
   --ease:       cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -48,10 +50,7 @@
 
 body {
   font-family: var(--sans);
-  background-image: url('/images/0059376_betina-white-damask-wallpaper.jpeg') ;
-  background-repeat: repeat;
-  background-size: 420px auto;
-  background-attachment: fixed;
+  background: var(--white);
   color: var(--text);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -71,8 +70,8 @@ button { font-family: inherit; cursor: pointer; }
 
 .icon-contour {
   font-size: 18px;
-  color: var(--beige-l);
-  -webkit-text-stroke: 1px var(--marron);
+  color: var(--white);
+  -webkit-text-stroke: 1px var(--bordeaux);
 }
 
 .icons {
@@ -86,7 +85,7 @@ button { font-family: inherit; cursor: pointer; }
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--marron);
+  color: var(--bordeaux);
   background: none;
   border: none;
   font-size: 1.05rem;
@@ -94,32 +93,26 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .icons a:hover,
-.icons button:hover { color: var(--gold); }
+.icons button:hover { color: var(--bordeaux-l); }
 
 
 /* ══ HEADER ══════════════════════════════════════════════════ */
+
 .header {
   position: fixed;
   top: 0;
   width: 100%;
   padding: 20px 6%;
-
-  background: #FAF6F0 !important  ;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
+  background: var(--white);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-
   border-bottom: 1px solid transparent;
-
   z-index: 1000;
-
   transition:
     border-color 0.35s ease,
     box-shadow 0.35s ease;
 }
+
 .header.scrolled {
   border-color: var(--border-s);
   box-shadow: 0 1px 0 var(--border-s), 0 4px 24px var(--dark-06);
@@ -131,7 +124,7 @@ button { font-family: inherit; cursor: pointer; }
   font-size: 1.5rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--marron);
+  color: var(--bordeaux);
 }
 
 .header .navbar a {
@@ -140,7 +133,7 @@ button { font-family: inherit; cursor: pointer; }
   font-weight: 400;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--marron);
+  color: var(--bordeaux);
   transition: color 0.2s;
   position: relative;
 }
@@ -152,7 +145,7 @@ button { font-family: inherit; cursor: pointer; }
   left: 0;
   width: 0;
   height: 1px;
-  background: var(--gold);
+  background: var(--bordeaux);
   transition: width 0.3s var(--ease);
 }
 
@@ -186,7 +179,7 @@ button { font-family: inherit; cursor: pointer; }
   transition: color 0.2s;
 }
 
-.breadcrumb-container a:hover { color: var(--gold); }
+.breadcrumb-container a:hover { color: var(--bordeaux); }
 
 .breadcrumb-container span {
   color: var(--dark-80);
@@ -230,18 +223,17 @@ button { font-family: inherit; cursor: pointer; }
   cursor: pointer;
   transition: border-color 0.3s var(--ease), transform 0.3s var(--ease), opacity 0.3s;
   opacity: 0.7;
-  filter: none;
 }
 
 .product-left img:hover {
   opacity: 1;
-  border-color: var(--beige-d);
+  border-color: var(--border);
   transform: translateX(2px);
 }
 
 .product-left img.active {
   opacity: 1;
-  border: 1.5px solid var(--gold);
+  border: 1.5px solid var(--bordeaux);
   transform: translateX(2px);
 }
 
@@ -251,7 +243,7 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .product-thumbnails img.active {
-  border: 1.5px solid var(--gold);
+  border: 1.5px solid var(--bordeaux);
   opacity: 1;
 }
 
@@ -295,18 +287,17 @@ button { font-family: inherit; cursor: pointer; }
   font-style: italic;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--dark);
+  color: var(--bordeaux);
   margin-bottom: 6px;
   line-height: 1.1;
 }
 
-/* Ligne dorée décorative sous le titre */
 .product-right h1::after {
   content: '';
   display: block;
   width: 40px;
   height: 1px;
-  background: var(--gold);
+  background: var(--bordeaux);
   margin-top: 16px;
 }
 
@@ -318,7 +309,7 @@ button { font-family: inherit; cursor: pointer; }
   font-size: 22px;
   font-weight: 500;
   letter-spacing: 0.06em;
-  color: var(--dark);
+  color: var(--bordeaux);
   margin-bottom: 28px;
   margin-top: 20px;
 }
@@ -331,7 +322,7 @@ button { font-family: inherit; cursor: pointer; }
   font-weight: 300;
 }
 
-.sale-price { color: var(--gold); }
+.sale-price { color: var(--bordeaux-l); }
 
 
 /* ══ DESCRIPTION ═════════════════════════════════════════════ */
@@ -373,7 +364,7 @@ button { font-family: inherit; cursor: pointer; }
   backdrop-filter: blur(8px);
   font-family: var(--sans);
   font-size: 13px;
-  color: var(--dark);
+  color: var(--bordeaux);
   letter-spacing: 0.06em;
   outline: none;
   border-radius: 0;
@@ -381,8 +372,8 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .quantity-wrapper input:focus {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 2px var(--gold-l);
+  border-color: var(--bordeaux);
+  box-shadow: 0 0 0 2px rgba(68, 11, 25, .10);
 }
 
 
@@ -390,9 +381,9 @@ button { font-family: inherit; cursor: pointer; }
 
 .add-to-cart,
 .choose-shade-btn {
-  background: transparent;
-  color: var(--marron);
-  border: 1px solid var(--marron);
+  background: var(--bordeaux);
+  color: var(--white);
+  border: 1px solid var(--bordeaux);
   padding: 15px 40px;
   font-family: var(--sans);
   font-size: 9px;
@@ -400,7 +391,7 @@ button { font-family: inherit; cursor: pointer; }
   letter-spacing: 0.24em;
   text-transform: uppercase;
   cursor: pointer;
-  border-radius: 100px;
+  border-radius: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -414,8 +405,8 @@ button { font-family: inherit; cursor: pointer; }
 
 .add-to-cart:hover,
 .choose-shade-btn:hover {
-  background: var(--marron);
-  color: var(--beige-l);
+  background: var(--white);
+  color: var(--bordeaux);
   box-shadow: 0 8px 28px var(--dark-20);
 }
 
@@ -445,14 +436,14 @@ button { font-family: inherit; cursor: pointer; }
 .average-rating { margin-top: 10px; }
 
 .average-rating i {
-  color: var(--gold);
+  color: var(--bordeaux);
   font-size: 14px;
 }
 
 .stars i {
   font-size: 18px;
   cursor: pointer;
-  color: var(--gold);
+  color: var(--bordeaux);
   transition: transform 0.2s var(--ease-back);
 }
 
@@ -485,8 +476,8 @@ button { font-family: inherit; cursor: pointer; }
   background: var(--glass);
   backdrop-filter: blur(8px);
   border: 1px solid var(--border-s);
-  border-radius: 50%;
-  color: var(--marron);
+  border-radius: 0;
+  color: var(--bordeaux);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -501,9 +492,9 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .share-btn:hover {
-  background: var(--marron);
-  color: var(--beige-l);
-  border-color: var(--marron);
+  background: var(--bordeaux);
+  color: var(--white);
+  border-color: var(--bordeaux);
 }
 
 
@@ -526,7 +517,7 @@ button { font-family: inherit; cursor: pointer; }
   font-style: italic;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--dark);
+  color: var(--bordeaux);
   margin-bottom: 36px;
   position: relative;
   padding-bottom: 18px;
@@ -539,7 +530,7 @@ button { font-family: inherit; cursor: pointer; }
   left: 0;
   width: 28px;
   height: 1px;
-  background: var(--gold);
+  background: var(--bordeaux);
 }
 
 .review-form label {
@@ -564,7 +555,7 @@ button { font-family: inherit; cursor: pointer; }
   font-family: var(--sans);
   font-size: 13px;
   font-weight: 300;
-  color: var(--dark);
+  color: var(--bordeaux);
   letter-spacing: 0.04em;
   outline: none;
   transition: border-color 0.25s var(--ease);
@@ -572,7 +563,7 @@ button { font-family: inherit; cursor: pointer; }
 
 .review-form input:focus,
 .review-form textarea:focus {
-  border-color: var(--gold);
+  border-color: var(--bordeaux);
 }
 
 .review-form textarea { resize: none; }
@@ -580,8 +571,8 @@ button { font-family: inherit; cursor: pointer; }
 .review-form button {
   margin-top: 16px;
   background: transparent;
-  color: var(--marron);
-  border: 1px solid var(--marron);
+  color: var(--bordeaux);
+  border: 1px solid var(--bordeaux);
   padding: 14px 40px;
   width: 100%;
   font-family: var(--sans);
@@ -589,14 +580,14 @@ button { font-family: inherit; cursor: pointer; }
   font-weight: 500;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  border-radius: 100px;
+  border-radius: 0;
   cursor: pointer;
   transition: background 0.3s var(--ease), color 0.3s var(--ease), box-shadow 0.3s;
 }
 
 .review-form button:hover {
-  background: var(--marron);
-  color: var(--beige-l);
+  background: var(--bordeaux);
+  color: var(--white);
   box-shadow: 0 8px 28px var(--dark-20);
 }
 
@@ -616,7 +607,7 @@ button { font-family: inherit; cursor: pointer; }
   font-style: italic;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--dark);
+  color: var(--bordeaux);
   margin-bottom: 56px;
   position: relative;
 }
@@ -626,7 +617,7 @@ button { font-family: inherit; cursor: pointer; }
   display: block;
   width: 32px;
   height: 1px;
-  background: var(--gold);
+  background: var(--bordeaux);
   margin: 14px auto 0;
 }
 
@@ -658,7 +649,7 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .similar-item:hover img {
-  border-color: var(--beige-d);
+  border-color: var(--bordeaux);
   box-shadow: 0 12px 32px var(--dark-12);
 }
 
@@ -668,7 +659,7 @@ button { font-family: inherit; cursor: pointer; }
   font-weight: 400;
   font-style: italic;
   letter-spacing: 0.04em;
-  color: var(--dark);
+  color: var(--bordeaux);
   margin-bottom: 6px;
 }
 
@@ -725,9 +716,7 @@ button { font-family: inherit; cursor: pointer; }
     margin-top: 28px;
   }
 
-  .similar-products {
-    padding: 60px 24px;
-  }
+  .similar-products { padding: 60px 24px; }
 
   .similar-container {
     grid-template-columns: repeat(3, 1fr);

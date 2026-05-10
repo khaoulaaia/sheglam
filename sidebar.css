@@ -1,5 +1,5 @@
 /* =====================================================
-   SIDEBAR – LUXE MINIMAL
+   SIDEBAR – Blanc & Bordeaux
 ===================================================== */
 
 .sidebar {
@@ -8,7 +8,8 @@
   right: -420px;
   width: 400px;
   height: 100vh;
-  background: rgba(250, 246, 240, 0.92);  z-index: 5000;
+  background: rgba(255, 255, 255, 0.97);
+  z-index: 5000;
   display: flex;
   flex-direction: column;
   transition: right .45s cubic-bezier(.4,0,.2,1);
@@ -28,7 +29,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #2E1A0A;
+  border-bottom: 1px solid rgba(68, 11, 25, 0.15);
 }
 
 .sidebar-header h3 {
@@ -36,6 +37,7 @@
   font-size: 18px;
   letter-spacing: .12em;
   text-transform: uppercase;
+  color: #440B19;
   margin: 0;
 }
 
@@ -43,6 +45,7 @@
 #closeWishlist {
   font-size: 26px;
   font-weight: 300;
+  color: #440B19;
   cursor: pointer;
   opacity: .6;
   transition: opacity .25s ease;
@@ -65,7 +68,7 @@
 
 .sidebar-content p {
   font-size: 14px;
-  color: #2E1A0A;
+  color: #440B19;
   text-align: center;
   margin-top: 40px;
 }
@@ -80,15 +83,16 @@
   gap: 16px;
   margin-bottom: 24px;
 }
+
 .cart-item-img,
 .wishlist-item-img {
   width: 72px;
   height: 72px;
-  object-fit: contain;   /* 🔥 clé */
-  background: #ffff;
-  border-radius: 6px;
+  object-fit: contain;
+  background: #ffffff;
+  border-radius: 0;
+  border: 1px solid rgba(68, 11, 25, 0.10);
 }
-
 
 /* INFO */
 .cart-item-info,
@@ -102,6 +106,7 @@
   font-weight: 500;
   letter-spacing: .05em;
   text-transform: uppercase;
+  color: #440B19;
   margin-bottom: 6px;
 }
 
@@ -109,6 +114,7 @@
 .wishlist-item-info p {
   font-size: 13px;
   font-weight: 600;
+  color: #440B19;
   margin-bottom: 10px;
 }
 
@@ -126,21 +132,24 @@
   width: 26px;
   height: 26px;
   background: none;
-  border: 1px solid #2E1A0A;
+  border: 1px solid #440B19;
+  border-radius: 0;
   cursor: pointer;
   font-size: 14px;
+  color: #440B19;
   transition: all .25s ease;
 }
 
 .quantity-controls button:hover {
-  background: #2E1A0A;
-  color: #fff;
+  background: #440B19;
+  color: #ffffff;
 }
 
 .quantity-controls .quantity {
   font-size: 13px;
   min-width: 18px;
   text-align: center;
+  color: #440B19;
 }
 
 /* REMOVE */
@@ -152,6 +161,7 @@
   font-size: 11px;
   letter-spacing: .08em;
   text-transform: uppercase;
+  color: #440B19;
   cursor: pointer;
   opacity: .6;
   transition: opacity .25s ease;
@@ -168,24 +178,7 @@
 
 .sidebar-footer {
   padding: 24px;
-  border-top: 1px solid #2E1A0A;
-}
-
-.checkout-btn {
-  width: 100%;
-  padding: 14px;
-  background: #2E1A0A;
-  color: rgba(250, 246, 240, 0.92);
-  border: none;
-  font-size: 13px;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: background .3s ease;
-}
-
-.checkout-btn:hover {
-  background: #2E1A0A;
+  border-top: 1px solid rgba(68, 11, 25, 0.15);
 }
 
 /* =====================================================
@@ -195,7 +188,7 @@
 .sidebar-overlay {
   position: fixed;
   inset: 0;
-  background: #2E1A0A;
+  background: rgba(68, 11, 25, 0.35);
   opacity: 0;
   pointer-events: none;
   transition: opacity .35s ease;
@@ -217,13 +210,19 @@
     right: -100%;
   }
 }
+
+/* =====================================================
+   PRIX & TOTAL
+===================================================== */
+
 .cart-item-price {
   font-size: 13px;
   font-weight: 600;
-    color: #2E1A0A;
+  color: #440B19;
   margin-bottom: 10px;
   letter-spacing: .02em;
 }
+
 .cart-total {
   display: flex;
   justify-content: space-between;
@@ -231,8 +230,9 @@
   font-size: 14px;
   font-weight: 600;
   padding: 12px 0;
-  border-top: 1px solid #2E1A0A;
+  border-top: 1px solid rgba(68, 11, 25, 0.15);
   margin-bottom: 12px;
+  color: #440B19;
 }
 
 .cart-total span {
@@ -245,43 +245,36 @@
   font-size: 16px;
 }
 
-/* Wishlist meta row */
+/* =====================================================
+   WISHLIST META
+===================================================== */
+
 .wishlist-meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-/* Price */
 .wishlist-meta p {
   margin: 0;
   font-size: 13px;
   font-weight: 600;
+  color: #440B19;
 }
 
-/* Remove button */
-.remove-wishlist {
-  background: none;
-  border: none;
-  font-size: 11px;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  opacity: .6;
-  transition: opacity .25s ease;
-}
+/* =====================================================
+   CHECKOUT BUTTON
+===================================================== */
 
-.remove-wishlist:hover {
-  opacity: 1;
-}
 .checkout-btn,
 .checkoutBtn {
   position: relative;
   width: 100%;
   padding: 17px 24px;
-  background: #2E1A0A;
-  color:  rgba(250, 246, 240, 0.92);
+  background: #440B19;
+  color: #ffffff;
   border: none;
+  border-radius: 0;
   font-family: "Didot", "Playfair Display", serif;
   font-size: 11px;
   letter-spacing: 0.28em;
@@ -289,7 +282,7 @@
   cursor: pointer;
   overflow: hidden;
   transition: color 0.45s ease;
-  isolation: isolate; /* crée un nouveau contexte d'empilement */
+  isolation: isolate;
 }
 
 /* Slide blanc */
@@ -298,10 +291,10 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(250, 246, 240, 0.92);
-    transform: translateX(-101%);
+  background: #ffffff;
+  transform: translateX(-101%);
   transition: transform 0.45s cubic-bezier(0.77, 0, 0.18, 1);
-  z-index: -1; /* DERRIÈRE le texte, pas devant */
+  z-index: -1;
 }
 
 .checkout-btn:hover::before,
@@ -311,6 +304,6 @@
 
 .checkout-btn:hover,
 .checkoutBtn:hover {
-  color: #2E1A0A;
-  outline: 1px solid #2E1A0A;
+  color: #440B19;
+  outline: 1px solid #440B19;
 }

@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════
-   CATALOGUE — Modern Old Money · Refined Luxury
+   CATALOGUE — Blanc & Bordeaux
    Fonts :
    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
    ══════════════════════════════════════════════════════════ */
@@ -8,28 +8,30 @@
 /* ══ VARIABLES ══════════════════════════════════════════════ */
 
 :root {
-  --beige:      #d9d0b4;
-  --beige-l:    #FAF6F0;
-  --beige-d:    #D6C4A8;
-  --beige-mid:  #EDE5D8;
-  --marron:     #2E1A0A;
-  --marron-mid: #5C3A1E;
-  --gold:       #B8924A;
-  --gold-l:     rgba(184, 146, 74, 0.15);
-  --border:     #D6C4A8;
-  --border-s:   rgba(214, 196, 168, 0.5);
-  --text:       #2E1A0A;
-  --muted:      #9a8a76;
-  --dark:       #2E1A0A;
-  --dark-80:    rgba(46, 26, 10, .80);
-  --dark-60:    rgba(46, 26, 10, .60);
-  --dark-40:    rgba(46, 26, 10, .40);
-  --dark-20:    rgba(46, 26, 10, .20);
-  --dark-12:    rgba(46, 26, 10, .12);
-  --dark-06:    rgba(46, 26, 10, .06);
-  --glass:      rgba(250, 246, 240, 0.72);
-  --glass-s:    rgba(250, 246, 240, 0.88);
-  --white:      #ffffff;
+  --bordeaux:   #440B19;
+  --bordeaux-s: #5c1022;
+  --bordeaux-l: #6e1a2e;
+  --bordeaux-xl:#8a2a3e;
+
+  --white:      #F5F1EE;
+
+  --border:     rgba(68, 11, 25, 0.15);
+  --border-s:   rgba(68, 11, 25, 0.10);
+
+  --text:       #440B19;
+  --muted:      #6e1a2e;
+
+  --dark:       #440B19;
+  --dark-80:    rgba(68, 11, 25, .80);
+  --dark-60:    rgba(68, 11, 25, .60);
+  --dark-40:    rgba(68, 11, 25, .40);
+  --dark-20:    rgba(68, 11, 25, .20);
+  --dark-12:    rgba(68, 11, 25, .12);
+  --dark-06:    rgba(68, 11, 25, .06);
+
+  --glass:      #F5F1EE;
+  --glass-s:    #F5F1EE;
+
   --serif:      'Cormorant Garamond', Georgia, serif;
   --sans:       'Jost', system-ui, sans-serif;
   --ease:       cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -48,11 +50,7 @@
 
 body {
   font-family: var(--sans);
-  background-color: var(--beige);
-  background-image: url('/images/0059376_betina-white-damask-wallpaper.jpeg');
-  background-repeat: repeat;
-  background-size: 420px auto;
-  background-attachment: fixed;
+  background: #F5F1EE;
   color: var(--text);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -75,8 +73,8 @@ button { font-family: inherit; cursor: pointer; }
 
 .icon-contour {
   font-size: 18px;
-  color: var(--beige-l);
-  -webkit-text-stroke: 1px var(--marron);
+  color: var(--white);
+  -webkit-text-stroke: 1px var(--bordeaux);
 }
 
 .icons {
@@ -90,7 +88,7 @@ button { font-family: inherit; cursor: pointer; }
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--marron);
+  color: var(--bordeaux);
   background: none;
   border: none;
   font-size: 1.05rem;
@@ -98,7 +96,7 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .icons a:hover,
-.icons button:hover { color: var(--gold); }
+.icons button:hover { color: var(--bordeaux-l); }
 
 
 /* ══ HEADER ══════════════════════════════════════════════════ */
@@ -108,7 +106,7 @@ button { font-family: inherit; cursor: pointer; }
   top: 0;
   width: 100%;
   padding: 20px 6%;
-  background: #FAF6F0 !important  ;
+  background: var(--white);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   border-bottom: 1px solid transparent;
@@ -127,7 +125,7 @@ button { font-family: inherit; cursor: pointer; }
   font-size: 1.5rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--marron);
+  color: var(--bordeaux);
 }
 
 .header .navbar a {
@@ -136,7 +134,7 @@ button { font-family: inherit; cursor: pointer; }
   font-weight: 400;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--marron);
+  color: var(--bordeaux);
   transition: color 0.2s;
   position: relative;
 }
@@ -148,11 +146,11 @@ button { font-family: inherit; cursor: pointer; }
   left: 0;
   width: 0;
   height: 1px;
-  background: var(--gold);
+  background: var(--bordeaux);
   transition: width 0.3s var(--ease);
 }
 
-.header .navbar a:hover { color: var(--marron); }
+.header .navbar a:hover { color: var(--bordeaux); }
 .header .navbar a:hover::after { width: 100%; }
 
 
@@ -180,14 +178,14 @@ button { font-family: inherit; cursor: pointer; }
   height: calc(100vh - 90px);
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: var(--beige-d) transparent;
+  scrollbar-color: var(--border) transparent;
 }
 
 .filter-sidebar::-webkit-scrollbar       { width: 3px; }
 .filter-sidebar::-webkit-scrollbar-track { background: transparent; }
 .filter-sidebar::-webkit-scrollbar-thumb {
-  background: var(--beige-d);
-  border-radius: 2px;
+  background: var(--border);
+  border-radius: 0;
 }
 
 /* Titre "Filtres" */
@@ -211,7 +209,7 @@ button { font-family: inherit; cursor: pointer; }
   left: 0;
   width: 24px;
   height: 1px;
-  background: var(--gold);
+  background: var(--bordeaux);
 }
 
 /* Bloc filtre */
@@ -240,33 +238,30 @@ button { font-family: inherit; cursor: pointer; }
   width: 100%;
   padding: 10px 32px 10px 14px;
   border: 1px solid var(--border-s);
-  background: var(--glass)
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%232E1A0A'/%3E%3C/svg%3E")
+  background: var(--white)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23440B19'/%3E%3C/svg%3E")
     no-repeat right 14px center;
   background-size: 7px;
-  backdrop-filter: blur(8px);
   appearance: none;
   -webkit-appearance: none;
   font-family: var(--sans);
   font-size: 11px;
   font-weight: 400;
   letter-spacing: 0.06em;
-  color: var(--text);
+  color: var(--bordeaux);
   cursor: pointer;
   border-radius: 0;
   outline: none;
-  transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.25s;
+  transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
 }
 
 .filter-group select:hover {
-  border-color: var(--gold);
-  background-color: rgba(250, 246, 240, 0.9);
+  border-color: var(--bordeaux);
 }
 
 .filter-group select:focus {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 2px var(--gold-l);
-  background-color: rgba(250, 246, 240, 0.9);
+  border-color: var(--bordeaux);
+  box-shadow: 0 0 0 2px rgba(68, 11, 25, .10);
 }
 
 
@@ -300,9 +295,9 @@ button { font-family: inherit; cursor: pointer; }
   position: absolute;
   cursor: pointer;
   inset: 0;
-  background: rgba(214, 196, 168, 0.4);
+  background: rgba(68, 11, 25, 0.12);
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: 0;
   transition: 0.35s var(--ease);
 }
 
@@ -313,14 +308,14 @@ button { font-family: inherit; cursor: pointer; }
   height: 14px;
   left: 2px;
   bottom: 2px;
-  background: var(--marron-mid);
-  border-radius: 50%;
+  background: var(--bordeaux-l);
+  border-radius: 0;
   transition: 0.35s var(--ease-back);
 }
 
 input:checked + .slider {
-  background: var(--gold);
-  border-color: var(--gold);
+  background: var(--bordeaux);
+  border-color: var(--bordeaux);
 }
 
 input:checked + .slider::before {
@@ -362,13 +357,12 @@ input:checked + .slider::before {
   width: 100%;
   border: 1px solid transparent;
   background: var(--glass);
-  backdrop-filter: blur(8px);
   transition: all 0.28s var(--ease);
 }
 
 .best-sellers li a:hover {
   border-color: var(--border-s);
-  background: rgba(250, 246, 240, 0.92);
+  background: var(--white);
   box-shadow: 0 4px 16px var(--dark-12);
   transform: translateX(3px);
 }
@@ -395,7 +389,7 @@ input:checked + .slider::before {
   font-size: 11px;
   font-weight: 400;
   font-style: italic;
-  color: var(--dark);
+  color: var(--bordeaux);
   letter-spacing: 0.03em;
   line-height: 1.4;
 }
@@ -404,7 +398,7 @@ input:checked + .slider::before {
   font-size: 12px;
   font-weight: 600;
   font-style: normal;
-  color: var(--gold);
+  color: var(--bordeaux-l);
   letter-spacing: 0.04em;
 }
 
@@ -425,7 +419,7 @@ input:checked + .slider::before {
   font-style: italic;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--dark);
+  color: var(--bordeaux);
   margin-bottom: 8px;
   line-height: 1.05;
 }
@@ -451,7 +445,7 @@ input:checked + .slider::before {
   transition: color 0.2s;
 }
 
-.breadcrumb a:hover { color: var(--gold); }
+.breadcrumb a:hover { color: var(--bordeaux); }
 .breadcrumb .separator { color: var(--dark-20); }
 .breadcrumb .current { font-weight: 500; color: var(--dark-80); }
 
@@ -461,11 +455,12 @@ input:checked + .slider::before {
 .filter-controls {
   display: flex;
   align-items: center;
-  justify-content: flex-end;  /* vue toggle à droite uniquement */
+  justify-content: flex-end;
   margin-bottom: 28px;
   flex-wrap: wrap;
   gap: 12px;
 }
+
 
 /* ══ BOUTONS VUE GRILLE/LISTE ════════════════════════════════ */
 
@@ -479,8 +474,7 @@ input:checked + .slider::before {
   width: 30px;
   height: 30px;
   border: 1px solid var(--border-s);
-  background: var(--glass);
-  backdrop-filter: blur(8px);
+  background: var(--white);
   display: flex;
   flex-wrap: wrap;
   align-content: center;
@@ -488,20 +482,20 @@ input:checked + .slider::before {
   gap: 2.5px;
   cursor: pointer;
   padding: 4px;
-  border-radius: 2px;
+  border-radius: 0;
   transition: background 0.25s var(--ease), border-color 0.25s;
 }
 
 .view-btn.active,
 .view-btn:hover {
-  background: var(--marron);
-  border-color: var(--marron);
+  background: var(--bordeaux);
+  border-color: var(--bordeaux);
 }
 
 .view-btn span {
   display: block;
-  background: var(--marron);
-  border-radius: 1px;
+  background: var(--bordeaux);
+  border-radius: 0;
   transition: background 0.25s var(--ease);
 }
 
@@ -509,7 +503,7 @@ input:checked + .slider::before {
 .view-btn[data-view="list"] span { width: 16px; height: 2px; }
 
 .view-btn.active span,
-.view-btn:hover span { background: var(--beige-l); }
+.view-btn:hover span { background: var(--white); }
 
 
 /* ══ GRILLE DE PRODUITS ══════════════════════════════════════ */
@@ -530,23 +524,19 @@ input:checked + .slider::before {
 }
 
 .product-card {
-  background: var(--glass);
-  backdrop-filter: blur(12px) saturate(160%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  background: var(--white);
   border: 1px solid var(--border-s);
-  border-radius: 1px;
+  border-radius: 0;
   padding: 18px;
   position: relative;
   text-align: center;
   transition:
     border-color 0.35s var(--ease),
     transform 0.4s var(--ease),
-    box-shadow 0.4s var(--ease),
-    background 0.35s var(--ease);
+    box-shadow 0.4s var(--ease);
   overflow: hidden;
 }
 
-/* Ligne décorative dorée en bas */
 .product-card::after {
   content: '';
   position: absolute;
@@ -555,18 +545,16 @@ input:checked + .slider::before {
   transform: translateX(-50%);
   width: 0;
   height: 1.5px;
-  background: var(--gold);
+  background: var(--bordeaux);
   transition: width 0.4s var(--ease);
 }
 
 .product-card:hover {
-  border-color: rgba(214, 196, 168, 0.8);
+  border-color: var(--bordeaux);
   transform: translateY(-6px);
-  background: rgba(250, 246, 240, 0.9);
   box-shadow:
     0 20px 48px var(--dark-12),
-    0 4px 16px rgba(46, 26, 10, .06),
-    inset 0 1px 0 rgba(255,255,255,0.6);
+    0 4px 16px var(--dark-06);
 }
 
 .product-card:hover::after { width: 60%; }
@@ -578,14 +566,14 @@ input:checked + .slider::before {
   height: 280px;
   object-fit: contain;
   border: 1px solid var(--border-s);
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--white);
   display: block;
   transition: transform 0.55s var(--ease), border-color 0.3s;
 }
 
 .product-card:hover img {
   transform: scale(1.05);
-  border-color: var(--beige-d);
+  border-color: var(--border);
 }
 
 .product-info h3 {
@@ -594,7 +582,7 @@ input:checked + .slider::before {
   font-weight: 400;
   font-style: italic;
   letter-spacing: 0.04em;
-  color: var(--dark);
+  color: var(--bordeaux);
   margin: 14px 0 8px;
   text-transform: none;
   min-height: 3em;
@@ -609,7 +597,7 @@ input:checked + .slider::before {
   font-family: var(--sans);
   font-size: 13px;
   font-weight: 500;
-  color: var(--dark);
+  color: var(--bordeaux);
   letter-spacing: 0.06em;
 }
 
@@ -620,16 +608,16 @@ input:checked + .slider::before {
   margin-right: 8px;
 }
 
-.sale-price { color: var(--gold); }
+.sale-price { color: var(--bordeaux-l); }
 
 
 /* ══ BOUTONS PANIER / TEINTE ══════════════════════════════════ */
 
 .add-to-cart,
 .choose-shade-btn {
-  background: transparent;
-  color: var(--marron);
-  border: 1px solid var(--marron);
+  background: var(--bordeaux);
+  color: var(--white);
+  border: 1px solid var(--bordeaux);
   padding: 10px 22px;
   font-family: var(--sans);
   font-size: 9px;
@@ -638,7 +626,7 @@ input:checked + .slider::before {
   text-transform: uppercase;
   cursor: pointer;
   margin-top: 12px;
-  border-radius: 100px;
+  border-radius: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -653,8 +641,8 @@ input:checked + .slider::before {
 
 .add-to-cart:hover,
 .choose-shade-btn:hover {
-  background: var(--marron);
-  color: var(--beige-l);
+  background: var(--bordeaux);
+  color: var(--white);
   box-shadow: 0 6px 20px var(--dark-20);
 }
 
@@ -670,9 +658,8 @@ input:checked + .slider::before {
   right: 10px;
   width: 28px;
   height: 28px;
-  border-radius: 50%;
-  background: var(--glass);
-  backdrop-filter: blur(8px);
+  border-radius: 0;
+  background: var(--white);
   border: 1px solid var(--border-s);
   color: var(--dark-40);
   font-size: 11px;
@@ -697,9 +684,9 @@ input:checked + .slider::before {
 }
 
 .add-to-wishlist:hover {
-  background: var(--marron);
-  color: var(--beige-l);
-  border-color: var(--marron);
+  background: var(--bordeaux);
+  color: var(--white);
+  border-color: var(--bordeaux);
 }
 
 
@@ -757,10 +744,9 @@ input:checked + .slider::before {
   width: 34px;
   height: 34px;
   border: 1px solid var(--border-s);
-  border-radius: 50%;
-  background: var(--glass);
-  backdrop-filter: blur(8px);
-  color: var(--marron);
+  border-radius: 0;
+  background: var(--white);
+  color: var(--bordeaux);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -769,9 +755,9 @@ input:checked + .slider::before {
 }
 
 .share-btn:hover {
-  background: var(--marron);
-  color: var(--beige-l);
-  border-color: var(--marron);
+  background: var(--bordeaux);
+  color: var(--white);
+  border-color: var(--bordeaux);
 }
 
 
@@ -802,7 +788,6 @@ footer,
     margin-top: 90px;
   }
 
-  /* Sidebar en drawer */
   .filter-sidebar {
     position: fixed;
     top: 90px;
@@ -818,18 +803,17 @@ footer,
     box-shadow: 8px 0 40px var(--dark-12);
     transition: left 0.38s cubic-bezier(0.77, 0, 0.18, 1);
     scrollbar-width: thin;
-    scrollbar-color: var(--beige-d) transparent;
+    scrollbar-color: var(--border) transparent;
     border-right: 1px solid var(--border-s);
   }
 
   .filter-sidebar.active { left: 0; }
 
-  /* Overlay sombre */
   .filter-overlay {
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(46, 26, 10, 0.35);
+    background: rgba(68, 11, 25, 0.35);
     backdrop-filter: blur(2px);
     z-index: 1500;
     opacity: 0;
@@ -842,13 +826,12 @@ footer,
     visibility: visible;
   }
 
-  /* Bouton flottant visible sur mobile/tablette */
   .filter-toggle-btn {
     display: inline-flex !important;
   }
 
   .products-section {
-    padding: 28px 24px 100px; /* extra bas pour le bouton flottant */
+    padding: 28px 24px 100px;
   }
 
   .products-grid {
@@ -856,7 +839,6 @@ footer,
     gap: 18px;
   }
 
-  /* Contrôles : seulement vue toggle visible */
   .filter-controls {
     justify-content: flex-end;
     margin-bottom: 20px;
@@ -912,5 +894,67 @@ footer,
   .filter-toggle-btn {
     bottom: 20px;
     padding: 12px 28px;
+  }
+}
+/* ══ BOUTON FILTRES FLOTTANT (mobile uniquement) ════════════ */
+
+.filter-toggle-btn {
+  display: none; /* caché par défaut sur desktop */
+}
+
+@media (max-width: 992px) {
+  .filter-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    position: fixed;
+    bottom: 82px; /* au-dessus de la bottom bar */
+    left: 50%;
+    transform: translateX(-50%);
+
+    z-index: 1400;
+
+    padding: 12px 28px;
+
+    background: var(--bordeaux);
+    color: var(--white);
+
+    border: none;
+    border-radius: 999px;
+
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+
+    box-shadow:
+      0 8px 28px var(--dark-40);
+
+    cursor: pointer;
+
+    transition:
+      background 0.25s var(--ease),
+      transform 0.25s var(--ease),
+      box-shadow 0.25s var(--ease);
+  }
+
+  .filter-toggle-btn:hover {
+    background: var(--bordeaux-s);
+    transform: translateX(-50%) translateY(-2px);
+    box-shadow: 0 12px 36px var(--dark-40);
+  }
+
+  .filter-toggle-btn:active {
+    transform: translateX(-50%) scale(0.97);
+  }
+}
+
+@media (max-width: 768px) {
+  .filter-toggle-btn {
+    bottom: 76px;
+    padding: 11px 24px;
+    font-size: 10px;
   }
 }

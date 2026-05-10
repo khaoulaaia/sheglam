@@ -2,12 +2,10 @@
  * shop.js — SheGlamour
  * BASE_URL est injecté par PHP dans chaque page via :
  *   <script>const BASE_URL = "<?= $b ?>";</script>
- * avant ce fichier. Valeur : "" (production) ou "/sheglam" (local).
  */
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  // BASE_URL défini globalement par PHP, fallback vide
   const B = (typeof BASE_URL !== "undefined") ? BASE_URL : "";
 
   // ─── ÉTAT GLOBAL ─────────────────────────────────────
@@ -20,13 +18,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // ─── UTILS ───────────────────────────────────────────
   const buildKey = (productId, shade) => shade ? `${productId}__${shade}` : `${productId}`;
 
-  /** Normalise une URL image vers un chemin absolu */
   const normalizeImage = (url) => {
     if (!url) return B + "/images/placeholder.jpg";
     if (url.startsWith("http")) return url;
-    // Retire tout préfixe /sheglam/images/ ou images/ existant
-    const filename = url.split("/").pop();
-    return B + "/images/" + filename;
+    return B + "/images/" + url.split("/").pop();
   };
 
   const getProductData = (el) => {
@@ -40,6 +35,9 @@ document.addEventListener("DOMContentLoaded", () => {
       image:     normalizeImage(raw)
     };
   };
+
+  const isOutOfStock = (btn) =>
+    btn.disabled || btn.dataset.stock === "0";
 
   const updateCartTotal = () => {
     let total = 0;
@@ -76,7 +74,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     Object.entries(cart).forEach(([key, item]) => {
       const imgUrl = normalizeImage(item.image_url);
-
       const div = document.createElement("div");
       div.className = "cart-item";
       div.innerHTML = `
@@ -147,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <img src="${normalizeImage(item.image_url)}" alt="${item.name}" class="wishlist-item-img">
         <h4>${item.name}${item.shade ? " — " + item.shade : ""}</h4>
         <p>${item.price.toFixed(2)} DA</p>
-        <button class="remove-wishlist"       data-product-id="${item.productId}">Supprimer</button>
+        <button class="remove-wishlist" data-product-id="${item.productId}">Supprimer</button>
         <button class="add-to-cart-wishlist"
           data-product-id="${item.productId}"
           data-name="${item.name}"
@@ -164,15 +161,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("productModal");
 
   if (modal) {
-    const productNameEl  = modal.querySelector("#productName");
-    const productPriceEl = modal.querySelector("#productPrice");
-    const productImageEl = modal.querySelector("#productMainImage");
-    const shadeOptionsEl = modal.querySelector("#shadeOptions");
+    const productNameEl   = modal.querySelector("#productName");
+    const productPriceEl  = modal.querySelector("#productPrice");
+    const productImageEl  = modal.querySelector("#productMainImage");
+    const shadeOptionsEl  = modal.querySelector("#shadeOptions");
     const addFromModalBtn = modal.querySelector("#addToCartFromModal");
-    const closeModalBtn  = modal.querySelector(".close-product-modal");
-    const qtyEl          = modal.querySelector("#quantity");
-    const increaseQtyBtn = modal.querySelector("#increaseQty");
-    const decreaseQtyBtn = modal.querySelector("#decreaseQty");
+    const closeModalBtn   = modal.querySelector(".close-product-modal");
+    const qtyEl           = modal.querySelector("#quantity");
+    const increaseQtyBtn  = modal.querySelector("#increaseQty");
+    const decreaseQtyBtn  = modal.querySelector("#decreaseQty");
+    const thumbsEl        = modal.querySelector("#productThumbnails");
 
     let currentProduct  = null;
     let selectedShade   = null;
@@ -186,10 +184,13 @@ document.addEventListener("DOMContentLoaded", () => {
       modal.style.display = "flex";
       document.body.style.overflow = "hidden";
     };
+
     const closeModal = () => {
       modal.style.display = "none";
       document.body.style.overflow = "auto";
-      selectedShade = null; currentProduct = null; currentQuantity = 1;
+      selectedShade = null;
+      currentProduct = null;
+      currentQuantity = 1;
     };
 
     closeModalBtn?.addEventListener("click", closeModal);
@@ -200,8 +201,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     addFromModalBtn?.addEventListener("click", () => {
-      if (!selectedShade)   { alert("Veuillez choisir une teinte."); return; }
-      if (!currentProduct)  return;
+      if (!selectedShade)  { alert("Veuillez choisir une teinte."); return; }
+      if (!currentProduct) return;
       addToCart({ ...currentProduct, quantity: currentQuantity, shade: selectedShade });
 
       if (modal.dataset.fromWishlist === "1") {
@@ -217,8 +218,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = getProductData(button);
       if (!data) return;
 
-      currentProduct = data;
-      selectedShade = null; currentQuantity = 1; updateQuantityUI();
+      currentProduct  = data;
+      selectedShade   = null;
+      currentQuantity = 1;
+      updateQuantityUI();
 
       const viewLink = document.getElementById("viewFullDetails");
       if (viewLink) viewLink.href = `${B}/product.php?id=${data.productId}`;
@@ -226,7 +229,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (productNameEl)  productNameEl.textContent  = data.name;
       if (productPriceEl) productPriceEl.textContent = `${data.price.toFixed(2)} DA`;
       if (productImageEl) productImageEl.src          = data.image;
-      if (shadeOptionsEl) shadeOptionsEl.innerHTML   = "<p>Chargement…</p>";
+      if (thumbsEl)       thumbsEl.innerHTML          = "";
+      if (shadeOptionsEl) shadeOptionsEl.innerHTML    = "<p>Chargement…</p>";
 
       try {
         const res    = await fetch(`${B}/includes/get_shades.php?product_id=${button.dataset.productId}`);
@@ -258,23 +262,29 @@ document.addEventListener("DOMContentLoaded", () => {
         modal.dataset.fromWishlist = button.dataset.fromWishlist || "";
         modal.dataset.wishlistKey  = button.dataset.wishlistKey  || "";
         openModal();
+
       } catch (err) {
         console.error("Erreur teintes", err);
         if (shadeOptionsEl) shadeOptionsEl.innerHTML = "<p>Erreur de chargement.</p>";
       }
     }
 
+    // Listener choose-shade-btn — avec vérification stock
     document.body.addEventListener("click", e => {
       const shadeBtn = e.target.closest(".choose-shade-btn");
-      if (shadeBtn) { e.preventDefault(); openShadeModal(shadeBtn); }
+      if (!shadeBtn) return;
+      e.preventDefault();
+      if (isOutOfStock(shadeBtn)) return;
+      openShadeModal(shadeBtn);
     });
   }
 
-  // ─── AJOUT PANIER DIRECT (sans teinte) ───────────────
+  // ─── AJOUT PANIER DIRECT — avec vérification stock ───
   document.body.addEventListener("click", e => {
     const addBtn = e.target.closest(".add-to-cart");
     if (!addBtn) return;
     e.preventDefault();
+    if (isOutOfStock(addBtn)) return;
     const data = getProductData(addBtn);
     if (!data) return;
     const wrapper  = addBtn.closest(".add-to-cart-wrapper");
@@ -301,9 +311,10 @@ document.addEventListener("DOMContentLoaded", () => {
   window.renderCart();
   updateCartTotal();
 
-}); // DOMContentLoaded
+});
 
-// ─── FILTRES (page catalogue uniquement) ──────────────
+
+// ─── FILTRES (page catalogue uniquement) ─────────────
 document.addEventListener("DOMContentLoaded", () => {
   const sortPrice   = document.getElementById("sortPrice");
   const filterSale  = document.getElementById("filterSale");
@@ -337,7 +348,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Réafficher dans la grille (via les liens parents)
     grid.innerHTML = "";
     visible.forEach(card => {
       const link = card.closest("a") || card;

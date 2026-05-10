@@ -17,33 +17,35 @@ $b = BASE_URL;
   <link rel="stylesheet" href="<?= $b ?>/sidebar.css?v=<?= time() ?>">
 
   <style>
-   /* ══════════════════════════════════════════════════════════
-   WISHLIST — Modern Old Money · Palette Beige & Marron
+/* ══════════════════════════════════════════════════════════
+   WISHLIST — Blanc & Bordeaux
    ══════════════════════════════════════════════════════════ */
 
 :root {
-  --beige:      #d9d0b4;
-  --beige-l:    #FAF6F0;
-  --beige-d:    #D6C4A8;
-  --beige-mid:  #EDE5D8;
-  --marron:     #2E1A0A;
-  --marron-mid: #5C3A1E;
-  --gold:       #B8924A;
-  --gold-l:     rgba(184, 146, 74, 0.15);
-  --border:     #D6C4A8;
-  --border-s:   rgba(214, 196, 168, 0.5);
-  --text:       #2E1A0A;
-  --muted:      #9a8a76;
-  --dark:       #2E1A0A;
-  --dark-80:    rgba(46, 26, 10, .80);
-  --dark-60:    rgba(46, 26, 10, .60);
-  --dark-40:    rgba(46, 26, 10, .40);
-  --dark-20:    rgba(46, 26, 10, .20);
-  --dark-12:    rgba(46, 26, 10, .12);
-  --dark-06:    rgba(46, 26, 10, .06);
-  --glass:      rgba(250, 246, 240, 0.72);
-  --glass-s:    rgba(250, 246, 240, 0.88);
+  --bordeaux:   #440B19;
+  --bordeaux-s: #5c1022;
+  --bordeaux-l: #6e1a2e;
+  --bordeaux-xl:#8a2a3e;
+
   --white:      #ffffff;
+
+  --border:     rgba(68, 11, 25, 0.15);
+  --border-s:   rgba(68, 11, 25, 0.10);
+
+  --text:       #440B19;
+  --muted:      #6e1a2e;
+
+  --dark:       #440B19;
+  --dark-80:    rgba(68, 11, 25, .80);
+  --dark-60:    rgba(68, 11, 25, .60);
+  --dark-40:    rgba(68, 11, 25, .40);
+  --dark-20:    rgba(68, 11, 25, .20);
+  --dark-12:    rgba(68, 11, 25, .12);
+  --dark-06:    rgba(68, 11, 25, .06);
+
+  --glass:      rgba(255, 255, 255, 0.72);
+  --glass-s:    rgba(255, 255, 255, 0.88);
+
   --serif:      'Cormorant Garamond', Georgia, serif;
   --sans:       'Jost', system-ui, sans-serif;
   --ease:       cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -54,11 +56,7 @@ $b = BASE_URL;
 
 body {
   font-family: var(--sans);
-  background-color: var(--beige-l);
-  background-image: url('/images/0059376_betina-white-damask-wallpaper.jpeg');
-  background-repeat: repeat;
-  background-size: 420px auto;
-  background-attachment: fixed;
+  background: var(--white);
   color: var(--text);
   min-height: 100vh;
   display: flex;
@@ -71,8 +69,6 @@ body {
 .page-hero {
   margin-top: 90px;
   background: var(--glass-s);
-  backdrop-filter: blur(16px) saturate(160%);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
   border-bottom: 1px solid var(--border-s);
   padding: 56px 6% 46px;
   text-align: center;
@@ -83,14 +79,14 @@ body {
 .page-hero::before {
   content: "✦  ✦  ✦";
   position: absolute; top: 22px; left: 6%;
-  font-size: 9px; color: var(--gold);
-  letter-spacing: 8px; opacity: .4;
+  font-size: 9px; color: var(--bordeaux);
+  letter-spacing: 8px; opacity: .25;
 }
 .page-hero::after {
   content: "✦  ✦  ✦";
   position: absolute; top: 22px; right: 6%;
-  font-size: 9px; color: var(--gold);
-  letter-spacing: 8px; opacity: .4;
+  font-size: 9px; color: var(--bordeaux);
+  letter-spacing: 8px; opacity: .25;
 }
 
 .page-hero h1 {
@@ -101,10 +97,10 @@ body {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   line-height: 1.1;
-  color: var(--dark);
+  color: var(--bordeaux);
 }
 
-.page-hero h1 em { font-style: normal; color: var(--gold); }
+.page-hero h1 em { font-style: normal; color: var(--bordeaux-l); }
 
 .page-hero .count {
   display: inline-block;
@@ -129,7 +125,7 @@ body {
 
 .empty-state .empty-icon {
   font-size: 48px;
-  color: var(--beige-d);
+  color: var(--bordeaux-l);
   margin-bottom: 24px;
   display: block;
   animation: pulse 2.5s ease-in-out infinite;
@@ -152,20 +148,20 @@ body {
   display: inline-block;
   padding: 13px 38px;
   background: transparent;
-  color: var(--marron);
-  border: 1px solid var(--marron);
+  color: var(--bordeaux);
+  border: 1px solid var(--bordeaux);
   font-family: var(--sans);
   font-size: 9px;
   letter-spacing: 0.28em;
   text-transform: uppercase;
   text-decoration: none;
-  border-radius: 100px;
+  border-radius: 0;
   transition: background .3s var(--ease), color .3s var(--ease), box-shadow .3s;
 }
 
 .empty-state a:hover {
-  background: var(--marron);
-  color: var(--beige-l);
+  background: var(--bordeaux);
+  color: var(--white);
   box-shadow: 0 8px 28px var(--dark-20);
 }
 
@@ -187,7 +183,6 @@ body {
 
 .wishlist-item:hover {
   background: var(--glass);
-  backdrop-filter: blur(8px);
   margin: 0 -18px;
   padding: 28px 18px;
 }
@@ -196,13 +191,14 @@ body {
   width: 120px;
   height: 120px;
   object-fit: contain;
-  background: var(--glass);
+  background: var(--white);
   border: 1px solid var(--border-s);
   display: block;
+  border-radius: 0;
   transition: border-color .3s;
 }
 
-.wishlist-item:hover .wishlist-item-img { border-color: var(--beige-d); }
+.wishlist-item:hover .wishlist-item-img { border-color: var(--border); }
 
 .wishlist-item-info { display: flex; flex-direction: column; gap: 6px; }
 
@@ -214,14 +210,14 @@ body {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   line-height: 1.3;
-  color: var(--dark);
+  color: var(--bordeaux);
 }
 
 .wishlist-item-price {
   font-family: var(--sans);
   font-size: 13px;
   font-weight: 500;
-  color: var(--gold);
+  color: var(--bordeaux-l);
   letter-spacing: 0.06em;
 }
 
@@ -248,19 +244,19 @@ body {
   isolation: isolate;
   width: 100%;
   text-align: center;
-  border-radius: 100px;
+  border-radius: 0;
   transition: color .35s var(--ease), box-shadow .35s;
 }
 
 .btn-add-cart {
-  background: var(--marron);
-  color: var(--beige-l);
-  border: 1px solid var(--marron);
+  background: var(--bordeaux);
+  color: var(--white);
+  border: 1px solid var(--bordeaux);
 }
 
 .btn-choose-shade {
   background: transparent;
-  color: var(--marron);
+  color: var(--bordeaux);
   border: 1px solid var(--border);
 }
 
@@ -272,17 +268,17 @@ body {
   transform: translateX(-101%);
   transition: transform .4s cubic-bezier(.77,0,.18,1);
   z-index: -1;
-  border-radius: 100px;
+  border-radius: 0;
 }
 
-.btn-add-cart::before    { background: var(--marron-mid); }
-.btn-choose-shade::before { background: var(--marron); }
+.btn-add-cart::before    { background: var(--bordeaux-s); }
+.btn-choose-shade::before { background: var(--bordeaux); }
 
 .btn-add-cart:hover::before,
 .btn-choose-shade:hover::before { transform: translateX(0); }
 
 .btn-add-cart:hover { box-shadow: 0 6px 20px var(--dark-20); }
-.btn-choose-shade:hover { color: var(--beige-l); border-color: var(--marron); }
+.btn-choose-shade:hover { color: var(--white); border-color: var(--bordeaux); }
 
 .btn-share {
   background: none;
@@ -299,7 +295,7 @@ body {
   transition: color .25s;
   padding: 0;
 }
-.btn-share:hover { color: var(--gold); }
+.btn-share:hover { color: var(--bordeaux); }
 
 .btn-supprimer {
   background: none;
@@ -322,14 +318,14 @@ body {
   position: fixed;
   bottom: 32px;
   right: 32px;
-  background: var(--marron);
-  color: var(--beige-l);
+  background: var(--bordeaux);
+  color: var(--white);
   padding: 13px 24px;
   font-family: var(--sans);
   font-size: 9px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  border-radius: 100px;
+  border-radius: 0;
   opacity: 0;
   transform: translateY(12px);
   transition: opacity .35s, transform .35s;
@@ -411,14 +407,7 @@ document.addEventListener("DOMContentLoaded", function () {
     (isNaN(parseFloat(v)) ? 0 : parseFloat(v))
       .toFixed(2).replace(".", ",") + " DA";
 
-  /* ── Écriture synchronisée localStorage + objet mémoire sidebar ──
-   *
-   * La sidebar (sidebar.php) lit window.cart / window.wishlist EN MÉMOIRE.
-   * Notre page lit localStorage.
-   * On doit mettre à jour les DEUX en même temps pour que :
-   *   - la sidebar reflète l'ajout immédiatement (sans rechargement)
-   *   - les autres pages trouvent la bonne valeur dans localStorage
-   */
+  /* ── Écriture synchronisée localStorage + objet mémoire sidebar ── */
   function cartAdd(productId, name, price, image_url, shade) {
     const key   = buildKey(productId, shade);
     const entry = { productId, name, price: parseFloat(price), image_url, shade: shade || null, quantity: 1 };
@@ -465,7 +454,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /* ── Rendu de la page wishlist ── */
   function renderPage() {
-    /* Source de vérité = localStorage (indépendant de l'objet mémoire sidebar) */
     const wl      = JSON.parse(localStorage.getItem("wishlist") || "{}");
     const el      = document.getElementById("wishlistContainer");
     const countEl = document.getElementById("wishlistCount");
@@ -494,16 +482,6 @@ document.addEventListener("DOMContentLoaded", function () {
       const img   = normalizeImg(item.image_url);
       const price = parseFloat(item.price) || 0;
 
-      /*
-       * Bouton "Choisir une teinte" :
-       *   On lui donne la classe "choose-shade-btn" que shop.js écoute
-       *   via délégation sur document.body → le clic sera intercepté
-       *   naturellement par shop.js sans avoir besoin d'appeler
-       *   openShadeModal() directement.
-       *
-       *   On ajoute data-from-wishlist et data-wishlist-key pour que
-       *   shop.js puisse retirer l'article de la wishlist après ajout.
-       */
       const actionBtn = item.hasShades
         ? `<button class="btn-choose-shade choose-shade-btn"
                 data-product-id="${item.productId}"
@@ -549,7 +527,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     /* ── Événements ── */
 
-    /* Ajouter au panier (sans teinte) */
     el.querySelectorAll(".js-add-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         cartAdd(
@@ -565,17 +542,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
 
-    /*
-     * "Choisir une teinte" → shop.js écoute body → click → .choose-shade-btn
-     * Le bouton a déjà la classe choose-shade-btn, donc le clic natif
-     * remontera et sera capté par shop.js. Rien à faire ici.
-     *
-     * Après que shop.js ajoute l'article au panier depuis la modale,
-     * il supprime la clé de localStorage.wishlist.
-     * L'événement "storage" ci-dessous rechargera la page wishlist.
-     */
-
-    /* Partager */
     el.querySelectorAll(".js-share-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         if (navigator.share) {
@@ -588,7 +554,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
 
-    /* Supprimer */
     el.querySelectorAll(".js-del-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         wishlistRemove(btn.dataset.key);
@@ -598,20 +563,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  /*
-   * Quand shop.js (modale teinte) modifie localStorage,
-   * l'événement "storage" est émis → on re-rend la page.
-   * (Ne se déclenche PAS sur le même onglet dans tous les navigateurs,
-   *  mais on écoute quand même pour la synchro multi-onglets.)
-   */
   window.addEventListener("storage", (e) => {
     if (e.key === "wishlist" || e.key === "cart") renderPage();
   });
 
-  /*
-   * Patch : quand shop.js appelle renderWishlist() depuis la modale
-   * (après avoir retiré l'article), on re-rend aussi notre page.
-   */
   const _origRenderWishlist = window.renderWishlist;
   window.renderWishlist = function (...args) {
     if (typeof _origRenderWishlist === "function") _origRenderWishlist(...args);

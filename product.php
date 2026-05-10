@@ -25,13 +25,15 @@ $stmt->execute([$productId]);
 $product = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$product) die("Produit introuvable");
 
+$stock      = (int)($product['stock'] ?? 0);
+$outOfStock = $stock === 0;
+
 // Images supplémentaires
 $imageStmt = $pdo->prepare("SELECT image FROM product_images WHERE product_id = ?");
 $imageStmt->execute([$productId]);
 $additionalImages = $imageStmt->fetchAll(PDO::FETCH_COLUMN);
 if (empty($additionalImages)) $additionalImages = [$product['image_url']];
 
-// Normaliser les URLs des images
 $additionalImages = array_map(function($img) use ($b) {
     if (empty($img)) return $b . '/images/placeholder.jpg';
     return str_starts_with($img, 'http') ? $img : $b . '/images/' . basename($img);
@@ -97,13 +99,32 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
   <!-- Image principale -->
   <div class="product-main">
     <div class="product-main-image">
+      <?php if ($outOfStock): ?>
+        <div class="out-of-stock-badge">Rupture de stock</div>
+      <?php endif; ?>
       <img id="mainImage"
            src="<?= htmlspecialchars($additionalImages[0]) ?>"
-           alt="<?= htmlspecialchars($product['name']) ?>">
+           alt="<?= htmlspecialchars($product['name']) ?>"
+           class="<?= $outOfStock ? 'img-out-of-stock' : '' ?>">
     </div>
 
     <div class="product-right">
       <h1><?= htmlspecialchars($product['name']) ?></h1>
+
+      <!-- Badge stock -->
+      <?php if ($outOfStock): ?>
+        <span class="stock-badge out">
+          <i class="fas fa-times-circle"></i> Rupture de stock
+        </span>
+      <?php elseif ($stock <= 5): ?>
+        <span class="stock-badge low">
+          <i class="fas fa-exclamation-circle"></i> Plus que <?= $stock ?> en stock
+        </span>
+      <?php else: ?>
+        <span class="stock-badge in">
+          <i class="fas fa-check-circle"></i> En stock
+        </span>
+      <?php endif; ?>
 
       <!-- Étoiles -->
       <div class="reviews">
@@ -111,9 +132,9 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
         <?php if ($reviews): ?>
           <div class="average-rating">
             <?php for ($i = 1; $i <= 5; $i++):
-              if ($i <= floor($averageRating))          echo '<i class="fas fa-star"></i>';
-              elseif ($i - $averageRating <= 0.5)       echo '<i class="fas fa-star-half-alt"></i>';
-              else                                       echo '<i class="far fa-star"></i>';
+              if ($i <= floor($averageRating))        echo '<i class="fas fa-star"></i>';
+              elseif ($i - $averageRating <= 0.5)     echo '<i class="fas fa-star-half-alt"></i>';
+              else                                     echo '<i class="far fa-star"></i>';
             endfor; ?>
             <span>(<?= $averageRating ?>/5)</span>
           </div>
@@ -138,21 +159,30 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
           data-product-id="<?= $product['id'] ?>"
           data-name="<?= htmlspecialchars($product['name']) ?>"
           data-price="<?= htmlspecialchars($product['price']) ?>"
-          data-image_url="<?= htmlspecialchars($additionalImages[0]) ?>">
-          <i class="fas fa-palette"></i> Choisir une teinte
+          data-image_url="<?= htmlspecialchars($additionalImages[0]) ?>"
+          data-stock="<?= $stock ?>"
+          <?= $outOfStock ? 'disabled' : '' ?>>
+          <i class="fas fa-<?= $outOfStock ? 'ban' : 'palette' ?>"></i>
+          <?= $outOfStock ? 'Rupture de stock' : 'Choisir une teinte' ?>
         </button>
       <?php else: ?>
         <div class="add-to-cart-wrapper">
-          <div class="quantity-wrapper">
-            <label for="quantity">Quantité :</label>
-            <input type="number" id="quantity" name="quantity" value="1" min="1" step="1">
-          </div>
+          <?php if (!$outOfStock): ?>
+            <div class="quantity-wrapper">
+              <label for="quantity">Quantité :</label>
+              <input type="number" id="quantity" name="quantity"
+                     value="1" min="1" max="<?= $stock ?>" step="1">
+            </div>
+          <?php endif; ?>
           <button class="add-to-cart"
             data-product-id="<?= $product['id'] ?>"
             data-name="<?= htmlspecialchars($product['name']) ?>"
             data-price="<?= htmlspecialchars($product['price']) ?>"
-            data-image_url="<?= htmlspecialchars($additionalImages[0]) ?>">
-            <i class="fas fa-shopping-bag"></i> Ajouter au panier
+            data-image_url="<?= htmlspecialchars($additionalImages[0]) ?>"
+            data-stock="<?= $stock ?>"
+            <?= $outOfStock ? 'disabled' : '' ?>>
+            <i class="fas fa-<?= $outOfStock ? 'ban' : 'shopping-bag' ?>"></i>
+            <?= $outOfStock ? 'Rupture de stock' : 'Ajouter au panier' ?>
           </button>
         </div>
       <?php endif; ?>
@@ -194,16 +224,44 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
   </form>
 </div>
 
+<!-- Liste des avis -->
+<?php if ($reviews): ?>
+<div class="reviews-list">
+  <h3>Ce que disent nos clients</h3>
+  <?php foreach ($reviews as $review): ?>
+    <div class="review-item">
+      <div class="review-header">
+        <strong><?= htmlspecialchars($review['customer_name']) ?></strong>
+        <div class="review-stars">
+          <?php for ($i = 1; $i <= 5; $i++): ?>
+            <i class="fa<?= $i <= $review['rating'] ? 's' : 'r' ?> fa-star"></i>
+          <?php endfor; ?>
+        </div>
+        <span class="review-date"><?= date('d/m/Y', strtotime($review['date_creation'])) ?></span>
+      </div>
+      <p class="review-comment"><?= htmlspecialchars($review['comment']) ?></p>
+    </div>
+  <?php endforeach; ?>
+</div>
+<?php endif; ?>
+
 <!-- Produits similaires -->
 <section class="similar-products">
   <h2>Produits similaires</h2>
   <div class="similar-container">
     <?php foreach ($similarProducts as $sp):
-      $spImg = empty($sp['image_url']) ? $b . '/images/placeholder.jpg'
-             : (str_starts_with($sp['image_url'], 'http') ? $sp['image_url'] : $b . '/images/' . basename($sp['image_url']));
+      $spImg      = empty($sp['image_url']) ? $b . '/images/placeholder.jpg'
+                  : (str_starts_with($sp['image_url'], 'http') ? $sp['image_url'] : $b . '/images/' . basename($sp['image_url']));
+      $spStock    = (int)($sp['stock'] ?? 0);
+      $spNoStock  = $spStock === 0;
     ?>
-      <a href="<?= $b ?>/product.php?id=<?= $sp['id'] ?>" class="similar-item">
-        <img src="<?= htmlspecialchars($spImg) ?>" alt="<?= htmlspecialchars($sp['name']) ?>">
+      <a href="<?= $b ?>/product.php?id=<?= $sp['id'] ?>" class="similar-item <?= $spNoStock ? 'out-of-stock' : '' ?>">
+        <?php if ($spNoStock): ?>
+          <span class="similar-badge-oos">Rupture</span>
+        <?php endif; ?>
+        <img src="<?= htmlspecialchars($spImg) ?>"
+             alt="<?= htmlspecialchars($sp['name']) ?>"
+             class="<?= $spNoStock ? 'img-out-of-stock' : '' ?>">
         <h4><?= htmlspecialchars($sp['name']) ?></h4>
         <p class="price"><?= number_format($sp['price'], 2, ',', ' ') ?> DA</p>
       </a>
@@ -214,7 +272,6 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
 <?php include 'includes/product_modal.php'; ?>
 
 <script>
-/* ── BASE URL passée au JS ── */
 const BASE_URL = "<?= $b ?>";
 
 /* ── Étoiles avis ── */

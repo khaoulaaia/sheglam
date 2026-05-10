@@ -24,7 +24,6 @@ if ($categorie === 'Tous') {
 </head>
 <body>
 
-<!-- BASE_URL pour le JS -->
 <script>const BASE_URL = "<?= $b ?>";</script>
 
 <?php include 'includes/sidebar.php'; ?>
@@ -49,6 +48,14 @@ if ($categorie === 'Tous') {
       <span>Produits en solde</span>
       <label class="switch">
         <input type="checkbox" id="filterSale">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="filter-group toggle-group">
+      <span>En stock uniquement</span>
+      <label class="switch">
+        <input type="checkbox" id="filterInStock">
         <span class="slider"></span>
       </label>
     </div>
@@ -101,9 +108,12 @@ if ($categorie === 'Tous') {
       <?php endif; ?>
     </nav>
 
-    <!-- Contrôles filtres + vue -->
+    <button class="filter-toggle-btn" id="filterToggleBtn">
+      <i class="fas fa-sliders-h"></i> Filtres
+    </button>
+
+    <!-- Contrôles vue -->
     <div class="filter-controls">
-      <button class="filter-toggle-btn">Filtres</button>
       <div class="view-toggle">
         <button class="view-btn active" data-view="grid" title="Grille">
           <span></span><span></span><span></span><span></span>
@@ -117,7 +127,9 @@ if ($categorie === 'Tous') {
     <div class="products-grid">
 
       <?php while ($product = $query->fetch(PDO::FETCH_ASSOC)):
-        $productId = $product['id'];
+        $productId  = $product['id'];
+        $stock      = (int)($product['stock'] ?? 0);
+        $outOfStock = $stock === 0;
 
         $imagePath = empty($product['image_url']) ? $b . '/images/placeholder.jpg'
           : (str_starts_with($product['image_url'], 'http') ? $product['image_url'] : $b . '/images/' . basename($product['image_url']));
@@ -127,14 +139,27 @@ if ($categorie === 'Tous') {
         $hasShades = $shadeStmt->fetchColumn() > 0;
       ?>
 
-      <a href="<?= $b ?>/product.php?id=<?= $productId ?>" class="product-card-link">
+      <a href="<?= $b ?>/product.php?id=<?= $productId ?>"
+         class="product-card-link"
+         data-instock="<?= $outOfStock ? '0' : '1' ?>">
+
         <div class="product-card"
              data-price="<?= $product['price'] ?>"
              data-brand="<?= htmlspecialchars($product['marque'] ?? '') ?>"
-             data-sale="<?= !empty($product['is_sale']) ? '1' : '0' ?>">
+             data-sale="<?= !empty($product['is_sale']) ? '1' : '0' ?>"
+             data-stock="<?= $stock ?>">
 
           <div class="product-image-wrapper">
-            <img src="<?= htmlspecialchars($imagePath) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
+            <?php if ($outOfStock): ?>
+              <span class="badge-oos">Rupture</span>
+            <?php elseif ($stock <= 5): ?>
+              <span class="badge-low">Stock limité</span>
+            <?php endif; ?>
+
+            <img src="<?= htmlspecialchars($imagePath) ?>"
+                 alt="<?= htmlspecialchars($product['name']) ?>"
+                 class="<?= $outOfStock ? 'img-out-of-stock' : '' ?>">
+
             <button class="add-to-wishlist"
                     data-product-id="<?= $productId ?>"
                     data-name="<?= htmlspecialchars($product['name']) ?>"
@@ -163,8 +188,11 @@ if ($categorie === 'Tous') {
                       data-name="<?= htmlspecialchars($product['name']) ?>"
                       data-price="<?= htmlspecialchars($product['price']) ?>"
                       data-image_url="<?= htmlspecialchars($imagePath) ?>"
-                      type="button">
-                <i class="fas fa-palette"></i> Choisir une teinte
+                      data-stock="<?= $stock ?>"
+                      type="button"
+                      <?= $outOfStock ? 'disabled' : '' ?>>
+                <i class="fas fa-<?= $outOfStock ? 'ban' : 'palette' ?>"></i>
+                <?= $outOfStock ? 'Rupture de stock' : 'Choisir une teinte' ?>
               </button>
             <?php else: ?>
               <button class="add-to-cart"
@@ -172,8 +200,11 @@ if ($categorie === 'Tous') {
                       data-name="<?= htmlspecialchars($product['name']) ?>"
                       data-price="<?= htmlspecialchars($product['price']) ?>"
                       data-image_url="<?= htmlspecialchars($imagePath) ?>"
-                      type="button">
-                <i class="fas fa-shopping-bag"></i> Ajouter au panier
+                      data-stock="<?= $stock ?>"
+                      type="button"
+                      <?= $outOfStock ? 'disabled' : '' ?>>
+                <i class="fas fa-<?= $outOfStock ? 'ban' : 'shopping-bag' ?>"></i>
+                <?= $outOfStock ? 'Rupture de stock' : 'Ajouter au panier' ?>
               </button>
             <?php endif; ?>
           </div>
@@ -184,7 +215,7 @@ if ($categorie === 'Tous') {
       <?php endwhile; ?>
 
     </div><!-- .products-grid -->
-  </section><!-- .products-section -->
+  </section>
 
 </div><!-- .page-layout -->
 
@@ -213,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ── Vue grille / liste ── */
 document.addEventListener('DOMContentLoaded', () => {
-  const grid       = document.querySelector('.products-grid');
+  const grid        = document.querySelector('.products-grid');
   const viewButtons = document.querySelectorAll('.view-btn');
 
   viewButtons.forEach(btn => {
@@ -235,7 +266,6 @@ document.addEventListener("click", e => {
 });
 </script>
 
-<!-- Modal teintes -->
 <?php include 'includes/product_modal.php'; ?>
 <script src="<?= $b ?>/js/shop.js?v=<?= time() ?>"></script>
 <?php include 'includes/footer.php'; ?>

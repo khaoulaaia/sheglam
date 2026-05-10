@@ -1,10 +1,9 @@
 <?php
 include_once 'includes/db.php';
-include_once 'includes/config.php'; // BASE_URL défini ici
-$b = BASE_URL;                       // raccourci
+include_once 'includes/config.php';
+$b = BASE_URL;
 $stmt = $pdo->query("SELECT * FROM products ORDER BY id ASC LIMIT 8");
 $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -12,20 +11,15 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SheGlamour — Beauté & Luxe</title>
-
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-
-  <!-- Styles -->
   <link rel="stylesheet" href="<?= $b ?>/index.css?v=<?= time() ?>">
-<link rel="stylesheet" href="<?= $b ?>/sidebar.css?v=<?= time() ?>">
+  <link rel="stylesheet" href="<?= $b ?>/sidebar.css?v=<?= time() ?>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
-<!-- ══ CURSEUR PERSONNALISÉ ═══════════════════════════════ -->
 <div class="cursor-dot"  id="cursorDot"></div>
 <div class="cursor-ring" id="cursorRing"></div>
 
@@ -35,61 +29,46 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!-- ══ HERO SLIDER ════════════════════════════════════════ -->
 <section class="hero-slider">
 
-  <!-- SLIDE 1 -->
   <div class="slide active">
     <picture>
-      <source media="(max-width:600px)" srcset="<?= $b ?>/images/4c37d3cda08609335217051381ede22f.jpg">
-      <img src="<?= $b ?>/images/8d6e7ad9be45433f0f482c6672df7f4f.jpg" alt="Nouvelle collection">
+      <source media="(max-width:600px)" srcset="<?= $b ?>/images/162f63d8d9bd46d89e65ee122a6cfb64.jpg">
+      <img src="<?= $b ?>/images/c8d0308b-18a7-492f-9beb-72bcf33af240-1.png" alt="Nouvelle collection">
     </picture>
   </div>
 
-  <!-- SLIDE 2 -->
+  <!--<div class="slide">
+    <picture>
+      <source media="(max-width:600px)" srcset="<?= $b ?>/images/162f63d8d9bd46d89e65ee122a6cfb64.jpg">
+      <img src="<?= $b ?>/images/162f63d8d9bd46d89e65ee122a6cfb64.jpg" alt="Couleurs éclatantes">
+    </picture>
+  </div>
+
   <div class="slide">
     <picture>
       <source media="(max-width:600px)" srcset="<?= $b ?>/images/162f63d8d9bd46d89e65ee122a6cfb64.jpg">
-      <img src="<?= $b ?>/images/17627683847b4f5dafc00e2b5d9b78b5921d37525e_thumbnail_3600x.webp" alt="Couleurs éclatantes">
+      <img src="<?= $b ?>/images/162f63d8d9bd46d89e65ee122a6cfb64.jpg" alt="Makeup professionnel">
     </picture>
-    <div class="hero-content">
-      <h1>Couleurs<br><em>éclatantes</em></h1>
-      <p>Des teintes audacieuses pour révéler votre beauté unique.</p>
-      <a href="<?= $b ?>/categorie.php?categorie=Tous" class="btn">Voir la boutique</a>
-    </div>
   </div>
 
-  <!-- SLIDE 3 -->
-  <div class="slide">
-    <picture>
-      <source media="(max-width:600px)" srcset="<?= $b ?>/images/797394d7c83cc5b68638c1a76cebc1d9.jpg">
-      <img src="<?= $b ?>/images/adea3c1ccd83ac8c0c1bca88cd01747d.jpg" alt="Makeup professionnel">
-    </picture>
-    <div class="hero-content">
-      <h1>Makeup<br><em>professionnel</em></h1>
-      <p>Des produits haut de gamme à prix doux.</p>
-      <a href="<?= $b ?>/categorie.php?categorie=Tous" class="btn">Shoppez maintenant</a>
-    </div>
-  </div>
-
-  <!-- Navigation -->
   <div class="navigation">
     <span class="prev"><i class="fas fa-chevron-left"></i></span>
     <span class="next"><i class="fas fa-chevron-right"></i></span>
   </div>
 
-  <!-- Dots -->
   <div class="slider-dots">
     <button class="slider-dot active"></button>
     <button class="slider-dot"></button>
     <button class="slider-dot"></button>
-  </div>
+  </div>-->
 
 </section>
-<!-- ══ CREATE YOUR LOOK ═══════════════════════════════════ -->
-<section class="create-look-section reveal" 
-  style="background-image: linear-gradient(158deg, rgba(240,235,224,.82) 0%, rgba(210,200,178,.88) 100%), url('<?= $b ?>/images/9b195786327e4840f5b28f9f42d9d6c7.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;"
->
 
-  <div class="section-header" >
-    <h2 class="section-title">Crée ton <em>Look</em></h2>
+
+<!-- ══ CREATE YOUR LOOK ═══════════════════════════════════ -->
+<section class="create-look-section reveal">
+
+  <div class="section-header">
+    <h2 class="section-title">Crée ton Look</h2>
   </div>
 
   <div class="create-look">
@@ -97,11 +76,8 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="create-item reveal reveal-delay-1">
       <a href="<?= $b ?>/categorie.php?categorie=Yeux">
         <div class="create-item-bg">
-          <div class="category-visual">
-            <!-- Remplacer le div.cat-icon par <img> si image disponible -->
-            <div class="cat-icon cat-yeux"></div>
-          </div>
-          <img src="<?= $b ?>/images/cafff133fa60bc2cacd2e3562f2a95fe.jpg" alt="Yeux" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.6;">
+          <img src="<?= $b ?>/images/cafff133fa60bc2cacd2e3562f2a95fe.jpg" alt="Yeux"
+               style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
         </div>
         <div class="create-overlay">
           <p class="create-name">Yeux</p>
@@ -113,10 +89,8 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="create-item reveal reveal-delay-2">
       <a href="<?= $b ?>/categorie.php?categorie=L%C3%A8vres">
         <div class="create-item-bg">
-          <div class="category-visual">
-            <div class="cat-icon cat-levres"></div>
-          </div>
-          <img src="<?= $b ?>/images/fb8e9e21c817a8cff37b67d55197d902.jpg" alt="Lèvres" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.6;">
+          <img src="<?= $b ?>/images/fb8e9e21c817a8cff37b67d55197d902.jpg" alt="Lèvres"
+               style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
         </div>
         <div class="create-overlay">
           <p class="create-name">Lèvres</p>
@@ -128,10 +102,8 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="create-item reveal reveal-delay-3">
       <a href="<?= $b ?>/categorie.php?categorie=Teint">
         <div class="create-item-bg">
-          <div class="category-visual">
-            <div class="cat-icon cat-teint"></div>
-          </div>
-          <img src="<?= $b ?>/images/bb8cc02eba2cacd02569a3f5abf6f6c9.jpg" alt="Teint" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.6;">
+          <img src="<?= $b ?>/images/bb8cc02eba2cacd02569a3f5abf6f6c9.jpg" alt="Teint"
+               style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
         </div>
         <div class="create-overlay">
           <p class="create-name">Teint</p>
@@ -143,10 +115,8 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="create-item reveal reveal-delay-4">
       <a href="<?= $b ?>/categorie.php?categorie=Accessoires">
         <div class="create-item-bg">
-          <div class="category-visual">
-            <div class="cat-icon cat-access"></div>
-          </div>
-          <img src="<?= $b ?>/images/067700c35a774da3a234d1a731a29ba8.jpg" alt="Accessoires" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.6;">
+          <img src="<?= $b ?>/images/067700c35a774da3a234d1a731a29ba8.jpg" alt="Accessoires"
+               style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
         </div>
         <div class="create-overlay">
           <p class="create-name">Accessoires</p>
@@ -157,96 +127,118 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   </div>
 </section>
-<section 
-  class="featured-section" 
-  id="featuredProducts"
-  style="background-image: linear-gradient(158deg, rgba(240,235,224,.82) 0%, rgba(210,200,178,.88) 100%), url('<?= $b ?>/images/9b195786327e4840f5b28f9f42d9d6c7.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;"
->
 
-  <!-- Fond texturé : vignette uniquement, plus de SVG grain -->
+
+<!-- ══ NOS ESSENTIELS ════════════════════════════════════ -->
+<section class="featured-section" id="featuredProducts">
+
   <div class="featured-bg" aria-hidden="true">
     <div class="featured-vignette"></div>
   </div>
 
   <div class="featured-inner">
 
-    <!-- En-tête section -->
     <div class="featured-header reveal">
-      <span class="featured-eyebrow">Collection</span>
-      <h2 class="featured-title">
-        Nos <em>Essentiels</em>
-      </h2>
-      <p class="featured-subtitle">
-        Des formules raffinées, pensées pour sublimer chaque teint.
-      </p>
+      <h2 class="featured-title">Nos Essentiels</h2>
       <div class="featured-rule"></div>
     </div>
 
-    <!-- Grille produits -->
     <?php if (empty($featured)): ?>
-  <p class="featured-empty">Aucun produit disponible pour le moment.</p>
-<?php else: ?>
-<div class="featured-track-wrapper">
-  <div class="featured-track reveal-up">
-    <?php foreach ($featured as $i => $p):
-      $img = $p['image_url']
-        ? (str_starts_with($p['image_url'], 'http') ? $p['image_url'] : $b . '/images/' . basename($p['image_url']))
-        : $b . '/images/placeholder.jpg';
-      $price = number_format((float)$p['price'], 2, ',', ' ');
-    ?>
-    <article
-      class="fp-card"
-      style="animation-delay: <?= $i * 0.07 ?>s"
-      data-product-id="<?= $p['id'] ?>"
-      data-name="<?= htmlspecialchars($p['name']) ?>"
-      data-price="<?= $p['price'] ?>"
-      data-image_url="<?= htmlspecialchars($img) ?>"
-    >
-      <div class="fp-img-wrap">
-        <a href="<?= $b ?>/product.php?id=<?= $p['id'] ?>">
-          <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($p['name']) ?>" loading="lazy">
-        </a>
-        <button
-          class="fp-wishlist add-to-wishlist"
-          aria-label="Ajouter à la wishlist"
-          data-product-id="<?= $p['id'] ?>"
-          data-name="<?= htmlspecialchars($p['name']) ?>"
-          data-price="<?= $p['price'] ?>"
-          data-image_url="<?= htmlspecialchars($img) ?>"
+      <p class="featured-empty">Aucun produit disponible pour le moment.</p>
+    <?php else: ?>
+
+    <div class="featured-track-wrapper">
+      <div class="featured-track reveal-up">
+
+        <?php foreach ($featured as $i => $p):
+          $img   = $p['image_url']
+            ? (str_starts_with($p['image_url'], 'http') ? $p['image_url'] : $b . '/images/' . basename($p['image_url']))
+            : $b . '/images/placeholder.jpg';
+          $price  = number_format((float)$p['price'], 2, ',', ' ');
+          $stock  = (int)($p['stock'] ?? 1);
+          $rupture = $stock === 0;
+
+          $shadeStmt = $pdo->prepare("SELECT COUNT(*) FROM teintes WHERE product_id = ?");
+          $shadeStmt->execute([$p['id']]);
+          $hasShades = $shadeStmt->fetchColumn() > 0;
+        ?>
+
+        <article
+          class="fp-card"
+          style="animation-delay: <?= $i * 0.07 ?>s"
         >
-          <i class="fa-regular fa-heart"></i>
-        </button>
-      </div><!-- /.fp-img-wrap -->
+          <div class="fp-img-wrap">
+            <a href="<?= $b ?>/product.php?id=<?= $p['id'] ?>">
+              <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($p['name']) ?>" loading="lazy">
+            </a>
+            <?php if ($rupture): ?>
+              <span class="out-of-stock-badge">Rupture</span>
+            <?php endif; ?>
+            <button
+              class="fp-wishlist add-to-wishlist"
+              aria-label="Ajouter à la wishlist"
+              data-product-id="<?= $p['id'] ?>"
+              data-name="<?= htmlspecialchars($p['name']) ?>"
+              data-price="<?= $p['price'] ?>"
+              data-image_url="<?= htmlspecialchars($img) ?>"
+            >
+              <i class="fa-regular fa-heart"></i>
+            </button>
+          </div>
 
-      <div class="fp-info">
-        <h3 class="fp-name">
-          <a href="<?= $b ?>/product.php?id=<?= $p['id'] ?>">
-            <?= htmlspecialchars($p['name']) ?>
-          </a>
-        </h3>
-        <span class="fp-price"><?= $price ?> DA</span>
-        <div class="fp-actions add-to-cart-wrapper">
-          <input type="number" name="quantity" value="1" min="1" class="fp-qty">
-          <button
-            class="fp-cart-btn add-to-cart"
-            data-product-id="<?= $p['id'] ?>"
-            data-name="<?= htmlspecialchars($p['name']) ?>"
-            data-price="<?= $p['price'] ?>"
-            data-image_url="<?= htmlspecialchars($img) ?>"
-          >
-            <i class="fa-solid fa-bag-shopping"></i>
-            Ajouter
-          </button>
-        </div>
-      </div><!-- /.fp-info -->
+          <div class="fp-info">
+            <h3 class="fp-name">
+              <a href="<?= $b ?>/product.php?id=<?= $p['id'] ?>">
+                <?= htmlspecialchars($p['name']) ?>
+              </a>
+            </h3>
+            <span class="fp-price"><?= $price ?> DA</span>
 
-    </article>
-    <?php endforeach; ?>
-  </div><!-- /.featured-track -->
-</div><!-- /.featured-track-wrapper -->
-<?php endif; ?>
+            <div class="fp-actions add-to-cart-wrapper">
+              <input
+                type="number" name="quantity" value="1" min="1"
+                class="fp-qty"
+                <?= $rupture ? 'disabled' : '' ?>
+              >
+              <?php if ($hasShades): ?>
+                <button
+                  class="fp-cart-btn choose-shade-btn"
+                  data-product-id="<?= $p['id'] ?>"
+                  data-name="<?= htmlspecialchars($p['name']) ?>"
+                  data-price="<?= $p['price'] ?>"
+                  data-image_url="<?= htmlspecialchars($img) ?>"
+                  data-stock="<?= $stock ?>"
+                  <?= $rupture ? 'disabled' : '' ?>
+                >
+                  <i class="fa-solid fa-palette"></i>
+                  <?= $rupture ? 'Rupture de stock' : 'Choisir une teinte' ?>
+                </button>
+              <?php else: ?>
+                <button
+                  class="fp-cart-btn add-to-cart"
+                  data-product-id="<?= $p['id'] ?>"
+                  data-name="<?= htmlspecialchars($p['name']) ?>"
+                  data-price="<?= $p['price'] ?>"
+                  data-image_url="<?= htmlspecialchars($img) ?>"
+                  data-stock="<?= $stock ?>"
+                  <?= $rupture ? 'disabled' : '' ?>
+                >
+                  <i class="fa-solid fa-bag-shopping"></i>
+                  <?= $rupture ? 'Rupture de stock' : 'Ajouter' ?>
+                </button>
+              <?php endif; ?>
+            </div>
+          </div>
 
-    <!-- Bouton Voir tout -->
+        </article>
+
+        <?php endforeach; ?>
+
+      </div>
+    </div>
+
+    <?php endif; ?>
+
     <div class="featured-footer reveal">
       <a href="<?= $b ?>/catalogue.php" class="featured-cta">
         <span>Voir toute la collection</span>
@@ -254,31 +246,24 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
       </a>
     </div>
 
-  </div><!-- /.featured-inner -->
+  </div>
 </section>
+
 <div class="divider"></div>
+
 
 <!-- ══ WORTH THE HYPE ════════════════════════════════════ -->
 <section class="worth-hype">
-<div class="hype-left reveal reveal-left">
-  <div class="hype-image-frame">
 
-    <picture>
-      <!-- Mobile -->
-      <source
-        media="(max-width: 768px)"
-        srcset="<?= $b ?>/images/45433ff5723689bcfaba43d9eee85b48.jpg">
-
-      <!-- Desktop -->
-      <img
-        src="<?= $b ?>/images/dd7c54ac45646f83d9ef7eaa56599363.jpg"
-        alt="Best Seller">
-    </picture>
-
-    <span class="badge-new">New Drop</span>
-
+  <div class="hype-left reveal reveal-left">
+    <div class="hype-image-frame">
+      <picture>
+        <source media="(max-width: 768px)" srcset="<?= $b ?>/images/45433ff5723689bcfaba43d9eee85b48.jpg">
+        <img src="<?= $b ?>/images/dd7c54ac45646f83d9ef7eaa56599363.jpg" alt="Best Seller">
+      </picture>
+      <span class="badge-new">New Drop</span>
+    </div>
   </div>
-</div>
 
   <div class="hype-right reveal reveal-right">
 
@@ -289,9 +274,11 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <div class="hype-products">
       <?php
-      $stmt = $pdo->query("SELECT * FROM products ORDER BY id ASC LIMIT 4");
-      while ($product = $stmt->fetch(PDO::FETCH_ASSOC)):
+      $hypeStmt = $pdo->query("SELECT * FROM products ORDER BY id ASC LIMIT 4");
+      while ($product = $hypeStmt->fetch(PDO::FETCH_ASSOC)):
         $productId = $product['id'];
+        $stock     = (int)($product['stock'] ?? 1);
+        $rupture   = $stock === 0;
 
         $shadeStmt = $pdo->prepare("SELECT COUNT(*) FROM teintes WHERE product_id = ?");
         $shadeStmt->execute([$productId]);
@@ -307,11 +294,13 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         <div class="product-image-wrapper">
           <a href="<?= $b ?>/product.php?id=<?= $productId ?>">
-            <img
-              src="<?= htmlspecialchars($image) ?>"
-              alt="<?= htmlspecialchars($product['name']) ?>">
+            <img src="<?= htmlspecialchars($image) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
           </a>
-          <button class="add-to-wishlist"
+          <?php if ($rupture): ?>
+            <span class="out-of-stock-badge">Rupture</span>
+          <?php endif; ?>
+          <button
+            class="add-to-wishlist"
             data-product-id="<?= $productId ?>"
             data-name="<?= htmlspecialchars($product['name']) ?>"
             data-price="<?= htmlspecialchars($product['price']) ?>"
@@ -322,7 +311,6 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
 
         <div class="product-info">
-          <!-- Optionnel : afficher la catégorie si disponible dans $product['categorie'] -->
           <?php if (!empty($product['categorie'])): ?>
             <p class="product-category-label"><?= htmlspecialchars($product['categorie']) ?></p>
           <?php endif; ?>
@@ -336,37 +324,49 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <p class="price"><?= number_format($product['price'], 2, ',', ' ') ?> DA</p>
 
           <?php if ($hasShades): ?>
-            <button class="choose-shade-btn"
+            <button
+              class="choose-shade-btn"
               data-product-id="<?= $productId ?>"
               data-name="<?= htmlspecialchars($product['name']) ?>"
               data-price="<?= htmlspecialchars($product['price']) ?>"
-              data-image_url="<?= htmlspecialchars($image) ?>">
-              <i class="fas fa-palette"></i> Choisir une teinte
+              data-image_url="<?= htmlspecialchars($image) ?>"
+              data-stock="<?= $stock ?>"
+              <?= $rupture ? 'disabled' : '' ?>>
+              <i class="fas fa-palette"></i>
+              <?= $rupture ? 'Rupture de stock' : 'Choisir une teinte' ?>
             </button>
           <?php else: ?>
             <div class="add-to-cart-wrapper">
               <div class="quantity-wrapper">
-                <input type="number" name="quantity" value="1" min="1" step="1">
+                <input
+                  type="number" name="quantity" value="1" min="1" step="1"
+                  <?= $rupture ? 'disabled' : '' ?>>
               </div>
-              <button class="add-to-cart"
+              <button
+                class="add-to-cart"
                 data-product-id="<?= $productId ?>"
                 data-name="<?= htmlspecialchars($product['name']) ?>"
                 data-price="<?= htmlspecialchars($product['price']) ?>"
-                data-image_url="<?= htmlspecialchars($image) ?>">
-                <i class="fas fa-shopping-bag"></i> Ajouter au panier
+                data-image_url="<?= htmlspecialchars($image) ?>"
+                data-stock="<?= $stock ?>"
+                <?= $rupture ? 'disabled' : '' ?>>
+                <i class="fas fa-shopping-bag"></i>
+                <?= $rupture ? 'Rupture de stock' : 'Ajouter au panier' ?>
               </button>
             </div>
           <?php endif; ?>
         </div>
 
       </div>
+
       <?php endwhile; ?>
     </div>
 
   </div>
-
 </section>
+
 <div class="divider"></div>
+
 
 <!-- ══ LIVRAISON & CONFIANCE ══════════════════════════════ -->
 <section class="trust-section">
@@ -388,6 +388,7 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
   </div>
 </section>
+
 
 <!-- ══ AVIS CLIENTS ═══════════════════════════════════════ -->
 <section class="reviews-section">
@@ -448,13 +449,11 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
   </div>
 </section>
+
 <?php include 'includes/product_modal.php'; ?>
 
-<!-- ══════════════════════════════════════════════════════ -->
-<!--  SCRIPTS                                               -->
-<!-- ══════════════════════════════════════════════════════ -->
 <script>
-/* ── CURSEUR CUSTOM ─────────────────────────────── */
+/* ── CURSEUR CUSTOM ──────────────────────────────────── */
 (function() {
   const dot  = document.getElementById('cursorDot');
   const ring = document.getElementById('cursorRing');
@@ -469,14 +468,13 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
     ring.style.top  = ry + 'px';
   });
 
-  // Agrandissement au hover interactif
   document.querySelectorAll('a, button, .create-item, .navigation span').forEach(el => {
     el.addEventListener('mouseenter', () => ring.style.transform = 'translate(-50%,-50%) scale(1.6)');
     el.addEventListener('mouseleave', () => ring.style.transform = 'translate(-50%,-50%) scale(1)');
   });
 })();
 
-/* ── SLIDER ──────────────────────────────────────── */
+/* ── SLIDER ──────────────────────────────────────────── */
 (function() {
   const slides = document.querySelectorAll('.slide');
   const dots   = document.querySelectorAll('.slider-dot');
@@ -490,52 +488,52 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
     dots[idx].classList.add('active');
   }
 
-  function next() { goTo(idx + 1); }
-  function prev() { goTo(idx - 1); }
-
-  function autoStart() { timer = setInterval(next, 5000); }
-  function autoStop()  { clearInterval(timer); }
+  const next = () => goTo(idx + 1);
+  const prev = () => goTo(idx - 1);
+  const autoStart = () => { timer = setInterval(next, 5000); };
+  const autoStop  = () => { clearInterval(timer); };
 
   document.querySelector('.next').addEventListener('click', () => { autoStop(); next(); autoStart(); });
   document.querySelector('.prev').addEventListener('click', () => { autoStop(); prev(); autoStart(); });
-
   dots.forEach((d, i) => d.addEventListener('click', () => { autoStop(); goTo(i); autoStart(); }));
 
   autoStart();
 })();
 
-/* ── HEADER SCROLL ───────────────────────────────── */
+/* ── HEADER SCROLL ───────────────────────────────────── */
 (function() {
-  const header = document.querySelector('.header');
-  const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 60);
+  const header     = document.querySelector('.header');
+  const headerLogo = document.getElementById('headerLogo');
+  const onScroll   = () => {
+    const scrolled = window.scrollY > 60;
+    header.classList.toggle('scrolled', scrolled);
+    if (headerLogo) headerLogo.src = scrolled ? '/images/logofib.png' : '/images/logowhite.png';
+  };
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 })();
 
-/* ── SCROLL REVEAL ───────────────────────────────── */
+/* ── SCROLL REVEAL ───────────────────────────────────── */
 (function() {
-  const els = document.querySelectorAll('.reveal');
-  const io  = new IntersectionObserver(entries => {
+  const io = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
     });
   }, { threshold: .12 });
-  els.forEach(el => io.observe(el));
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 })();
 
-/* ── SPARKLES AU CLIC ────────────────────────────── */
+/* ── SPARKLES AU CLIC ────────────────────────────────── */
 document.addEventListener('click', e => {
   for (let i = 0; i < 6; i++) {
     const s = document.createElement('div');
     s.className = 'sparkle';
     s.style.cssText = `
-      left: ${e.clientX}px;
-      top:  ${e.clientY}px;
-      width:  ${4 + Math.random() * 6}px;
-      height: ${4 + Math.random() * 6}px;
+      left: ${e.clientX}px; top: ${e.clientY}px;
+      width: ${4 + Math.random() * 6}px; height: ${4 + Math.random() * 6}px;
       animation-duration: ${.6 + Math.random() * .8}s;
       animation-delay: ${Math.random() * .2}s;
-      transform: translate(${(Math.random()-0.5)*60}px, ${(Math.random()-0.5)*60}px);
+      transform: translate(${(Math.random()-.5)*60}px, ${(Math.random()-.5)*60}px);
     `;
     document.body.appendChild(s);
     setTimeout(() => s.remove(), 1400);
@@ -543,6 +541,7 @@ document.addEventListener('click', e => {
 });
 </script>
 
+<script>const BASE_URL = "<?= $b ?>";</script>
 <script src="<?= $b ?>/js/shop.js?v=<?= time() ?>"></script>
 <script src="<?= $b ?>/js/checkout.js" defer></script>
 <script>
@@ -550,6 +549,7 @@ document.addEventListener('click', e => {
     document.body.style.visibility = 'visible';
   });
 </script>
+
 <?php include 'includes/footer.php'; ?>
 </body>
 </html>
