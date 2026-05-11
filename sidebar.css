@@ -8,7 +8,7 @@
   right: -420px;
   width: 400px;
   height: 100vh;
-  background: rgba(255, 255, 255, 0.97);
+  background: #F5F1EE;
   z-index: 5000;
   display: flex;
   flex-direction: column;
@@ -272,7 +272,7 @@
   width: 100%;
   padding: 17px 24px;
   background: #440B19;
-  color: #ffffff;
+  color: #F5F1EE;
   border: none;
   border-radius: 0;
   font-family: "Didot", "Playfair Display", serif;
@@ -291,7 +291,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: #ffffff;
+  background: #F5F1EE;
   transform: translateX(-101%);
   transition: transform 0.45s cubic-bezier(0.77, 0, 0.18, 1);
   z-index: -1;

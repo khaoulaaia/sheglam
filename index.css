@@ -197,7 +197,7 @@ button { font-family: inherit; cursor: pointer; }
   flex-direction: column;
   gap: 28px;
   padding: 70px 32px;
-  background: var(--white);
+  background: #F5F1EE;
   border-right: 1px solid var(--border);
   z-index: 103;
   box-shadow: 8px 0 40px rgba(68, 11, 25, 0.12);

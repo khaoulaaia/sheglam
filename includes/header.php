@@ -306,7 +306,7 @@ a { text-decoration: none; color: inherit; }
   z-index: 2600;
 }
 
-.navbar-mobile.active { left: 0; }
+.navbar-mobile.active { left: 0; background: #F5F1EE !important; }
 
 .navbar-mobile::before {
   content: '';
@@ -771,7 +771,7 @@ a { text-decoration: none; color: inherit; }
     align-items: center;
     justify-content: space-around;
     padding: 0 8px;
-    background: rgba(255, 255, 255, 0.96);
+    background: #F5F1EE;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-top: 1px solid var(--border);

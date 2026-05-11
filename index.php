@@ -31,7 +31,7 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   <div class="slide active">
     <picture>
-      <source media="(max-width:600px)" srcset="<?= $b ?>/images/162f63d8d9bd46d89e65ee122a6cfb64.jpg">
+      <source media="(max-width:600px)" srcset="<?= $b ?>/images/2ab4601fecaf19c74d1c3247c8699fc4.jpg">
       <img src="<?= $b ?>/images/c8d0308b-18a7-492f-9beb-72bcf33af240-1.png" alt="Nouvelle collection">
     </picture>
   </div>
@@ -258,8 +258,8 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <div class="hype-left reveal reveal-left">
     <div class="hype-image-frame">
       <picture>
-        <source media="(max-width: 768px)" srcset="<?= $b ?>/images/45433ff5723689bcfaba43d9eee85b48.jpg">
-        <img src="<?= $b ?>/images/dd7c54ac45646f83d9ef7eaa56599363.jpg" alt="Best Seller">
+        <source media="(max-width: 768px)" srcset="<?= $b ?>/images/adea3c1ccd83ac8c0c1bca88cd01747d.jpg">
+        <img src="<?= $b ?>/images/48cdd3f716df344a4ac66ec6e464eb77.jpg" alt="Best Seller">
       </picture>
       <span class="badge-new">New Drop</span>
     </div>
