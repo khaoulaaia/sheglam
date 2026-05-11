@@ -331,7 +331,7 @@ a { text-decoration: none; color: inherit; }
 }
 
 .mobile-logo img {
-  height: 130px;
+  height: 150px !important;
   width: auto;
   display: block;
   object-fit: contain;
@@ -845,6 +845,13 @@ a { text-decoration: none; color: inherit; }
 
 .header.scrolled #openSearch {
   color: var(--bordeaux) !important;
+}
+
+/* Mobile (≤ 768 px) */
+@media (max-width: 768px) {
+  .logo img {
+    height: 70px !important;
+  }
 }
   </style>
 </head>

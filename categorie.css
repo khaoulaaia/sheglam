@@ -94,13 +94,23 @@ button { font-family: inherit; cursor: pointer; }
 .header .logo img,
 .header .logo-img {
   content: url('/images/logofib.png') !important;
-  height: 52px !important;
+  height: 70px !important;
   width: auto !important;
   object-fit: contain !important;
   opacity: 1 !important;
   visibility: visible !important;
 }
 
+.mobile-logo img {
+  height: 150px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
 /* Navbar desktop bordeaux toujours */
 .header .navbar-desktop a,
 .header .navbar a {

@@ -54,7 +54,7 @@
 body {
   font-family: var(--sans);
   color: var(--text);
-  background: #F5F1EE;
+  background: #F5F1EE !important;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -108,6 +108,29 @@ button { font-family: inherit; cursor: pointer; }
   color: var(--bordeaux);
 }
 
+.logo img {
+  height: 70px !important;
+  width: auto;
+  display: block;
+  object-fit: contain;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  transition:
+    opacity .25s var(--ease),
+    transform .25s var(--ease);
+}
+.mobile-logo img {
+  height: 150px !important;
+  width: auto;
+  display: block;
+  object-fit: contain;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
 .navbar {
   display: flex;
   gap: 32px;
@@ -216,6 +239,7 @@ button { font-family: inherit; cursor: pointer; }
   overflow: hidden;
   margin-top: -70px;
   margin-bottom: var(--section-gap);
+  background: #F5F1EE;
 }
 
 /* ── Vignette cinématique (coins sombres) ── */
@@ -660,7 +684,7 @@ button { font-family: inherit; cursor: pointer; }
 .badge-new {
   bottom: 24px;
   right: 20px;
-  background: var(--white);
+  background: #F5F1EE;
   color: var(--bordeaux);
   border: 1.5px solid var(--bordeaux);
 }
@@ -709,7 +733,7 @@ button { font-family: inherit; cursor: pointer; }
 /* ══ CARTE PRODUIT — composant partagé ═══════════════════════ */
 
 .product-card {
-  background: var(--white);
+  background: #F5F1EE;
   border: 1px solid var(--border);
   overflow: hidden;
   display: flex;
@@ -849,7 +873,7 @@ button { font-family: inherit; cursor: pointer; }
   width: 38px;
   height: 32px;
   border: 1.5px solid var(--bordeaux);
-  background: var(--white);
+  background: #F5F1EE;
   color: var(--bordeaux);
   font-family: var(--sans);
   font-size: 11px;
@@ -1491,7 +1515,7 @@ button { font-family: inherit; cursor: pointer; }
   top: 10px;
   left: 10px;
   padding: 4px 10px;
-  background: var(--white);
+  background: #F5F1EE;
   border: 1px solid var(--border);
   color: var(--bordeaux-l);
   font-family: var(--sans);
@@ -1501,4 +1525,27 @@ button { font-family: inherit; cursor: pointer; }
   text-transform: uppercase;
   pointer-events: none;
   z-index: 2;
+}
+/* ══ LOGO ════════════════════════════════════════════════════ */
+
+/* Desktop & tablette (≥ 769 px) */
+.logo img {
+  height: 70px !important;
+  width: auto;
+  display: block;
+  object-fit: contain;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  transition:
+    opacity  .25s var(--ease),
+    transform .25s var(--ease);
+}
+
+/* Mobile (≤ 768 px) */
+@media (max-width: 768px) {
+  .logo img {
+    height: 60px !important;
+  }
 }

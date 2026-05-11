@@ -91,7 +91,7 @@ button { font-family: inherit; cursor: pointer; }
 .header .logo img,
 .header .logo-img {
   content: url('/images/logofib.png') !important;
-  height: 52px !important;
+  height: 70px !important;
   width: auto !important;
   object-fit: contain !important;
   opacity: 1 !important;
@@ -150,6 +150,16 @@ button { font-family: inherit; cursor: pointer; }
   border-top: 1px solid var(--border-s);
 }
 
+.mobile-logo img {
+  height: 150px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
 /* Search overlay */
 .search-overlay {
   background: rgba(245, 241, 238, 0.97) !important;
