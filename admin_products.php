@@ -249,6 +249,7 @@ $activeCount   = count(array_filter($products, fn($p) => $p['active']));
 <title>SheGlamour — Produits</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Nunito:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="<?= $b ?>/images/logofib.png">
 <style>
 :root {
   --bg: #f7f4f2;

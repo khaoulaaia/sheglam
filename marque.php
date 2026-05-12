@@ -18,9 +18,11 @@ $produits = $stmt->fetchAll();
 <head>
 <meta charset="UTF-8">
 <title><?= htmlspecialchars($marque) ?> - SheGlamour</title>
-<link rel="stylesheet" href="/sheglam/categorie.css?v=<?= time(); ?>">
-<link rel="stylesheet" href="/sheglam/sidebar.css?v=<?= time(); ?>">
+<link rel="stylesheet" href="/categorie.css?v=<?= time(); ?>">
+<link rel="stylesheet" href="/sidebar.css?v=<?= time(); ?>">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="icon" type="image/png" href="<?= $b ?>/images/logofib.png">
+
 </head>
 <body>
 
@@ -66,7 +68,7 @@ $produits = $stmt->fetchAll();
             $img = $item['image_url'] ? 'images/' . basename($item['image_url']) : '/images/placeholder.jpg';
         ?>
         <li>
-          <a href="/sheglam/product.php?id=<?= $item['id'] ?>">
+          <a href="/product.php?id=<?= $item['id'] ?>">
             <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($item['name']) ?>">
             <div class="best-seller-info">
               <span class="name"><?= htmlspecialchars($item['name']) ?></span>
@@ -85,7 +87,7 @@ $produits = $stmt->fetchAll();
     <h1><?= htmlspecialchars($marque) ?></h1>
 
     <nav class="breadcrumb">
-      <a href="/sheglam/index.php">Accueil</a> &gt;
+      <a href="/index.php">Accueil</a> &gt;
         <span><?= htmlspecialchars($marque) ?></span>
     </nav>
 
@@ -115,7 +117,7 @@ $produits = $stmt->fetchAll();
         $shadeStmt->execute([$productId]);
         $hasShades = $shadeStmt->fetchColumn() > 0;
       ?>
-      <a href="/sheglam/product.php?id=<?= $productId ?>" class="product-card-link">
+      <a href="/product.php?id=<?= $productId ?>" class="product-card-link">
         <div class="product-card"
              data-price="<?= $product['price'] ?>"
              data-brand="<?= htmlspecialchars($product['marque']) ?>"
@@ -177,7 +179,7 @@ $produits = $stmt->fetchAll();
 <?php include 'includes/footer.php'; ?>
 <?php include 'includes/product_modal.php'; ?>
 
-<script src="/sheglam/js/shop.js?v=<?= time(); ?>"></script>
+<script src="/js/shop.js?v=<?= time(); ?>"></script>
 
 </body>
 </html>

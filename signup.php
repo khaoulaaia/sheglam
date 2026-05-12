@@ -74,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8">
   <title>Créer un compte - SheGlamour</title>
   <link rel="stylesheet" href="signup.css">
+  <link rel="icon" type="image/png" href="<?= $b ?>/images/logofib.png">
 </head>
 <body>
   <div class="signup-container">

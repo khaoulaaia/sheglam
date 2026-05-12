@@ -51,6 +51,7 @@ $error = $_GET['error'] ?? '';
   <meta charset="UTF-8">
   <title>Connexion - SheGlamour</title>
   <link rel="stylesheet" href="login.css">
+  <link rel="icon" type="image/png" href="<?= $b ?>/images/logofib.png">
 </head>
 <body>
   <div class="login-container">
