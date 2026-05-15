@@ -65,6 +65,44 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ══ HEADER ══════════════════════════════════════════════════ */
+
+.header {
+  position: fixed; top: 0; width: 100%; height: 72px; padding: 0 5%;
+  background: #F5F1EE !important; backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important; border-bottom: 1px solid transparent;
+  z-index: 1000; transition: border-color 0.35s ease, box-shadow 0.35s ease;
+}
+.header.scrolled {
+  background: #F5F1EE !important; border-color: var(--border-s) !important;
+  box-shadow: 0 1px 0 var(--border-s), 0 4px 24px var(--dark-06);
+}
+.header #headerLogo, .header .logo img, .header .logo-img {
+  content: url('/images/logofib.png') !important; height: 70px !important;
+  width: auto !important; object-fit: contain !important;
+  opacity: 1 !important; visibility: visible !important;
+}
+.mobile-logo img {
+  height: 150px; width: auto; display: block; object-fit: contain;
+  image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;
+  backface-visibility: hidden; transform: translateZ(0);
+}
+.header .navbar-desktop a, .header .navbar a {
+  color: var(--bordeaux) !important; font-family: var(--sans);
+  font-size: .72rem; font-weight: 400; letter-spacing: .18em;
+  text-transform: uppercase; position: relative; transition: color 0.2s;
+}
+.header .navbar-desktop a::after, .header .navbar a::after {
+  content: ''; position: absolute; bottom: -3px; left: 0; width: 0; height: 1px;
+  background: var(--bordeaux) !important; transition: width 0.3s var(--ease);
+}
+.header .navbar-desktop a:hover::after, .header .navbar a:hover::after { width: 100%; }
+.header .icon-btn, .header .icons a, .header .icons button, .header #openSearch { color: var(--bordeaux) !important; }
+.header .icon-btn:hover, .header .icons a:hover, .header #openSearch:hover { color: var(--bordeaux-l) !important; opacity: 1 !important; }
+.header .menu-toggle span { background: var(--bordeaux) !important; }
+.mobile-bottom-bar { background: #F5F1EE !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; border-top: 1px solid var(--border-s); }
+.search-overlay { background: rgba(245, 241, 238, 0.97) !important; }
+.search-product, .search-product img { background: var(--bg-warm) !important; }
 /* ── Hero ── */
 .page-hero {
   margin-top: 90px;

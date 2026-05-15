@@ -475,18 +475,22 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
   });
 })();
 
-/* ── SLIDER ──────────────────────────────────────────── */
+/* ── SLIDER (guards si navigation commentée) ── */
 (function() {
   const slides = document.querySelectorAll('.slide');
   const dots   = document.querySelectorAll('.slider-dot');
+  const nextBtn = document.querySelector('.next');
+  const prevBtn = document.querySelector('.prev');
+  if (slides.length < 2) return;   // ← stoppe tout si un seul slide
+
   let idx = 0, timer;
 
   function goTo(i) {
     slides[idx].classList.remove('active');
-    dots[idx].classList.remove('active');
+    if (dots[idx]) dots[idx].classList.remove('active');
     idx = (i + slides.length) % slides.length;
     slides[idx].classList.add('active');
-    dots[idx].classList.add('active');
+    if (dots[idx]) dots[idx].classList.add('active');
   }
 
   const next = () => goTo(idx + 1);
@@ -494,8 +498,8 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
   const autoStart = () => { timer = setInterval(next, 5000); };
   const autoStop  = () => { clearInterval(timer); };
 
-  document.querySelector('.next').addEventListener('click', () => { autoStop(); next(); autoStart(); });
-  document.querySelector('.prev').addEventListener('click', () => { autoStop(); prev(); autoStart(); });
+  nextBtn?.addEventListener('click', () => { autoStop(); next(); autoStart(); });
+  prevBtn?.addEventListener('click', () => { autoStop(); prev(); autoStart(); });
   dots.forEach((d, i) => d.addEventListener('click', () => { autoStop(); goTo(i); autoStart(); }));
 
   autoStart();

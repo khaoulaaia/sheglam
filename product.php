@@ -6,7 +6,7 @@ $b = BASE_URL;
 $productId = $_GET['id'] ?? null;
 if (!$productId) die("Produit introuvable");
 
-// Traitement avis
+// ── Traitement avis ──────────────────────────────────────────────────────────
 if (isset($_POST['submit_review'])) {
     $name    = trim($_POST['customer_name']);
     $rating  = (int) $_POST['rating'];
@@ -19,7 +19,7 @@ if (isset($_POST['submit_review'])) {
     }
 }
 
-// Produit
+// ── Produit ──────────────────────────────────────────────────────────────────
 $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
 $stmt->execute([$productId]);
 $product = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -28,34 +28,39 @@ if (!$product) die("Produit introuvable");
 $stock      = (int)($product['stock'] ?? 0);
 $outOfStock = $stock === 0;
 
-// Images supplémentaires
+// ── Images ───────────────────────────────────────────────────────────────────
 $imageStmt = $pdo->prepare("SELECT image FROM product_images WHERE product_id = ?");
 $imageStmt->execute([$productId]);
 $additionalImages = $imageStmt->fetchAll(PDO::FETCH_COLUMN);
-if (empty($additionalImages)) $additionalImages = [$product['image_url']];
 
-$additionalImages = array_map(function($img) use ($b) {
+if (!empty($product['image_url'])) {
+    array_unshift($additionalImages, $product['image_url']);
+}
+if (empty($additionalImages)) {
+    $additionalImages = [$b . '/images/placeholder.jpg'];
+}
+$additionalImages = array_values(array_unique($additionalImages));
+$additionalImages = array_map(function ($img) use ($b) {
     if (empty($img)) return $b . '/images/placeholder.jpg';
     return str_starts_with($img, 'http') ? $img : $b . '/images/' . basename($img);
 }, $additionalImages);
 
-// Teintes
+// ── Teintes ──────────────────────────────────────────────────────────────────
 $shadeStmt = $pdo->prepare("SELECT COUNT(*) FROM teintes WHERE product_id = ?");
 $shadeStmt->execute([$productId]);
 $hasShades = $shadeStmt->fetchColumn() > 0;
 
-// Avis
+// ── Avis ─────────────────────────────────────────────────────────────────────
 $reviewStmt = $pdo->prepare("SELECT * FROM product_reviews WHERE product_id = ? ORDER BY date_creation DESC");
 $reviewStmt->execute([$productId]);
 $reviews = $reviewStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Note moyenne
 $averageRating = 0;
 if ($reviews) {
     $averageRating = round(array_sum(array_column($reviews, 'rating')) / count($reviews), 1);
 }
 
-// Produits similaires
+// ── Produits similaires ───────────────────────────────────────────────────────
 $similarStmt = $pdo->prepare("SELECT * FROM products WHERE categorie = ? AND id != ? LIMIT 4");
 $similarStmt->execute([$product['categorie'], $productId]);
 $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
@@ -93,7 +98,7 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
     <?php foreach ($additionalImages as $img): ?>
       <img src="<?= htmlspecialchars($img) ?>"
            class="thumbnail"
-           onclick="document.getElementById('mainImage').src='<?= htmlspecialchars($img) ?>'">
+           alt="<?= htmlspecialchars($product['name']) ?>">
     <?php endforeach; ?>
   </div>
 
@@ -129,53 +134,56 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
 
       <!-- Étoiles -->
       <div class="reviews">
-        <h3>Avis clients</h3>
         <?php if ($reviews): ?>
           <div class="average-rating">
             <?php for ($i = 1; $i <= 5; $i++):
-              if ($i <= floor($averageRating))        echo '<i class="fas fa-star"></i>';
-              elseif ($i - $averageRating <= 0.5)     echo '<i class="fas fa-star-half-alt"></i>';
-              else                                     echo '<i class="far fa-star"></i>';
+              if ($i <= floor($averageRating))      echo '<i class="fas fa-star"></i>';
+              elseif ($i - $averageRating <= 0.5)   echo '<i class="fas fa-star-half-alt"></i>';
+              else                                   echo '<i class="far fa-star"></i>';
             endfor; ?>
-            <span>(<?= $averageRating ?>/5)</span>
+            <span>(<?= $averageRating ?>/5 — <?= count($reviews) ?> avis)</span>
           </div>
         <?php else: ?>
-          <p>Aucun avis pour le moment.</p>
+          <p class="no-reviews">Aucun avis pour le moment.</p>
         <?php endif; ?>
       </div>
 
       <!-- Prix -->
       <p class="price">
         <?php if (!empty($product['old_price']) && $product['old_price'] > $product['price']): ?>
-          <span class="old-price"><?= number_format($product['old_price'], 2, ',', ' ') ?>DA</span>
+          <span class="old-price"><?= number_format($product['old_price'], 2, ',', ' ') ?> DA</span>
         <?php endif; ?>
-        <?= number_format($product['price'], 2, ',', ' ') ?>DA
+        <?= number_format($product['price'], 2, ',', ' ') ?> DA
       </p>
 
       <p class="description"><?= htmlspecialchars($product['description']) ?></p>
 
-      <!-- Bouton teinte ou panier -->
-      <?php if ($hasShades): ?>
-        <button class="choose-shade-btn"
-          data-product-id="<?= $product['id'] ?>"
-          data-name="<?= htmlspecialchars($product['name']) ?>"
-          data-price="<?= htmlspecialchars($product['price']) ?>"
-          data-image_url="<?= htmlspecialchars($additionalImages[0]) ?>"
-          data-stock="<?= $stock ?>"
-          <?= $outOfStock ? 'disabled' : '' ?>>
-          <i class="fas fa-<?= $outOfStock ? 'ban' : 'palette' ?>"></i>
-          <?= $outOfStock ? 'Rupture de stock' : 'Choisir une teinte' ?>
-        </button>
-      <?php else: ?>
-        <div class="add-to-cart-wrapper">
-          <?php if (!$outOfStock): ?>
-            <div class="quantity-wrapper">
-              <label for="quantity">Quantité :</label>
-              <input type="number" id="quantity" name="quantity"
-                     value="1" min="1" max="<?= $stock ?>" step="1">
-            </div>
-          <?php endif; ?>
-          <button class="add-to-cart"
+      <!-- Quantité (hors teintes, hors rupture) -->
+      <?php if (!$outOfStock && !$hasShades): ?>
+        <div class="quantity-wrapper">
+          <label for="quantity">Quantité :</label>
+          <input type="number" id="quantity" name="quantity"
+                 value="1" min="1" max="<?= $stock ?>" step="1">
+        </div>
+      <?php endif; ?>
+
+      <!-- Boutons action -->
+      <div class="product-actions">
+        <?php if ($hasShades): ?>
+          <!-- Choisir une teinte -->
+          <button class="choose-shade-btn btn-secondary-action"
+            data-product-id="<?= $product['id'] ?>"
+            data-name="<?= htmlspecialchars($product['name']) ?>"
+            data-price="<?= htmlspecialchars($product['price']) ?>"
+            data-image_url="<?= htmlspecialchars($additionalImages[0]) ?>"
+            data-stock="<?= $stock ?>"
+            <?= $outOfStock ? 'disabled' : '' ?>>
+            <i class="fas fa-<?= $outOfStock ? 'ban' : 'palette' ?>"></i>
+            <?= $outOfStock ? 'Rupture de stock' : 'Choisir une teinte' ?>
+          </button>
+        <?php else: ?>
+          <!-- Ajouter au panier -->
+          <button class="add-to-cart btn-secondary-action"
             data-product-id="<?= $product['id'] ?>"
             data-name="<?= htmlspecialchars($product['name']) ?>"
             data-price="<?= htmlspecialchars($product['price']) ?>"
@@ -185,17 +193,44 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
             <i class="fas fa-<?= $outOfStock ? 'ban' : 'shopping-bag' ?>"></i>
             <?= $outOfStock ? 'Rupture de stock' : 'Ajouter au panier' ?>
           </button>
-        </div>
+        <?php endif; ?>
+
+        <!-- Achat direct -->
+        <?php if (!$outOfStock): ?>
+          <button class="buy-now-btn" id="buyNowBtn"
+            data-product-id="<?= $product['id'] ?>"
+            data-name="<?= htmlspecialchars($product['name']) ?>"
+            data-price="<?= htmlspecialchars($product['price']) ?>"
+            data-image_url="<?= htmlspecialchars($additionalImages[0]) ?>">
+            <i class="fas fa-bolt"></i> Acheter maintenant
+          </button>
+        <?php endif; ?>
+      </div>
+
+      <?php if (!$outOfStock): ?>
+        <p class="buy-now-note">
+          <i class="fas fa-shield-alt"></i> Paiement sécurisé · Livraison partout en Algérie
+        </p>
       <?php endif; ?>
 
       <!-- Partage -->
       <div class="share-product">
         <span>Partager :</span>
-        <a href="#" class="share-btn facebook" data-network="facebook" title="Facebook"><i class="fab fa-facebook-square"></i></a>
-        <a href="#" class="share-btn twitter"   data-network="twitter"   title="Twitter"><i class="fab fa-x-twitter"></i></a>
-        <a href="#" class="share-btn whatsapp"  data-network="whatsapp"  title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-        <a href="#" class="share-btn pinterest" data-network="pinterest" title="Pinterest"><i class="fab fa-pinterest-p"></i></a>
-        <button id="nativeShare" class="share-btn native" title="Partager"><i class="fas fa-share-alt"></i></button>
+        <a href="#" class="share-btn facebook" data-network="facebook" title="Facebook">
+          <i class="fab fa-facebook-square"></i>
+        </a>
+        <a href="#" class="share-btn twitter" data-network="twitter" title="Twitter">
+          <i class="fab fa-x-twitter"></i>
+        </a>
+        <a href="#" class="share-btn whatsapp" data-network="whatsapp" title="WhatsApp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+        <a href="#" class="share-btn pinterest" data-network="pinterest" title="Pinterest">
+          <i class="fab fa-pinterest-p"></i>
+        </a>
+        <button id="nativeShare" class="share-btn native" title="Partager">
+          <i class="fas fa-share-alt"></i>
+        </button>
       </div>
 
     </div><!-- .product-right -->
@@ -251,12 +286,16 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
   <h2>Produits similaires</h2>
   <div class="similar-container">
     <?php foreach ($similarProducts as $sp):
-      $spImg      = empty($sp['image_url']) ? $b . '/images/placeholder.jpg'
-                  : (str_starts_with($sp['image_url'], 'http') ? $sp['image_url'] : $b . '/images/' . basename($sp['image_url']));
-      $spStock    = (int)($sp['stock'] ?? 0);
-      $spNoStock  = $spStock === 0;
+      $spImg   = empty($sp['image_url'])
+               ? $b . '/images/placeholder.jpg'
+               : (str_starts_with($sp['image_url'], 'http')
+                  ? $sp['image_url']
+                  : $b . '/images/' . basename($sp['image_url']));
+      $spStock   = (int)($sp['stock'] ?? 0);
+      $spNoStock = $spStock === 0;
     ?>
-      <a href="<?= $b ?>/product.php?id=<?= $sp['id'] ?>" class="similar-item <?= $spNoStock ? 'out-of-stock' : '' ?>">
+      <a href="<?= $b ?>/product.php?id=<?= $sp['id'] ?>"
+         class="similar-item <?= $spNoStock ? 'out-of-stock' : '' ?>">
         <?php if ($spNoStock): ?>
           <span class="similar-badge-oos">Rupture</span>
         <?php endif; ?>
@@ -275,7 +314,7 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
 <script>
 const BASE_URL = "<?= $b ?>";
 
-/* ── Étoiles avis ── */
+/* ── Étoiles avis ─────────────────────────────────────────────────── */
 document.querySelectorAll("#starRating i").forEach(star => {
   star.addEventListener("click", () => {
     const v = star.dataset.value;
@@ -287,9 +326,10 @@ document.querySelectorAll("#starRating i").forEach(star => {
   });
 });
 
-/* ── Thumbnails ── */
-const thumbnails = document.querySelectorAll(".product-left img");
+/* ── Thumbnails ────────────────────────────────────────────────────── */
+const thumbnails = document.querySelectorAll(".product-left .thumbnail");
 const mainImage  = document.getElementById("mainImage");
+
 thumbnails.forEach(img => {
   img.addEventListener("click", () => {
     mainImage.src = img.src;
@@ -299,16 +339,17 @@ thumbnails.forEach(img => {
 });
 if (thumbnails.length) thumbnails[0].classList.add("active");
 
-/* ── Partage réseaux sociaux ── */
+/* ── Partage réseaux sociaux ───────────────────────────────────────── */
 document.querySelectorAll(".share-btn:not(.native)").forEach(btn => {
   btn.addEventListener("click", e => {
     e.preventDefault();
-    const network = btn.dataset.network;
-    if (!network) return;
-    const productName  = "<?= addslashes($product['name']) ?>";
+    const network      = btn.dataset.network;
+    const productName  = "<?= addslashes(htmlspecialchars($product['name'])) ?>";
     const productPrice = "<?= number_format($product['price'], 2, ',', ' ') ?> DA";
-    const url = encodeURIComponent(window.location.href);
-    const message = encodeURIComponent(`✨ J'ai trouvé ce produit incroyable sur SheGlamour ! 💄\n👉 ${productName} à ${productPrice}\n🔗 `);
+    const url          = encodeURIComponent(window.location.href);
+    const message      = encodeURIComponent(
+      `✨ J'ai trouvé ce produit incroyable sur SheGlamour ! 💄\n👉 ${productName} à ${productPrice}\n🔗 `
+    );
     const urls = {
       whatsapp:  `https://api.whatsapp.com/send?text=${message}${url}`,
       twitter:   `https://twitter.com/intent/tweet?text=${message}${url}`,
@@ -319,22 +360,77 @@ document.querySelectorAll(".share-btn:not(.native)").forEach(btn => {
   });
 });
 
-/* ── Partage natif (mobile) ── */
-const shareBtn = document.getElementById("nativeShare");
-if (navigator.share && shareBtn) {
-  shareBtn.addEventListener("click", async () => {
+/* ── Partage natif (mobile) ────────────────────────────────────────── */
+const nativeShareBtn = document.getElementById("nativeShare");
+if (navigator.share && nativeShareBtn) {
+  nativeShareBtn.addEventListener("click", async () => {
     try {
       await navigator.share({
-        title: "<?= addslashes($product['name']) ?>",
-        text: "✨ J'ai trouvé ce produit incroyable sur SheGlamour ! 💄",
-        url: window.location.href
+        title: "<?= addslashes(htmlspecialchars($product['name'])) ?>",
+        text:  "✨ J'ai trouvé ce produit incroyable sur SheGlamour ! 💄",
+        url:   window.location.href
       });
-    } catch (err) {}
+    } catch {}
+  });
+} else if (nativeShareBtn) {
+  nativeShareBtn.style.display = "none";
+}
+
+/* ── Achat direct ──────────────────────────────────────────────────── */
+const buyNowBtn = document.getElementById("buyNowBtn");
+if (buyNowBtn) {
+  buyNowBtn.addEventListener("click", () => {
+    const qty       = parseInt(document.getElementById("quantity")?.value || 1);
+    const productId = buyNowBtn.dataset.productId;
+
+    const item = {
+      id:        productId,
+      name:      buyNowBtn.dataset.name,
+      price:     parseFloat(buyNowBtn.dataset.price),
+      image_url: buyNowBtn.dataset.image_url,
+      quantity:  qty,
+      shade:     null
+    };
+
+    /* Sauvegarde du panier actuel */
+    const previousCart = localStorage.getItem("cart");
+
+    /* Panier temporaire : ce produit uniquement */
+    localStorage.setItem("cart", JSON.stringify({ [productId]: item }));
+
+    if (typeof openCheckout === "function") {
+      openCheckout();
+    } else {
+      console.warn("checkout.js non chargé");
+      return;
+    }
+
+    /* Restaure le panier si la commande est annulée */
+    const checkoutSidebar = document.getElementById("sg-checkout-sidebar");
+    if (!checkoutSidebar) return;
+
+    const observer = new MutationObserver(() => {
+      if (!checkoutSidebar.classList.contains("active")) {
+        /* Si le panier n'a pas été vidé par place_order, on restaure */
+        const current = localStorage.getItem("cart");
+        if (current !== null) {
+          localStorage.setItem("cart", previousCart || "{}");
+        }
+        if (typeof window.renderCart === "function") window.renderCart();
+        observer.disconnect();
+      }
+    });
+
+    observer.observe(checkoutSidebar, {
+      attributes:      true,
+      attributeFilter: ["class"]
+    });
   });
 }
 </script>
 
 <script src="<?= $b ?>/js/shop.js?v=<?= time() ?>"></script>
+<script src="<?= $b ?>/js/checkout.js?v=<?= time() ?>"></script>
 <?php include 'includes/footer.php'; ?>
 </body>
 </html>

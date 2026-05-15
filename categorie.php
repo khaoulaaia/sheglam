@@ -135,9 +135,13 @@ if ($categorie === 'Tous') {
         $imagePath = empty($product['image_url']) ? $b . '/images/placeholder.jpg'
           : (str_starts_with($product['image_url'], 'http') ? $product['image_url'] : $b . '/images/' . basename($product['image_url']));
 
-        $shadeStmt = $pdo->prepare("SELECT COUNT(*) FROM teintes WHERE product_id = ?");
+        /* ── Teintes ── */
+        $shadeStmt = $pdo->prepare("SELECT nom_teinte, code_couleur FROM teintes WHERE product_id = ?");
         $shadeStmt->execute([$productId]);
-        $hasShades = $shadeStmt->fetchColumn() > 0;
+        $productShades = $shadeStmt->fetchAll(PDO::FETCH_ASSOC);
+        $hasShades     = !empty($productShades);
+
+        $oldPrice = $product['old_price'] ?? '';
       ?>
 
       <a href="<?= $b ?>/product.php?id=<?= $productId ?>"
@@ -151,6 +155,7 @@ if ($categorie === 'Tous') {
              data-stock="<?= $stock ?>">
 
           <div class="product-image-wrapper">
+
             <?php if ($outOfStock): ?>
               <span class="badge-oos">Rupture</span>
             <?php elseif ($stock <= 5): ?>
@@ -161,27 +166,66 @@ if ($categorie === 'Tous') {
                  alt="<?= htmlspecialchars($product['name']) ?>"
                  class="<?= $outOfStock ? 'img-out-of-stock' : '' ?>">
 
+            <!-- Wishlist -->
             <button class="add-to-wishlist"
                     data-product-id="<?= $productId ?>"
                     data-name="<?= htmlspecialchars($product['name']) ?>"
                     data-price="<?= htmlspecialchars($product['price']) ?>"
                     data-image_url="<?= htmlspecialchars($imagePath) ?>"
                     data-has-shades="<?= $hasShades ? 1 : 0 ?>"
-                    type="button">
+                    type="button"
+                    aria-label="Ajouter aux favoris">
               <i class="fas fa-heart"></i>
             </button>
-          </div>
+
+            <!-- ✦ BOUTON APERÇU RAPIDE ✦ -->
+            <button class="quick-view-btn"
+                    data-product-id="<?= $productId ?>"
+                    data-name="<?= htmlspecialchars($product['name']) ?>"
+                    data-price="<?= htmlspecialchars($product['price']) ?>"
+                    data-old-price="<?= htmlspecialchars($oldPrice) ?>"
+                    data-image="<?= htmlspecialchars($imagePath) ?>"
+                    data-brand="<?= htmlspecialchars($product['marque'] ?? '') ?>"
+                    data-stock="<?= $stock ?>"
+                    data-has-shades="<?= $hasShades ? 1 : 0 ?>"
+                    data-shades="<?= htmlspecialchars(json_encode($productShades), ENT_QUOTES) ?>"
+                    data-description="<?= htmlspecialchars($product['description'] ?? '') ?>"
+                    data-url="<?= $b ?>/product.php?id=<?= $productId ?>"
+                    type="button"
+                    aria-label="Aperçu rapide">
+              <i class="fas fa-eye"></i>
+              <span>Aperçu rapide</span>
+            </button>
+
+          </div><!-- /.product-image-wrapper -->
 
           <div class="product-info">
             <h3><?= htmlspecialchars($product['name']) ?></h3>
+
             <p class="price">
-              <?php if (!empty($product['old_price']) && $product['old_price'] > $product['price']): ?>
-                <span class="old-price"><?= number_format($product['old_price'], 2, ',', ' ') ?>DA</span>
+              <?php if (!empty($oldPrice) && $oldPrice > $product['price']): ?>
+                <span class="old-price"><?= number_format($oldPrice, 2, ',', ' ') ?>DA</span>
                 <span class="sale-price"><?= number_format($product['price'], 2, ',', ' ') ?>DA</span>
               <?php else: ?>
                 <?= number_format($product['price'], 2, ',', ' ') ?>DA
               <?php endif; ?>
             </p>
+
+            <!-- ✦ SWATCHES SUR LA CARTE ✦ -->
+             <?php if (!empty($productShades)): ?>
+     <div class="card-shades">
+       <?php foreach (array_slice($productShades, 0, 6) as $shade): ?>
+         <span class="card-shade-dot"
+               style="background:<?= htmlspecialchars($shade['code_couleur'] ?? '#ccc') ?>"
+               title="<?= htmlspecialchars($shade['nom_teinte']) ?>"></span>
+       <?php endforeach; ?>
+       <?php if (count($productShades) > 6): ?>
+         <span class="card-shade-more">+<?= count($productShades) - 6 ?></span>
+       <?php endif; ?>
+     </div>
+   <?php else: ?>
+     <div class="card-shades card-shades-placeholder"></div>  <!-- ← AJOUT : placeholder hauteur fixe -->
+   <?php endif; ?>
 
             <?php if ($hasShades): ?>
               <button class="choose-shade-btn"
@@ -210,18 +254,69 @@ if ($categorie === 'Tous') {
             <?php endif; ?>
           </div>
 
-        </div>
-      </a>
+        </div><!-- /.product-card -->
+      </a><!-- /.product-card-link -->
 
       <?php endwhile; ?>
 
-    </div><!-- .products-grid -->
+    </div><!-- /.products-grid -->
   </section>
 
-</div><!-- .page-layout -->
+</div><!-- /.page-layout -->
+
+
+<!-- ══════════════════════════════════════════
+     MODALE APERÇU RAPIDE
+═══════════════════════════════════════════ -->
+<div class="qv-overlay" id="qvOverlay" role="dialog" aria-modal="true" aria-label="Aperçu rapide">
+  <div class="qv-modal" id="qvModal">
+
+    <button class="qv-close" id="qvClose" aria-label="Fermer">&times;</button>
+
+    <!-- Colonne image -->
+    <div class="qv-col-image">
+      <img id="qvImg" src="" alt="" loading="lazy">
+      <span class="qv-badge" id="qvBadge"></span>
+    </div>
+
+    <!-- Colonne infos -->
+    <div class="qv-col-info">
+      <span class="qv-brand" id="qvBrand"></span>
+      <h2 class="qv-name" id="qvName"></h2>
+
+      <div class="qv-price" id="qvPrice"></div>
+
+      <div class="qv-stock-line">
+        <span class="qv-stock-dot" id="qvStockDot"></span>
+        <span class="qv-stock-label" id="qvStockLabel"></span>
+      </div>
+
+      <div class="qv-divider"></div>
+
+      <!-- ✦ DESCRIPTION ✦ -->
+      <p class="qv-description" id="qvDescription"></p>
+
+      <!-- ✦ TEINTES ✦ -->
+      <div class="qv-shades-block" id="qvShadesBlock">
+        <span class="qv-shades-title">Teintes disponibles</span>
+        <div class="qv-shades-row" id="qvShadesRow"></div>
+      </div>
+
+      <div class="qv-actions">
+        <button class="qv-cart-btn" id="qvCartBtn" type="button"></button>
+        <a class="qv-detail-link" id="qvDetailLink" href="#">
+          Voir la fiche complète <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- /MODALE -->
+
 
 <script>
-/* ── Sidebar mobile ── */
+/* ══ Sidebar mobile ══════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   const sidebar   = document.getElementById('filterSidebar');
   const toggleBtn = document.querySelector('.filter-toggle-btn');
@@ -236,14 +331,14 @@ document.addEventListener('DOMContentLoaded', () => {
     overlay.classList.remove('active');
   });
   document.addEventListener('keydown', e => {
-    if (e.key === "Escape") {
+    if (e.key === 'Escape') {
       sidebar.classList.remove('active');
       overlay.classList.remove('active');
     }
   });
 });
 
-/* ── Vue grille / liste ── */
+/* ══ Vue grille / liste ══════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   const grid        = document.querySelector('.products-grid');
   const viewButtons = document.querySelectorAll('.view-btn');
@@ -258,12 +353,149 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-/* ── Empêche le lien sur boutons d'action ── */
-document.addEventListener("click", e => {
-  if (e.target.closest(".add-to-wishlist, .add-to-cart, .choose-shade-btn")) {
+/* ══ Empêche propagation sur boutons d'action ═══════════════ */
+document.addEventListener('click', e => {
+  if (e.target.closest('.add-to-wishlist, .add-to-cart, .choose-shade-btn, .quick-view-btn')) {
     e.preventDefault();
     e.stopPropagation();
   }
+});
+
+/* ══ APERÇU RAPIDE ═══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  const overlay    = document.getElementById('qvOverlay');
+  const closeBtn   = document.getElementById('qvClose');
+  const cartBtn    = document.getElementById('qvCartBtn');
+  const detailLink = document.getElementById('qvDetailLink');
+
+  /* Ouvre la modale avec les données du bouton */
+  function openQV(btn) {
+    const id          = btn.dataset.productId;
+    const name        = btn.dataset.name;
+    const price       = parseFloat(btn.dataset.price);
+    const oldPrice    = parseFloat(btn.dataset.oldPrice);
+    const image       = btn.dataset.image;
+    const brand       = btn.dataset.brand;
+    const stock       = parseInt(btn.dataset.stock, 10);
+    const hasShades   = btn.dataset.hasShades === '1';
+    const url         = btn.dataset.url;
+    const description = btn.dataset.description || '';
+
+    /* Image */
+    const imgEl = document.getElementById('qvImg');
+    imgEl.src = '';
+    requestAnimationFrame(() => { imgEl.src = image; imgEl.alt = name; });
+
+    /* Textes */
+    document.getElementById('qvBrand').textContent = brand || '';
+    document.getElementById('qvName').textContent  = name;
+
+    /* Description */
+    document.getElementById('qvDescription').textContent = description;
+
+    /* Teintes */
+    const shadesBlock = document.getElementById('qvShadesBlock');
+    const shadesRow   = document.getElementById('qvShadesRow');
+    shadesRow.innerHTML = '';
+
+    let shades = [];
+    try { shades = JSON.parse(btn.dataset.shades || '[]'); } catch {}
+
+    if (hasShades && shades.length) {
+      shades.forEach(s => {
+        const dot = document.createElement('span');
+        dot.className        = 'qv-shade-dot';
+        dot.title            = s.nom_teinte || '';
+        dot.style.background = s.code_couleur || '#ccc';
+        dot.addEventListener('click', () => {
+          shadesRow.querySelectorAll('.qv-shade-dot').forEach(d => d.classList.remove('active'));
+          dot.classList.add('active');
+        });
+        shadesRow.appendChild(dot);
+      });
+      shadesBlock.style.display = 'flex';
+    } else {
+      shadesBlock.style.display = 'none';
+    }
+
+    /* Prix */
+    const priceEl = document.getElementById('qvPrice');
+    if (!isNaN(oldPrice) && oldPrice > price) {
+      priceEl.innerHTML =
+        `<span class="qv-old">${fmtDA(oldPrice)}</span>
+         <span class="qv-current">${fmtDA(price)}</span>`;
+    } else {
+      priceEl.innerHTML = `<span class="qv-normal">${fmtDA(price)}</span>`;
+    }
+
+    /* Badge image + stock */
+    const badge      = document.getElementById('qvBadge');
+    const stockDot   = document.getElementById('qvStockDot');
+    const stockLabel = document.getElementById('qvStockLabel');
+
+    if (stock === 0) {
+      badge.textContent      = 'Rupture';
+      badge.className        = 'qv-badge qv-badge--oos';
+      stockDot.className     = 'qv-stock-dot qv-dot--out';
+      stockLabel.textContent = 'Rupture de stock';
+    } else if (stock <= 5) {
+      badge.textContent      = 'Stock limité';
+      badge.className        = 'qv-badge qv-badge--low';
+      stockDot.className     = 'qv-stock-dot qv-dot--low';
+      stockLabel.textContent = `Seulement ${stock} restant${stock > 1 ? 's' : ''}`;
+    } else {
+      badge.textContent      = '';
+      badge.className        = 'qv-badge';
+      stockDot.className     = 'qv-stock-dot qv-dot--in';
+      stockLabel.textContent = 'En stock';
+    }
+
+    /* Bouton panier */
+    cartBtn.disabled   = stock === 0;
+    cartBtn.className  = 'qv-cart-btn ' + (hasShades ? 'choose-shade-btn' : 'add-to-cart');
+    cartBtn.innerHTML  = stock === 0
+      ? '<i class="fas fa-ban"></i> Rupture de stock'
+      : hasShades
+        ? '<i class="fas fa-palette"></i> Choisir une teinte'
+        : '<i class="fas fa-shopping-bag"></i> Ajouter au panier';
+
+    /* Data pour shop.js */
+    cartBtn.dataset.productId = id;
+    cartBtn.dataset.name      = name;
+    cartBtn.dataset.price     = price;
+    cartBtn.dataset.imageUrl  = image;
+    cartBtn.dataset.stock     = stock;
+
+    /* Lien fiche */
+    detailLink.href = url;
+
+    /* Ouvre */
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    closeBtn.focus();
+  }
+
+  function closeQV() {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  /* Format montant algérien */
+  function fmtDA(v) {
+    return v.toLocaleString('fr-DZ', { minimumFractionDigits: 2 }) + ' DA';
+  }
+
+  /* Listeners */
+  document.querySelectorAll('.quick-view-btn').forEach(btn => {
+    btn.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); openQV(btn); });
+  });
+
+  closeBtn.addEventListener('click', closeQV);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeQV(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeQV(); });
+
+  /* Ferme aussi si shop.js dispatch un event "addedToCart" */
+  document.addEventListener('addedToCart', closeQV);
 });
 </script>
 

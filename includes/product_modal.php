@@ -90,7 +90,6 @@
   gap: 42px;
   padding: 34px;
 
-  border-radius: 26px;
   background: #F5F1EE;                  /* crème ivoire */
   border: 1px solid rgba(68, 11, 25, 0.14);
   box-shadow: 0 30px 80px rgba(68, 11, 25, 0.22);
@@ -146,7 +145,6 @@
   width: 72px;
   height: 72px;
   object-fit: cover;
-  border-radius: 14px;
   border: 1px solid transparent;
   background: rgba(68, 11, 25, 0.06);
   cursor: pointer;
@@ -179,7 +177,6 @@
     rgba(68, 11, 25, 0.05)
   );
 
-  border-radius: 22px;
   padding: 24px;
   min-height: 500px;
 }
@@ -280,7 +277,6 @@
   width: 38px;
   height: 38px;
   border: 1px solid rgba(68, 11, 25, 0.18);
-  border-radius: 12px;
   background: rgba(68, 11, 25, 0.06);
   color: #5c1225;
   font-size: 20px;
@@ -313,7 +309,6 @@
   width: 100%;
   padding: 16px;
   border: none;
-  border-radius: 14px;
 
   background: linear-gradient(
     135deg,
@@ -376,7 +371,6 @@
     padding: 28px;
     gap: 28px;
     flex-direction: column;
-    border-radius: 24px;
   }
 
   .product-modal-left {
@@ -435,7 +429,6 @@
     max-width: 100%;
     max-height: 94vh;
 
-    border-radius: 28px 28px 0 0;
     padding: 20px 16px 28px;
     gap: 20px;
     flex-direction: column;
@@ -455,13 +448,11 @@
     width: 58px;
     height: 58px;
     flex-shrink: 0;
-    border-radius: 12px;
   }
 
   .main-image {
     min-height: 280px;
     padding: 16px;
-    border-radius: 18px;
   }
 
   .main-image img {
@@ -501,13 +492,11 @@
     width: 36px;
     height: 36px;
     font-size: 18px;
-    border-radius: 10px;
   }
 
   .btn-primary {
     padding: 14px;
     font-size: .72rem;
-    border-radius: 12px;
   }
 
   .close-product-modal {

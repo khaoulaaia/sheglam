@@ -26,12 +26,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const getProductData = (el) => {
     if (!el) return null;
-    const raw = el.dataset.image_url;
+    const raw = el.dataset.image_url || el.dataset.imageUrl;
     if (!raw) return null;
     return {
       productId: el.dataset.productId,
       name:      el.dataset.name,
-      price:     parseFloat(el.dataset.price.replace(",", ".")),
+      price:     parseFloat((el.dataset.price || "0").replace(",", ".")),
       image:     normalizeImage(raw)
     };
   };
@@ -57,6 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     saveCart();
     window.openCart?.();
     window.renderCart();
+    document.dispatchEvent(new CustomEvent("addedToCart"));
   }
 
   // ─── PANIER — RENDU ──────────────────────────────────
@@ -119,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
     wishlist[productId] = {
       productId,
       name:      btn.dataset.name,
-      price:     parseFloat(btn.dataset.price.replace(",", ".")),
+      price:     parseFloat((btn.dataset.price || "0").replace(",", ".")),
       image_url: normalizeImage(btn.dataset.image_url),
       hasShades: btn.dataset.hasShades === "1"
     };
@@ -157,7 +158,312 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ─── MODAL TEINTES ───────────────────────────────────
+  // ═══════════════════════════════════════════════════════════
+  // ─── MINI SHADE PICKER (carte produit — page catalogue) ───
+  // ═══════════════════════════════════════════════════════════
+  //
+  // Quand l'utilisateur clique "Choisir une teinte" sur une carte,
+  // on remplace le bouton par un mini-picker inline directement
+  // sur la carte. Une fois la teinte choisie, le bouton devient
+  // "Ajouter au panier" et exécute l'ajout immédiatement.
+  //
+
+  document.body.addEventListener("click", async e => {
+    const shadeBtn = e.target.closest(".choose-shade-btn");
+    // Ignore si c'est le bouton de la modale ou de la vue rapide
+    if (!shadeBtn) return;
+    if (shadeBtn.closest("#productModal") || shadeBtn.closest(".qv-modal")) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (isOutOfStock(shadeBtn)) return;
+
+    const card       = shadeBtn.closest(".product-card");
+    const productInfo = card?.querySelector(".product-info");
+    if (!productInfo) return;
+
+    // Évite d'ouvrir plusieurs pickers sur la même carte
+    if (productInfo.querySelector(".inline-shade-picker")) return;
+
+    const productId = shadeBtn.dataset.productId;
+    const name      = shadeBtn.dataset.name;
+    const price     = parseFloat((shadeBtn.dataset.price || "0").replace(",", "."));
+    const imageRaw  = shadeBtn.dataset.image_url || shadeBtn.dataset.imageUrl;
+    const image     = normalizeImage(imageRaw);
+    const stock     = parseInt(shadeBtn.dataset.stock, 10);
+
+    // Masque le bouton d'origine le temps du picker
+    shadeBtn.style.display = "none";
+
+    // Conteneur picker
+    const picker = document.createElement("div");
+    picker.className = "inline-shade-picker";
+    picker.innerHTML = `
+      <div class="isp-label">Choisir une teinte</div>
+      <div class="isp-dots"></div>
+      <div class="isp-selected-name"></div>
+      <div class="isp-actions">
+        <button class="isp-add-btn" disabled>
+          <i class="fas fa-shopping-bag"></i> Ajouter au panier
+        </button>
+        <button class="isp-cancel" title="Annuler">✕</button>
+      </div>
+    `;
+    productInfo.appendChild(picker);
+
+    const dotsEl       = picker.querySelector(".isp-dots");
+    const selectedName = picker.querySelector(".isp-selected-name");
+    const addBtn       = picker.querySelector(".isp-add-btn");
+    const cancelBtn    = picker.querySelector(".isp-cancel");
+
+    // Annulation : restaure le bouton d'origine
+    cancelBtn.addEventListener("click", e => {
+      e.preventDefault();
+      e.stopPropagation();
+      picker.remove();
+      shadeBtn.style.display = "";
+    });
+
+    // Charge les teintes depuis l'API
+    dotsEl.innerHTML = `<span class="isp-loading">Chargement…</span>`;
+    let shades = [];
+    try {
+      const res = await fetch(`${B}/includes/get_shades.php?product_id=${productId}`);
+      shades    = await res.json();
+    } catch {
+      dotsEl.innerHTML = `<span class="isp-loading">Erreur de chargement.</span>`;
+      return;
+    }
+
+    dotsEl.innerHTML = "";
+    let selectedShade = null;
+
+    if (!shades.length) {
+      // Aucune teinte en base → ajout direct sans teinte
+      dotsEl.innerHTML = `<span class="isp-loading">Aucune teinte.</span>`;
+      addBtn.disabled  = false;
+    } else {
+      shades.forEach(s => {
+        const dot = document.createElement("span");
+        dot.className        = "isp-dot";
+        dot.title            = s.nom_teinte;
+        dot.style.background = s.code_couleur || "#ccc";
+
+        dot.addEventListener("click", e => {
+          e.preventDefault();
+          e.stopPropagation();
+          dotsEl.querySelectorAll(".isp-dot").forEach(d => d.classList.remove("active"));
+          dot.classList.add("active");
+          selectedShade         = s.nom_teinte;
+          selectedName.textContent = s.nom_teinte;
+          addBtn.disabled       = false;
+        });
+
+        dotsEl.appendChild(dot);
+      });
+    }
+
+    // Ajout au panier depuis le picker
+    addBtn.addEventListener("click", e => {
+      e.preventDefault();
+      e.stopPropagation();
+      addToCart({ productId, name, price, image, quantity: 1, shade: selectedShade });
+      picker.remove();
+      shadeBtn.style.display = "";
+    });
+  });
+
+
+  // ═══════════════════════════════════════════════════════════
+  // ─── VUE RAPIDE — SÉLECTION DE TEINTE ────────────────────
+  // ═══════════════════════════════════════════════════════════
+  //
+  // Les swatches dans la modale aperçu rapide permettent de
+  // sélectionner une teinte, puis le bouton "Ajouter au panier"
+  // ajoute le produit avec la teinte choisie.
+  //
+
+  (function setupQuickViewCart() {
+    const overlay    = document.getElementById("qvOverlay");
+    if (!overlay) return;
+
+    const closeBtn   = document.getElementById("qvClose");
+    const cartBtn    = document.getElementById("qvCartBtn");
+    const shadesRow  = document.getElementById("qvShadesRow");
+
+    // État interne de la vue rapide
+    let qvState = {
+      productId:   null,
+      name:        null,
+      price:       null,
+      image:       null,
+      stock:       0,
+      hasShades:   false,
+      selectedShade: null,
+    };
+
+    // Expose openQV globalement pour le code PHP/inline
+    window._qvOpenCallback = function(btn) {
+      const id        = btn.dataset.productId;
+      const name      = btn.dataset.name;
+      const price     = parseFloat(btn.dataset.price);
+      const oldPrice  = parseFloat(btn.dataset.oldPrice);
+      const image     = btn.dataset.image;
+      const brand     = btn.dataset.brand;
+      const stock     = parseInt(btn.dataset.stock, 10);
+      const hasShades = btn.dataset.hasShades === "1";
+      const url       = btn.dataset.url;
+      const desc      = btn.dataset.description || "";
+
+      // Réinitialise la teinte sélectionnée
+      qvState = { productId: id, name, price, image: normalizeImage(image), stock, hasShades, selectedShade: null };
+
+      // Image
+      const imgEl = document.getElementById("qvImg");
+      imgEl.src = ""; requestAnimationFrame(() => { imgEl.src = image; imgEl.alt = name; });
+
+      // Textes de base
+      document.getElementById("qvBrand").textContent = brand || "";
+      document.getElementById("qvName").textContent  = name;
+      document.getElementById("qvDescription").textContent = desc;
+
+      // Prix
+      const priceEl = document.getElementById("qvPrice");
+      if (!isNaN(oldPrice) && oldPrice > price) {
+        priceEl.innerHTML =
+          `<span class="qv-old">${fmtDA(oldPrice)}</span>
+           <span class="qv-current">${fmtDA(price)}</span>`;
+      } else {
+        priceEl.innerHTML = `<span class="qv-normal">${fmtDA(price)}</span>`;
+      }
+
+      // Badge + stock
+      const badge      = document.getElementById("qvBadge");
+      const stockDot   = document.getElementById("qvStockDot");
+      const stockLabel = document.getElementById("qvStockLabel");
+      if (stock === 0) {
+        badge.textContent = "Rupture"; badge.className = "qv-badge qv-badge--oos";
+        stockDot.className = "qv-stock-dot qv-dot--out";
+        stockLabel.textContent = "Rupture de stock";
+      } else if (stock <= 5) {
+        badge.textContent = "Stock limité"; badge.className = "qv-badge qv-badge--low";
+        stockDot.className = "qv-stock-dot qv-dot--low";
+        stockLabel.textContent = `Seulement ${stock} restant${stock > 1 ? "s" : ""}`;
+      } else {
+        badge.textContent = ""; badge.className = "qv-badge";
+        stockDot.className = "qv-stock-dot qv-dot--in";
+        stockLabel.textContent = "En stock";
+      }
+
+      // Lien fiche
+      document.getElementById("qvDetailLink").href = url;
+
+      // Teintes
+      const shadesBlock = document.getElementById("qvShadesBlock");
+      shadesRow.innerHTML = "";
+
+      let shades = [];
+      try { shades = JSON.parse(btn.dataset.shades || "[]"); } catch {}
+
+      if (hasShades && shades.length) {
+        // Label de teinte sélectionnée
+        let labelEl = document.getElementById("qvSelectedShadeName");
+        if (!labelEl) {
+          labelEl = document.createElement("span");
+          labelEl.id        = "qvSelectedShadeName";
+          labelEl.className = "qv-selected-shade-name";
+          shadesBlock.appendChild(labelEl);
+        }
+        labelEl.textContent = "";
+
+        shades.forEach(s => {
+          const dot = document.createElement("span");
+          dot.className        = "qv-shade-dot";
+          dot.title            = s.nom_teinte || "";
+          dot.style.background = s.code_couleur || "#ccc";
+
+          dot.addEventListener("click", () => {
+            shadesRow.querySelectorAll(".qv-shade-dot").forEach(d => d.classList.remove("active"));
+            dot.classList.add("active");
+            qvState.selectedShade = s.nom_teinte;
+            labelEl.textContent   = s.nom_teinte;
+            // Active le bouton panier dès qu'une teinte est choisie
+            updateQvCartBtn();
+          });
+
+          shadesRow.appendChild(dot);
+        });
+
+        shadesBlock.style.display = "flex";
+      } else {
+        shadesBlock.style.display = "none";
+      }
+
+      // Bouton panier initial
+      updateQvCartBtn();
+
+      // Ouvre la modale
+      overlay.classList.add("active");
+      document.body.style.overflow = "hidden";
+      closeBtn.focus();
+    };
+
+    // Met à jour l'état du bouton panier de la vue rapide
+    function updateQvCartBtn() {
+      const { stock, hasShades, selectedShade } = qvState;
+      const outOfStock     = stock === 0;
+      const needsShade     = hasShades && !selectedShade;
+      const disabled       = outOfStock || needsShade;
+
+      cartBtn.disabled  = disabled;
+      cartBtn.className = "qv-cart-btn";
+
+      if (outOfStock) {
+        cartBtn.innerHTML = `<i class="fas fa-ban"></i> Rupture de stock`;
+      } else if (needsShade) {
+        cartBtn.innerHTML = `<i class="fas fa-palette"></i> Sélectionnez une teinte`;
+      } else {
+        cartBtn.innerHTML = `<i class="fas fa-shopping-bag"></i> Ajouter au panier`;
+      }
+    }
+
+    // Clic sur le bouton panier de la vue rapide
+    cartBtn.addEventListener("click", () => {
+      const { productId, name, price, image, stock, hasShades, selectedShade } = qvState;
+      if (stock === 0) return;
+      if (hasShades && !selectedShade) {
+        // Secoue le bloc teintes pour indiquer qu'il faut choisir
+        const shadesBlock = document.getElementById("qvShadesBlock");
+        shadesBlock?.classList.add("qv-shake");
+        setTimeout(() => shadesBlock?.classList.remove("qv-shake"), 500);
+        return;
+      }
+      addToCart({ productId, name, price, image, quantity: 1, shade: selectedShade });
+      closeQV();
+    });
+
+    function closeQV() {
+      overlay.classList.remove("active");
+      document.body.style.overflow = "";
+      qvState.selectedShade = null;
+    }
+
+    closeBtn.addEventListener("click", closeQV);
+    overlay.addEventListener("click", e => { if (e.target === overlay) closeQV(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") closeQV(); });
+    document.addEventListener("addedToCart", closeQV);
+  })();
+
+  // Redirige les boutons quick-view vers le callback unifié
+  document.querySelectorAll(".quick-view-btn").forEach(btn => {
+    btn.addEventListener("click", e => {
+      e.preventDefault();
+      e.stopPropagation();
+      window._qvOpenCallback?.(btn);
+    });
+  });
+
+
+  // ─── MODAL TEINTES (product.php / wishlist) ───────────────
   const modal = document.getElementById("productModal");
 
   if (modal) {
@@ -269,10 +575,14 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // Listener choose-shade-btn — avec vérification stock
+    // Listener choose-shade-btn dans la modale produit uniquement
     document.body.addEventListener("click", e => {
       const shadeBtn = e.target.closest(".choose-shade-btn");
       if (!shadeBtn) return;
+      if (shadeBtn.closest("#productModal") || shadeBtn.closest(".qv-modal")) return;
+      // Déjà géré par le listener inline-shade-picker ci-dessus
+      // Ce listener ne traite QUE les boutons de la wishlist (fromWishlist)
+      if (shadeBtn.dataset.fromWishlist !== "1") return;
       e.preventDefault();
       if (isOutOfStock(shadeBtn)) return;
       openShadeModal(shadeBtn);
@@ -283,6 +593,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.body.addEventListener("click", e => {
     const addBtn = e.target.closest(".add-to-cart");
     if (!addBtn) return;
+    if (addBtn.closest("#productModal") || addBtn.closest(".qv-modal") || addBtn.closest(".inline-shade-picker")) return;
     e.preventDefault();
     if (isOutOfStock(addBtn)) return;
     const data = getProductData(addBtn);
@@ -316,10 +627,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ─── FILTRES (page catalogue uniquement) ─────────────
 document.addEventListener("DOMContentLoaded", () => {
-  const sortPrice   = document.getElementById("sortPrice");
-  const filterSale  = document.getElementById("filterSale");
-  const filterBrand = document.getElementById("filterBrand");
-  const grid        = document.querySelector(".products-grid");
+  const sortPrice    = document.getElementById("sortPrice");
+  const filterSale   = document.getElementById("filterSale");
+  const filterStock  = document.getElementById("filterInStock");
+  const filterBrand  = document.getElementById("filterBrand");
+  const grid         = document.querySelector(".products-grid");
 
   if (!sortPrice || !filterSale || !filterBrand || !grid) return;
 
@@ -335,8 +647,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function applyFilters() {
     let visible = cards.filter(card => {
-      if (filterSale.checked && card.dataset.sale !== "1") return false;
-      if (filterBrand.value && card.dataset.brand !== filterBrand.value) return false;
+      if (filterSale.checked  && card.dataset.sale  !== "1") return false;
+      if (filterStock?.checked && card.closest(".product-card-link")?.dataset.instock === "0") return false;
+      if (filterBrand.value   && card.dataset.brand !== filterBrand.value) return false;
       return true;
     });
 
@@ -355,5 +668,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  [sortPrice, filterSale, filterBrand].forEach(el => el.addEventListener("change", applyFilters));
+  const els = [sortPrice, filterSale, filterBrand];
+  if (filterStock) els.push(filterStock);
+  els.forEach(el => el.addEventListener("change", applyFilters));
 });
+
+
+// ─── FORMAT montant algérien ────────────────────────────
+function fmtDA(v) {
+  return Number(v).toLocaleString("fr-DZ", { minimumFractionDigits: 2 }) + " DA";
+}
