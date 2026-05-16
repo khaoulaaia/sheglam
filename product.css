@@ -561,3 +561,90 @@ button { font-family: inherit; cursor: pointer; }
     font-size: 8.5px;
   }
 }
+/* ── Sélecteur de teintes inline ──────────────────── */
+.shade-selector {
+  margin-bottom: 1rem;
+}
+
+.shade-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
+.shade-chosen-name {
+  font-weight: 400;
+  color: #c4729a;
+  margin-left: 4px;
+}
+
+.shade-dots-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 4px 0;
+}
+
+.shade-loading {
+  font-size: 0.85rem;
+  color: #aaa;
+  font-style: italic;
+}
+
+.shade-dot-inline {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid transparent;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+  transition: transform 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+
+.shade-dot-inline:hover {
+  transform: scale(1.18);
+}
+
+.shade-dot-inline.active {
+  border-color: #c4729a;
+  transform: scale(1.18);
+  box-shadow: 0 0 0 3px rgba(196,114,154,0.25);
+}
+
+/* Tooltip nom */
+.shade-dot-tip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #222;
+  color: #fff;
+  font-size: 0.72rem;
+  white-space: nowrap;
+  padding: 3px 8px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+.shade-dot-inline:hover .shade-dot-tip {
+  display: block;
+}
+
+/* Quantité + bouton côte à côte */
+.add-to-cart-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.add-to-cart-wrapper input[type="number"] {
+  width: 70px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1rem;
+}

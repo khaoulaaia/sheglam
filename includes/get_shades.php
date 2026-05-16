@@ -13,7 +13,7 @@ $productId = (int) $_GET['product_id'];
 
 try {
     // Récupérer le nom et le code couleur
-    $stmt = $pdo->prepare("SELECT nom_teinte, code_couleur FROM teintes WHERE product_id = ?");
+    $stmt = $pdo->prepare("SELECT id, nom_teinte, code_couleur, image FROM teintes WHERE product_id = ?");
     $stmt->execute([$productId]);
     $shades = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

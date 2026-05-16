@@ -25,10 +25,13 @@ $stmt->execute([$productId]);
 $product = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$product) die("Produit introuvable");
 
-$stock      = (int)($product['stock'] ?? 0);
-$outOfStock = $stock === 0;
+$stock        = (int)($product['stock'] ?? 0);
+$outOfStock   = $stock === 0;
+$basePrice    = (float)$product['price'];
+$baseOldPrice = (!empty($product['old_price']) && $product['old_price'] > $product['price'])
+              ? (float)$product['old_price'] : null;
 
-// ── Images ───────────────────────────────────────────────────────────────────
+// ── Images produit ───────────────────────────────────────────────────────────
 $imageStmt = $pdo->prepare("SELECT image FROM product_images WHERE product_id = ?");
 $imageStmt->execute([$productId]);
 $additionalImages = $imageStmt->fetchAll(PDO::FETCH_COLUMN);
@@ -45,10 +48,32 @@ $additionalImages = array_map(function ($img) use ($b) {
     return str_starts_with($img, 'http') ? $img : $b . '/images/' . basename($img);
 }, $additionalImages);
 
-// ── Teintes ──────────────────────────────────────────────────────────────────
-$shadeStmt = $pdo->prepare("SELECT COUNT(*) FROM teintes WHERE product_id = ?");
+// ── Teintes (avec prix, stock, image) ────────────────────────────────────────
+// ALTER TABLE teintes
+//   ADD COLUMN prix  DECIMAL(10,2) DEFAULT NULL,
+//   ADD COLUMN stock INT           DEFAULT 0,
+//   ADD COLUMN image VARCHAR(255)  DEFAULT NULL;
+$shadeStmt = $pdo->prepare("
+    SELECT id, nom_teinte, code_couleur,
+           COALESCE(prix, 0)  AS prix,
+           COALESCE(stock, 0) AS stock,
+           image
+    FROM teintes
+    WHERE product_id = ?
+    ORDER BY id ASC
+");
 $shadeStmt->execute([$productId]);
-$hasShades = $shadeStmt->fetchColumn() > 0;
+$shades    = $shadeStmt->fetchAll(PDO::FETCH_ASSOC);
+$hasShades = count($shades) > 0;
+
+foreach ($shades as &$s) {
+    $s['prix']      = (float)$s['prix'];
+    $s['stock']     = (int)$s['stock'];
+    $s['image_url'] = !empty($s['image'])
+                    ? $b . '/images/' . basename($s['image'])
+                    : '';
+}
+unset($s);
 
 // ── Avis ─────────────────────────────────────────────────────────────────────
 $reviewStmt = $pdo->prepare("SELECT * FROM product_reviews WHERE product_id = ? ORDER BY date_creation DESC");
@@ -94,7 +119,7 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
 <section class="product-page">
 
   <!-- Miniatures gauche -->
-  <div class="product-left">
+  <div class="product-left" id="thumbnailStrip">
     <?php foreach ($additionalImages as $img): ?>
       <img src="<?= htmlspecialchars($img) ?>"
            class="thumbnail"
@@ -105,32 +130,31 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
   <!-- Image principale -->
   <div class="product-main">
     <div class="product-main-image">
-      <?php if ($outOfStock): ?>
+      <?php if ($outOfStock && !$hasShades): ?>
         <div class="out-of-stock-badge">Rupture de stock</div>
       <?php endif; ?>
       <img id="mainImage"
            src="<?= htmlspecialchars($additionalImages[0]) ?>"
            alt="<?= htmlspecialchars($product['name']) ?>"
-           class="<?= $outOfStock ? 'img-out-of-stock' : '' ?>">
+           class="<?= ($outOfStock && !$hasShades) ? 'img-out-of-stock' : '' ?>">
     </div>
 
     <div class="product-right">
       <h1><?= htmlspecialchars($product['name']) ?></h1>
 
-      <!-- Badge stock -->
-      <?php if ($outOfStock): ?>
-        <span class="stock-badge out">
+      <!-- Badge stock — mis à jour par JS quand une teinte est choisie -->
+      <span class="stock-badge <?= $hasShades ? 'neutral' : ($outOfStock ? 'out' : ($stock <= 5 ? 'low' : 'in')) ?>"
+            id="stockBadge">
+        <?php if ($hasShades): ?>
+          <i class="fas fa-palette"></i> Choisissez une teinte
+        <?php elseif ($outOfStock): ?>
           <i class="fas fa-times-circle"></i> Rupture de stock
-        </span>
-      <?php elseif ($stock <= 5): ?>
-        <span class="stock-badge low">
+        <?php elseif ($stock <= 5): ?>
           <i class="fas fa-exclamation-circle"></i> Plus que <?= $stock ?> en stock
-        </span>
-      <?php else: ?>
-        <span class="stock-badge in">
+        <?php else: ?>
           <i class="fas fa-check-circle"></i> En stock
-        </span>
-      <?php endif; ?>
+        <?php endif; ?>
+      </span>
 
       <!-- Étoiles -->
       <div class="reviews">
@@ -148,89 +172,98 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
         <?php endif; ?>
       </div>
 
-      <!-- Prix -->
-      <p class="price">
-        <?php if (!empty($product['old_price']) && $product['old_price'] > $product['price']): ?>
-          <span class="old-price"><?= number_format($product['old_price'], 2, ',', ' ') ?> DA</span>
-        <?php endif; ?>
-        <?= number_format($product['price'], 2, ',', ' ') ?> DA
+      <!-- Prix — mis à jour par JS selon teinte -->
+      <p class="price" id="priceBlock">
+        <span class="old-price" id="oldPriceEl"
+              style="<?= $baseOldPrice ? '' : 'display:none' ?>">
+          <?= $baseOldPrice ? number_format($baseOldPrice, 2, ',', ' ') . ' DA' : '' ?>
+        </span>
+        <span id="currentPriceEl"><?= number_format($basePrice, 2, ',', ' ') ?> DA</span>
       </p>
 
       <p class="description"><?= htmlspecialchars($product['description']) ?></p>
 
-      <!-- Quantité (hors teintes, hors rupture) -->
-      <?php if (!$outOfStock && !$hasShades): ?>
-        <div class="quantity-wrapper">
-          <label for="quantity">Quantité :</label>
-          <input type="number" id="quantity" name="quantity"
-                 value="1" min="1" max="<?= $stock ?>" step="1">
-        </div>
-      <?php endif; ?>
-
-      <!-- Boutons action -->
+      <!-- ── Boutons action ────────────────────────────────────────────── -->
       <div class="product-actions">
+
         <?php if ($hasShades): ?>
-          <!-- Choisir une teinte -->
-          <button class="choose-shade-btn btn-secondary-action"
-            data-product-id="<?= $product['id'] ?>"
-            data-name="<?= htmlspecialchars($product['name']) ?>"
-            data-price="<?= htmlspecialchars($product['price']) ?>"
-            data-image_url="<?= htmlspecialchars($additionalImages[0]) ?>"
-            data-stock="<?= $stock ?>"
-            <?= $outOfStock ? 'disabled' : '' ?>>
-            <i class="fas fa-<?= $outOfStock ? 'ban' : 'palette' ?>"></i>
-            <?= $outOfStock ? 'Rupture de stock' : 'Choisir une teinte' ?>
-          </button>
+
+          <!-- Sélecteur de teintes : toutes les données viennent du PHP via data-* -->
+          <div class="shade-selector" id="shadeSelectorBlock">
+            <p class="shade-label">
+              Choisir une teinte :
+              <span id="selectedShadeName" class="shade-chosen-name"></span>
+            </p>
+            <div class="shade-dots-row" id="shadeDots">
+              <?php foreach ($shades as $s): ?>
+                <span class="shade-dot-inline"
+                      data-nom="<?= htmlspecialchars($s['nom_teinte']) ?>"
+                      data-prix="<?= $s['prix'] ?>"
+                      data-stock="<?= $s['stock'] ?>"
+                      data-image_url="<?= htmlspecialchars($s['image_url']) ?>"
+                      title="<?= htmlspecialchars($s['nom_teinte']) ?>"
+                      style="background:<?= htmlspecialchars($s['code_couleur'] ?? '#ccc') ?>">
+                  <span class="shade-dot-tip"><?= htmlspecialchars($s['nom_teinte']) ?></span>
+                </span>
+              <?php endforeach; ?>
+            </div>
+          </div>
+
+          <div class="add-to-cart-wrapper">
+            <input type="number" name="quantity" id="quantity"
+                   value="1" min="1" max="1" step="1" disabled>
+            <button id="addWithShadeBtn"
+                    class="add-to-cart btn-secondary-action"
+                    data-product-id="<?= $product['id'] ?>"
+                    data-name="<?= htmlspecialchars($product['name']) ?>"
+                    data-price="<?= $basePrice ?>"
+                    data-image_url="<?= htmlspecialchars($additionalImages[0]) ?>"
+                    disabled>
+              <i class="fas fa-palette"></i> Choisissez une teinte
+            </button>
+          </div>
+
         <?php else: ?>
-          <!-- Ajouter au panier -->
-          <button class="add-to-cart btn-secondary-action"
-            data-product-id="<?= $product['id'] ?>"
-            data-name="<?= htmlspecialchars($product['name']) ?>"
-            data-price="<?= htmlspecialchars($product['price']) ?>"
-            data-image_url="<?= htmlspecialchars($additionalImages[0]) ?>"
-            data-stock="<?= $stock ?>"
-            <?= $outOfStock ? 'disabled' : '' ?>>
-            <i class="fas fa-<?= $outOfStock ? 'ban' : 'shopping-bag' ?>"></i>
-            <?= $outOfStock ? 'Rupture de stock' : 'Ajouter au panier' ?>
-          </button>
+
+          <!-- Produit sans teintes -->
+          <div class="add-to-cart-wrapper">
+            <input type="number" name="quantity" id="quantity"
+                   value="1" min="1" max="<?= $stock ?>" step="1"
+                   <?= $outOfStock ? 'disabled' : '' ?>>
+            <button class="add-to-cart btn-secondary-action"
+                    data-product-id="<?= $product['id'] ?>"
+                    data-name="<?= htmlspecialchars($product['name']) ?>"
+                    data-price="<?= $basePrice ?>"
+                    data-image_url="<?= htmlspecialchars($additionalImages[0]) ?>"
+                    data-stock="<?= $stock ?>"
+                    <?= $outOfStock ? 'disabled' : '' ?>>
+              <i class="fas fa-<?= $outOfStock ? 'ban' : 'shopping-bag' ?>"></i>
+              <?= $outOfStock ? 'Rupture de stock' : 'Ajouter au panier' ?>
+            </button>
+          </div>
+
         <?php endif; ?>
 
         <!-- Achat direct -->
-        <?php if (!$outOfStock): ?>
-          <button class="buy-now-btn" id="buyNowBtn"
-            data-product-id="<?= $product['id'] ?>"
-            data-name="<?= htmlspecialchars($product['name']) ?>"
-            data-price="<?= htmlspecialchars($product['price']) ?>"
-            data-image_url="<?= htmlspecialchars($additionalImages[0]) ?>">
-            <i class="fas fa-bolt"></i> Acheter maintenant
-          </button>
-        <?php endif; ?>
-      </div>
+        <button class="buy-now-btn" id="buyNowBtn"
+                data-product-id="<?= $product['id'] ?>"
+                data-name="<?= htmlspecialchars($product['name']) ?>"
+                data-price="<?= $basePrice ?>"
+                data-image_url="<?= htmlspecialchars($additionalImages[0]) ?>"
+                <?= ($outOfStock && !$hasShades) ? 'disabled style="opacity:.5;cursor:not-allowed"' : '' ?>>
+          <i class="fas fa-bolt"></i> Acheter maintenant
+        </button>
 
-      <?php if (!$outOfStock): ?>
-        <p class="buy-now-note">
-          <i class="fas fa-shield-alt"></i> Paiement sécurisé · Livraison partout en Algérie
-        </p>
-      <?php endif; ?>
+      </div><!-- .product-actions -->
 
       <!-- Partage -->
       <div class="share-product">
         <span>Partager :</span>
-        <a href="#" class="share-btn facebook" data-network="facebook" title="Facebook">
-          <i class="fab fa-facebook-square"></i>
-        </a>
-        <a href="#" class="share-btn twitter" data-network="twitter" title="Twitter">
-          <i class="fab fa-x-twitter"></i>
-        </a>
-        <a href="#" class="share-btn whatsapp" data-network="whatsapp" title="WhatsApp">
-          <i class="fab fa-whatsapp"></i>
-        </a>
-        <a href="#" class="share-btn pinterest" data-network="pinterest" title="Pinterest">
-          <i class="fab fa-pinterest-p"></i>
-        </a>
-        <button id="nativeShare" class="share-btn native" title="Partager">
-          <i class="fas fa-share-alt"></i>
-        </button>
+        <a href="#" class="share-btn facebook" data-network="facebook" title="Facebook"><i class="fab fa-facebook-square"></i></a>
+        <a href="#" class="share-btn twitter"  data-network="twitter"  title="Twitter"><i class="fab fa-x-twitter"></i></a>
+        <a href="#" class="share-btn whatsapp" data-network="whatsapp" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+        <a href="#" class="share-btn pinterest" data-network="pinterest" title="Pinterest"><i class="fab fa-pinterest-p"></i></a>
+        <button id="nativeShare" class="share-btn native" title="Partager"><i class="fas fa-share-alt"></i></button>
       </div>
 
     </div><!-- .product-right -->
@@ -286,11 +319,11 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
   <h2>Produits similaires</h2>
   <div class="similar-container">
     <?php foreach ($similarProducts as $sp):
-      $spImg   = empty($sp['image_url'])
-               ? $b . '/images/placeholder.jpg'
-               : (str_starts_with($sp['image_url'], 'http')
-                  ? $sp['image_url']
-                  : $b . '/images/' . basename($sp['image_url']));
+      $spImg     = empty($sp['image_url'])
+                 ? $b . '/images/placeholder.jpg'
+                 : (str_starts_with($sp['image_url'], 'http')
+                    ? $sp['image_url']
+                    : $b . '/images/' . basename($sp['image_url']));
       $spStock   = (int)($sp['stock'] ?? 0);
       $spNoStock = $spStock === 0;
     ?>
@@ -312,9 +345,138 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
 <?php include 'includes/product_modal.php'; ?>
 
 <script>
-const BASE_URL = "<?= $b ?>";
+/* ── Constantes injectées par PHP ──────────────────────────────────── */
+const BASE_URL       = <?= json_encode($b) ?>;
+const BASE_PRICE     = <?= json_encode($basePrice) ?>;
+const BASE_OLD_PRICE = <?= json_encode($baseOldPrice) ?>;
+const BASE_IMAGE     = <?= json_encode($additionalImages[0]) ?>;
 
-/* ── Étoiles avis ─────────────────────────────────────────────────── */
+/* ── Image principale avec fondu ───────────────────────────────────── */
+const mainImage = document.getElementById("mainImage");
+mainImage.style.transition = "opacity 0.15s ease";
+
+function setMainImage(url) {
+  if (!url) return;
+  mainImage.style.opacity = "0";
+  setTimeout(() => { mainImage.src = url; mainImage.style.opacity = "1"; }, 150);
+}
+
+/* ── Thumbnails produit ────────────────────────────────────────────── */
+const thumbnails = document.querySelectorAll("#thumbnailStrip .thumbnail");
+thumbnails.forEach(img => {
+  img.addEventListener("click", () => {
+    setMainImage(img.src);
+    thumbnails.forEach(t => t.classList.remove("active"));
+    img.classList.add("active");
+  });
+});
+if (thumbnails.length) thumbnails[0].classList.add("active");
+
+/* ── Helpers UI ────────────────────────────────────────────────────── */
+function setPrice(price, oldPrice) {
+  const cur = document.getElementById("currentPriceEl");
+  const old = document.getElementById("oldPriceEl");
+  if (cur) cur.textContent = price.toLocaleString("fr-DZ", { minimumFractionDigits: 2 }) + " DA";
+  if (old) {
+    if (oldPrice && oldPrice > price) {
+      old.textContent = oldPrice.toLocaleString("fr-DZ", { minimumFractionDigits: 2 }) + " DA";
+      old.style.display = "";
+    } else {
+      old.style.display = "none";
+    }
+  }
+}
+
+function setStockBadge(stock, shadeSelected) {
+  const badge = document.getElementById("stockBadge");
+  if (!badge) return;
+  if (!shadeSelected) {
+    badge.className = "stock-badge neutral";
+    badge.innerHTML = `<i class="fas fa-palette"></i> Choisissez une teinte`;
+    return;
+  }
+  if (stock === 0) {
+    badge.className = "stock-badge out";
+    badge.innerHTML = `<i class="fas fa-times-circle"></i> Rupture de stock`;
+  } else if (stock <= 5) {
+    badge.className = "stock-badge low";
+    badge.innerHTML = `<i class="fas fa-exclamation-circle"></i> Plus que ${stock} en stock`;
+  } else {
+    badge.className = "stock-badge in";
+    badge.innerHTML = `<i class="fas fa-check-circle"></i> En stock`;
+  }
+}
+
+/* ── Sélecteur de teintes ──────────────────────────────────────────── */
+(function initShadeSelector() {
+  const dotsRow   = document.getElementById("shadeDots");
+  const nameLabel = document.getElementById("selectedShadeName");
+  const addBtn    = document.getElementById("addWithShadeBtn");
+  const qtyInput  = document.getElementById("quantity");
+  if (!dotsRow || !addBtn) return;
+
+  let selectedShade      = null;
+  let selectedShadeImage = null;
+  let selectedShadePrice = BASE_PRICE;
+  let selectedShadeStock = 0;
+
+  const dots = dotsRow.querySelectorAll(".shade-dot-inline");
+
+  dots.forEach(dot => {
+    dot.addEventListener("click", () => {
+      // 1. Activer le dot cliqué
+      dots.forEach(d => d.classList.remove("active"));
+      dot.classList.add("active");
+
+      // 2. Lire les données injectées par PHP dans les data-*
+      selectedShade      = dot.dataset.nom;
+      selectedShadePrice = parseFloat(dot.dataset.prix) || BASE_PRICE;
+      selectedShadeStock = parseInt(dot.dataset.stock, 10) || 0;
+      selectedShadeImage = dot.dataset.image_url || null;
+
+      // 3. Mettre à jour l'affichage : nom, prix, stock
+      nameLabel.textContent = "— " + selectedShade;
+      setPrice(selectedShadePrice, BASE_OLD_PRICE);
+      setStockBadge(selectedShadeStock, true);
+
+      // 4. Changer l'image principale
+      if (selectedShadeImage) {
+        setMainImage(selectedShadeImage);
+        thumbnails.forEach(t => t.classList.remove("active"));
+      } else {
+        setMainImage(BASE_IMAGE);
+        if (thumbnails.length) thumbnails[0].classList.add("active");
+      }
+
+      // 5. Mettre à jour le bouton + input quantité
+      if (selectedShadeStock === 0) {
+        addBtn.disabled  = true;
+        addBtn.innerHTML = `<i class="fas fa-ban"></i> Rupture de stock`;
+        if (qtyInput) { qtyInput.disabled = true; qtyInput.max = 1; qtyInput.value = 1; }
+      } else {
+        addBtn.disabled  = false;
+        addBtn.innerHTML = `<i class="fas fa-shopping-bag"></i> Ajouter au panier`;
+        if (qtyInput) { qtyInput.disabled = false; qtyInput.max = selectedShadeStock; qtyInput.value = 1; }
+      }
+    });
+  });
+
+  // Clic "Ajouter au panier" avec la teinte sélectionnée
+  addBtn.addEventListener("click", () => {
+    if (addBtn.disabled || !selectedShade) return;
+    const qty = Math.max(1, parseInt(qtyInput?.value || 1));
+    window.addToCart({
+      productId: addBtn.dataset.productId,
+      name:      addBtn.dataset.name,
+      price:     selectedShadePrice,
+      image:     selectedShadeImage || BASE_IMAGE,
+      quantity:  qty,
+      shade:     selectedShade
+    });
+  });
+})();
+
+/* ── Étoiles avis ──────────────────────────────────────────────────── */
 document.querySelectorAll("#starRating i").forEach(star => {
   star.addEventListener("click", () => {
     const v = star.dataset.value;
@@ -326,30 +488,15 @@ document.querySelectorAll("#starRating i").forEach(star => {
   });
 });
 
-/* ── Thumbnails ────────────────────────────────────────────────────── */
-const thumbnails = document.querySelectorAll(".product-left .thumbnail");
-const mainImage  = document.getElementById("mainImage");
-
-thumbnails.forEach(img => {
-  img.addEventListener("click", () => {
-    mainImage.src = img.src;
-    thumbnails.forEach(t => t.classList.remove("active"));
-    img.classList.add("active");
-  });
-});
-if (thumbnails.length) thumbnails[0].classList.add("active");
-
 /* ── Partage réseaux sociaux ───────────────────────────────────────── */
 document.querySelectorAll(".share-btn:not(.native)").forEach(btn => {
   btn.addEventListener("click", e => {
     e.preventDefault();
     const network      = btn.dataset.network;
-    const productName  = "<?= addslashes(htmlspecialchars($product['name'])) ?>";
-    const productPrice = "<?= number_format($product['price'], 2, ',', ' ') ?> DA";
+    const productName  = <?= json_encode($product['name']) ?>;
+    const productPrice = <?= json_encode(number_format($basePrice, 2, ',', ' ') . ' DA') ?>;
     const url          = encodeURIComponent(window.location.href);
-    const message      = encodeURIComponent(
-      `✨ J'ai trouvé ce produit incroyable sur SheGlamour ! 💄\n👉 ${productName} à ${productPrice}\n🔗 `
-    );
+    const message      = encodeURIComponent(`✨ J'ai trouvé ce produit incroyable sur SheGlamour ! 💄\n👉 ${productName} à ${productPrice}\n🔗 `);
     const urls = {
       whatsapp:  `https://api.whatsapp.com/send?text=${message}${url}`,
       twitter:   `https://twitter.com/intent/tweet?text=${message}${url}`,
@@ -360,13 +507,13 @@ document.querySelectorAll(".share-btn:not(.native)").forEach(btn => {
   });
 });
 
-/* ── Partage natif (mobile) ────────────────────────────────────────── */
+/* ── Partage natif mobile ──────────────────────────────────────────── */
 const nativeShareBtn = document.getElementById("nativeShare");
 if (navigator.share && nativeShareBtn) {
   nativeShareBtn.addEventListener("click", async () => {
     try {
       await navigator.share({
-        title: "<?= addslashes(htmlspecialchars($product['name'])) ?>",
+        title: <?= json_encode($product['name']) ?>,
         text:  "✨ J'ai trouvé ce produit incroyable sur SheGlamour ! 💄",
         url:   window.location.href
       });
@@ -380,51 +527,61 @@ if (navigator.share && nativeShareBtn) {
 const buyNowBtn = document.getElementById("buyNowBtn");
 if (buyNowBtn) {
   buyNowBtn.addEventListener("click", () => {
-    const qty       = parseInt(document.getElementById("quantity")?.value || 1);
-    const productId = buyNowBtn.dataset.productId;
+    const addBtn = document.getElementById("addWithShadeBtn");
 
+    // Si teintes dispo mais aucune choisie → secouer le sélecteur
+    if (addBtn && addBtn.disabled) {
+      const selector = document.getElementById("shadeSelectorBlock");
+      selector?.classList.add("shake");
+      setTimeout(() => selector?.classList.remove("shake"), 600);
+      return;
+    }
+
+    const qty      = parseInt(document.getElementById("quantity")?.value || 1);
+    const pId      = buyNowBtn.dataset.productId;
+    const shadeName = document.getElementById("selectedShadeName")
+                        ?.textContent.replace(/^—\s*/, "").trim() || null;
+
+    // Prix et image courants (teinte ou produit)
+    const currentPrice = addBtn
+      ? parseFloat(addBtn.dataset.price || buyNowBtn.dataset.price)
+      : parseFloat(buyNowBtn.dataset.price);
+    const currentImage = (addBtn && addBtn.dataset.image_url)
+      ? addBtn.dataset.image_url
+      : buyNowBtn.dataset.image_url;
+
+    const cartKey = pId + (shadeName ? '__' + shadeName : '');
     const item = {
-      id:        productId,
       name:      buyNowBtn.dataset.name,
-      price:     parseFloat(buyNowBtn.dataset.price),
-      image_url: buyNowBtn.dataset.image_url,
+      price:     currentPrice,
+      image_url: currentImage,
       quantity:  qty,
-      shade:     null
+      shade:     shadeName
     };
 
-    /* Sauvegarde du panier actuel */
     const previousCart = localStorage.getItem("cart");
-
-    /* Panier temporaire : ce produit uniquement */
-    localStorage.setItem("cart", JSON.stringify({ [productId]: item }));
+    localStorage.setItem("cart", JSON.stringify({ [cartKey]: item }));
 
     if (typeof openCheckout === "function") {
       openCheckout();
     } else {
       console.warn("checkout.js non chargé");
+      localStorage.setItem("cart", previousCart || "{}");
       return;
     }
 
-    /* Restaure le panier si la commande est annulée */
+    // Restaurer le panier si checkout annulé
     const checkoutSidebar = document.getElementById("sg-checkout-sidebar");
     if (!checkoutSidebar) return;
-
     const observer = new MutationObserver(() => {
       if (!checkoutSidebar.classList.contains("active")) {
-        /* Si le panier n'a pas été vidé par place_order, on restaure */
         const current = localStorage.getItem("cart");
-        if (current !== null) {
-          localStorage.setItem("cart", previousCart || "{}");
-        }
+        if (current !== null) localStorage.setItem("cart", previousCart || "{}");
         if (typeof window.renderCart === "function") window.renderCart();
         observer.disconnect();
       }
     });
-
-    observer.observe(checkoutSidebar, {
-      attributes:      true,
-      attributeFilter: ["class"]
-    });
+    observer.observe(checkoutSidebar, { attributes: true, attributeFilter: ["class"] });
   });
 }
 </script>

@@ -8,10 +8,10 @@
         <p>Votre panier est vide.</p>
     </div>
     <div class="sidebar-footer">
-      <div class="cart-total">
-    <span>Total</span>
-    <strong id="cartTotal">0.00DA</strong>
-  </div>
+        <div class="cart-total">
+            <span>Total</span>
+            <strong id="cartTotal">0.00 DA</strong>
+        </div>
         <button class="checkoutBtn">Passer à la caisse</button>
     </div>
 </div>
@@ -32,164 +32,241 @@
 <script src="/js/checkout.js" defer></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-  const sidebar = document.getElementById('sidebar');
-  const wishlistSidebar = document.getElementById('wishlistSidebar');
-  const overlay = document.getElementById('sidebarOverlay');
-  const closeSidebarBtn = document.getElementById('closeSidebar');
-  const closeWishlistBtn = document.getElementById('closeWishlist');
-  const cartItems = document.getElementById('cartItems');
-  const wishlistItems = document.getElementById('wishlistItems');
+// =============================================================================
+// Tout est déclaré HORS de DOMContentLoaded pour être accessible
+// immédiatement par product.php et shop.js (chargés après sidebar.php).
+// =============================================================================
 
-  // --- Charger panier et wishlist ---
-  window.cart = JSON.parse(localStorage.getItem('cart')) || {};
-  window.wishlist = JSON.parse(localStorage.getItem('wishlist')) || {};
+window.cart     = JSON.parse(localStorage.getItem('cart'))     || {};
+window.wishlist = JSON.parse(localStorage.getItem('wishlist')) || {};
 
-  function saveCart() { localStorage.setItem('cart', JSON.stringify(window.cart)); }
-  function saveWishlist() { localStorage.setItem('wishlist', JSON.stringify(window.wishlist)); }
+function saveCart()     { localStorage.setItem('cart',     JSON.stringify(window.cart)); }
+function saveWishlist() { localStorage.setItem('wishlist', JSON.stringify(window.wishlist)); }
 
-  // --- Ouvrir / fermer sidebars ---
-  window.openCart = () => { sidebar.classList.add('active'); overlay.classList.add('active'); };
-  window.openWishlist = () => { wishlistSidebar.classList.add('active'); overlay.classList.add('active'); };
+// ── Ouvrir sidebars ───────────────────────────────────────────────────────────
+window.openCart = () => {
+    document.getElementById('sidebar').classList.add('active');
+    document.getElementById('sidebarOverlay').classList.add('active');
+};
+window.openWishlist = () => {
+    document.getElementById('wishlistSidebar').classList.add('active');
+    document.getElementById('sidebarOverlay').classList.add('active');
+};
 
-  closeSidebarBtn.addEventListener('click', () => {
-    sidebar.classList.remove('active');
-    overlay.classList.remove('active');
-  });
-  closeWishlistBtn.addEventListener('click', () => {
-    wishlistSidebar.classList.remove('active');
-    overlay.classList.remove('active');
-  });
-  overlay.addEventListener('click', () => {
-    sidebar.classList.remove('active');
-    wishlistSidebar.classList.remove('active');
-    overlay.classList.remove('active');
-  });
+// ── Rendu du panier ───────────────────────────────────────────────────────────
+window.renderCart = () => {
+    const cartItemsEl = document.getElementById('cartItems');
+    const cartTotalEl = document.getElementById('cartTotal');
+    if (!cartItemsEl) return;
 
-  // --- Rendu du panier ---
-  window.renderCart = () => {
+    // Panier vide
     if (!window.cart || Object.keys(window.cart).length === 0) {
-      cartItems.innerHTML = '<p>Votre panier est vide.</p>';
-      return;
+        cartItemsEl.innerHTML = '<p>Votre panier est vide.</p>';
+        if (cartTotalEl) cartTotalEl.textContent = '0.00 DA';
+        return;
     }
 
-    cartItems.innerHTML = '';
+    cartItemsEl.innerHTML = '';
+    let total = 0;
 
     for (const key in window.cart) {
-      const item = window.cart[key];
-      if (!item || !item.name) continue;
+        const item = window.cart[key];
+        if (!item || !item.name) continue;
 
-      const imageSrc = item.image_url || '/images/placeholder.jpg';
-      const price = parseFloat(item.price) || 0;
-      const qty = parseInt(item.quantity) || 1;
+        const price = parseFloat(item.price)  || 0;
+        const qty   = parseInt(item.quantity)  || 1;
+        total += price * qty;
 
-      const itemHTML = document.createElement('div');
-      itemHTML.classList.add('cart-item');
-      itemHTML.innerHTML = `
-        <img src="${imageSrc}" alt="${item.name}" class="cart-item-img">
-        <div class="cart-item-info">
-          <h4>${item.name}${item.shade ? ' - ' + item.shade : ''}</h4>
-          <p>${price.toFixed(2)}DA</p>
-          <div class="quantity-controls">
-            <button class="decrease">-</button>
-            <span class="quantity">${qty}</span>
-            <button class="increase">+</button>
-            <button class="remove-item">x</button>
-          </div>
-        </div>
-      `;
+        // Image : priorité à image_url de la teinte (passée lors du addToCart),
+        // fallback sur placeholder
+        const imageSrc = (item.image_url && item.image_url.trim())
+                       ? item.image_url
+                       : '/images/placeholder.jpg';
 
-      itemHTML.querySelector('.increase').addEventListener('click', () => {
-        item.quantity += 1;
-        saveCart(); renderCart();
-      });
+        // Nom affiché : "Produit — Teinte" si teinte présente
+        const displayName = item.shade
+                          ? `${item.name} <span class="cart-shade-tag">— ${item.shade}</span>`
+                          : item.name;
 
-      itemHTML.querySelector('.decrease').addEventListener('click', () => {
-        item.quantity -= 1;
-        if (item.quantity <= 0) delete window.cart[key];
-        saveCart(); renderCart();
-      });
+        const itemEl = document.createElement('div');
+        itemEl.classList.add('cart-item');
+        itemEl.innerHTML = `
+            <img src="${imageSrc}"
+                 alt="${item.name}"
+                 class="cart-item-img"
+                 onerror="this.src='/images/placeholder.jpg'">
+            <div class="cart-item-info">
+                <h4>${displayName}</h4>
+                <p class="cart-item-price">${price.toFixed(2)} DA</p>
+                <div class="quantity-controls">
+                    <button class="decrease">−</button>
+                    <span class="quantity">${qty}</span>
+                    <button class="increase">+</button>
+                    <button class="remove-item">✕</button>
+                </div>
+            </div>
+        `;
 
-      itemHTML.querySelector('.remove-item').addEventListener('click', () => {
-        delete window.cart[key];
-        saveCart(); renderCart();
-      });
+        // Événements quantité / suppression
+        itemEl.querySelector('.increase').addEventListener('click', () => {
+            window.cart[key].quantity += 1;
+            saveCart();
+            window.renderCart();
+        });
+        itemEl.querySelector('.decrease').addEventListener('click', () => {
+            window.cart[key].quantity -= 1;
+            if (window.cart[key].quantity <= 0) delete window.cart[key];
+            saveCart();
+            window.renderCart();
+        });
+        itemEl.querySelector('.remove-item').addEventListener('click', () => {
+            delete window.cart[key];
+            saveCart();
+            window.renderCart();
+        });
 
-      cartItems.appendChild(itemHTML);
+        cartItemsEl.appendChild(itemEl);
     }
-  };
 
-  // --- Rendu de la wishlist ---
-  window.renderWishlist = () => {
+    // Mise à jour du total
+    if (cartTotalEl) cartTotalEl.textContent = total.toFixed(2) + ' DA';
+};
+
+// ── Ajouter au panier ─────────────────────────────────────────────────────────
+// Utilisé par product.php (teintes) ET shop.js (catalogue, wishlist…)
+window.addToCart = ({ productId, name, price, image, quantity, shade }) => {
+    // Clé unique : "Produit - Teinte" ou "Produit"
+    const key       = shade ? `${name} - ${shade}` : name;
+    const image_url = (image && image.trim()) ? image : '/images/placeholder.jpg';
+    quantity        = parseInt(quantity) || 1;
+    price           = parseFloat(price)  || 0;
+
+    if (window.cart[key]) {
+        window.cart[key].quantity += quantity;
+        // Mettre à jour l'image si elle a changé (ex : teinte avec image)
+        if (image_url !== '/images/placeholder.jpg') {
+            window.cart[key].image_url = image_url;
+        }
+    } else {
+        window.cart[key] = { name, price, image_url, quantity, shade: shade || null };
+    }
+
+    saveCart();
+    window.renderCart();
+    window.openCart();
+};
+
+// ── Rendu de la wishlist ──────────────────────────────────────────────────────
+window.renderWishlist = () => {
+    const wishlistItemsEl = document.getElementById('wishlistItems');
+    if (!wishlistItemsEl) return;
+
     if (!window.wishlist || Object.keys(window.wishlist).length === 0) {
-      wishlistItems.innerHTML = '<p>Votre liste de souhaits est vide.</p>';
-      return;
+        wishlistItemsEl.innerHTML = '<p>Votre liste de souhaits est vide.</p>';
+        return;
     }
 
-    wishlistItems.innerHTML = '';
+    wishlistItemsEl.innerHTML = '';
     for (const key in window.wishlist) {
-      const item = window.wishlist[key];
-      if (!item || !item.name) continue;
+        const item = window.wishlist[key];
+        if (!item || !item.name) continue;
 
-      const imageSrc = item.image_url || '/images/placeholder.jpg';
-      const price = parseFloat(item.price) || 0;
+        const imageSrc = (item.image_url && item.image_url.trim())
+                       ? item.image_url
+                       : '/images/placeholder.jpg';
+        const price = parseFloat(item.price) || 0;
 
-      const itemHTML = document.createElement('div');
-      itemHTML.classList.add('wishlist-item');
-      itemHTML.innerHTML = `
-  <img src="${imageSrc}" alt="${item.name}" class="wishlist-item-img">
-  <div class="wishlist-item-info">
-    <h4>${item.name}</h4>
-    <div class="wishlist-meta">
-      <p>${price.toFixed(2)}DA</p>
-      <button class="remove-wishlist">x</button>
-    </div>
-  </div>
-`;
+        const itemEl = document.createElement('div');
+        itemEl.classList.add('wishlist-item');
+        itemEl.innerHTML = `
+            <img src="${imageSrc}"
+                 alt="${item.name}"
+                 class="wishlist-item-img"
+                 onerror="this.src='/images/placeholder.jpg'">
+            <div class="wishlist-item-info">
+                <h4>${item.name}</h4>
+                <div class="wishlist-meta">
+                    <p>${price.toFixed(2)} DA</p>
+                    <button class="remove-wishlist">✕</button>
+                </div>
+            </div>
+        `;
 
-      itemHTML.querySelector('.remove-wishlist').addEventListener('click', () => {
-        delete window.wishlist[key];
-        saveWishlist(); renderWishlist();
-      });
+        itemEl.querySelector('.remove-wishlist').addEventListener('click', () => {
+            delete window.wishlist[key];
+            saveWishlist();
+            window.renderWishlist();
+        });
 
-      wishlistItems.appendChild(itemHTML);
+        wishlistItemsEl.appendChild(itemEl);
     }
-  };
+};
 
-  // --- Ajouter au panier ---
-  document.querySelectorAll('.add-to-cart').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const name = btn.dataset.name;
-      const price = parseFloat(btn.dataset.price?.replace(',', '.')) || 0;
-      const image_url = btn.dataset.image_url || '/images/placeholder.jpg';
-      const shade = btn.dataset.shade || null;
-      const key = shade ? `${name} - ${shade}` : name;
+// =============================================================================
+// Listeners DOM — après le chargement de la page
+// =============================================================================
+document.addEventListener("DOMContentLoaded", function () {
+    const overlay         = document.getElementById('sidebarOverlay');
+    const sidebar         = document.getElementById('sidebar');
+    const wishlistSidebar = document.getElementById('wishlistSidebar');
 
-      if (window.cart[key]) window.cart[key].quantity += 1;
-      else window.cart[key] = { name, price, image_url, quantity: 1, shade };
-
-      saveCart();
-      renderCart();
-      openCart();
+    // ── Fermeture ─────────────────────────────────────────────────────────────
+    document.getElementById('closeSidebar').addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
     });
-  });
-
-  // --- Ajouter à la wishlist ---
-  document.querySelectorAll('.add-to-wishlist').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const name = btn.dataset.name;
-      const price = parseFloat(btn.dataset.price?.replace(',', '.')) || 0;
-      const image_url = btn.dataset.image_url || '/images/placeholder.jpg';
-
-      if (!window.wishlist[name]) window.wishlist[name] = { name, price, image_url };
-      saveWishlist();
-      renderWishlist();
-      openWishlist();
+    document.getElementById('closeWishlist').addEventListener('click', () => {
+        wishlistSidebar.classList.remove('active');
+        overlay.classList.remove('active');
     });
-  });
+    overlay.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        wishlistSidebar.classList.remove('active');
+        overlay.classList.remove('active');
+    });
 
-  // --- Initialisation ---
-  renderCart();
-  renderWishlist();
+    // ── Boutons .add-to-cart classiques (pages sans teintes) ──────────────────
+    // Note : sur product.php avec teintes, c'est window.addToCart() qui est
+    // appelé directement depuis le JS inline — ces listeners ne s'en occupent pas.
+    document.querySelectorAll('.add-to-cart').forEach(btn => {
+        // Éviter de double-binder le bouton addWithShadeBtn géré par product.php
+        if (btn.id === 'addWithShadeBtn') return;
+
+        btn.addEventListener('click', () => {
+            if (btn.disabled) return;
+            const name      = btn.dataset.name;
+            const price     = parseFloat((btn.dataset.price || '0').replace(',', '.')) || 0;
+            const image_url = btn.dataset.image_url || '/images/placeholder.jpg';
+            const shade     = btn.dataset.shade     || null;
+            const key       = shade ? `${name} - ${shade}` : name;
+
+            if (window.cart[key]) window.cart[key].quantity += 1;
+            else window.cart[key] = { name, price, image_url, quantity: 1, shade };
+
+            saveCart();
+            window.renderCart();
+            window.openCart();
+        });
+    });
+
+    // ── Boutons .add-to-wishlist ──────────────────────────────────────────────
+    document.querySelectorAll('.add-to-wishlist').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const name      = btn.dataset.name;
+            const price     = parseFloat((btn.dataset.price || '0').replace(',', '.')) || 0;
+            const image_url = btn.dataset.image_url || '/images/placeholder.jpg';
+
+            if (!window.wishlist[name]) {
+                window.wishlist[name] = { name, price, image_url };
+            }
+            saveWishlist();
+            window.renderWishlist();
+            window.openWishlist();
+        });
+    });
+
+    // ── Initialisation ────────────────────────────────────────────────────────
+    window.renderCart();
+    window.renderWishlist();
 });
 </script>

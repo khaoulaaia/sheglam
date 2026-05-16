@@ -8,6 +8,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const B = (typeof BASE_URL !== "undefined") ? BASE_URL : "";
 
+  // ─── CONTEXTE DE PAGE ────────────────────────────────
+  // Détermine si on est sur la page catalogue (avec .products-grid)
+  // ou sur une autre page (index, wishlist…)
+  const isCataloguePage = !!document.querySelector(".products-grid");
+
   // ─── ÉTAT GLOBAL ─────────────────────────────────────
   const cart     = JSON.parse(localStorage.getItem("cart"))     || {};
   const wishlist = JSON.parse(localStorage.getItem("wishlist")) || {};
@@ -47,18 +52,18 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // ─── PANIER — AJOUT ──────────────────────────────────
-  function addToCart({ productId, name, price, image, quantity = 1, shade = null }) {
-    const key = buildKey(productId, shade);
-    if (cart[key]) {
-      cart[key].quantity += quantity;
-    } else {
-      cart[key] = { productId, name, price, image_url: image, shade, quantity };
-    }
-    saveCart();
-    window.openCart?.();
-    window.renderCart();
-    document.dispatchEvent(new CustomEvent("addedToCart"));
+ window.addToCart = function({ productId, name, price, image, quantity = 1, shade = null }) {
+  const key = buildKey(productId, shade);
+  if (cart[key]) {
+    cart[key].quantity += quantity;
+  } else {
+    cart[key] = { productId, name, price, image_url: image, shade, quantity };
   }
+  saveCart();
+  window.openCart?.();
+  window.renderCart();
+  document.dispatchEvent(new CustomEvent("addedToCart"));
+};
 
   // ─── PANIER — RENDU ──────────────────────────────────
   window.renderCart = () => {
@@ -158,129 +163,272 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+
   // ═══════════════════════════════════════════════════════════
-  // ─── MINI SHADE PICKER (carte produit — page catalogue) ───
+  // ─── MODAL TEINTES — logique partagée ─────────────────────
   // ═══════════════════════════════════════════════════════════
   //
-  // Quand l'utilisateur clique "Choisir une teinte" sur une carte,
-  // on remplace le bouton par un mini-picker inline directement
-  // sur la carte. Une fois la teinte choisie, le bouton devient
-  // "Ajouter au panier" et exécute l'ajout immédiatement.
+  // Utilisée sur index.php (sections fp-card, hype-products)
+  // ET sur wishlist (fromWishlist=1).
+  // Sur catalogue, on utilise le picker inline à la place.
+  //
+
+  const modal = document.getElementById("productModal");
+
+  // Expose openShadeModal globalement pour pouvoir l'appeler
+  // depuis n'importe quel contexte
+  async function openShadeModal(button) {
+    if (!modal) return;
+
+    const data = getProductData(button);
+    if (!data) return;
+
+    let currentProduct  = data;
+    let selectedShade   = null;
+    let currentQuantity = 1;
+
+    const productNameEl   = modal.querySelector("#productName");
+    const productPriceEl  = modal.querySelector("#productPrice");
+    const productImageEl  = modal.querySelector("#productMainImage");
+    const shadeOptionsEl  = modal.querySelector("#shadeOptions");
+    const addFromModalBtn = modal.querySelector("#addToCartFromModal");
+    const qtyEl           = modal.querySelector("#quantity");
+    const thumbsEl        = modal.querySelector("#productThumbnails");
+
+    const updateQtyUI = () => { if (qtyEl) qtyEl.textContent = currentQuantity; };
+    updateQtyUI();
+
+    const viewLink = document.getElementById("viewFullDetails");
+    if (viewLink) viewLink.href = `${B}/product.php?id=${data.productId}`;
+
+    if (productNameEl)  productNameEl.textContent  = data.name;
+    if (productPriceEl) productPriceEl.textContent = `${data.price.toFixed(2)} DA`;
+    if (productImageEl) productImageEl.src          = data.image;
+    if (thumbsEl)       thumbsEl.innerHTML          = "";
+    if (shadeOptionsEl) shadeOptionsEl.innerHTML    = "<p>Chargement…</p>";
+
+    // Gestionnaires quantité — on réinitialise à chaque ouverture
+    const increaseQtyBtn = modal.querySelector("#increaseQty");
+    const decreaseQtyBtn = modal.querySelector("#decreaseQty");
+
+    // Clones pour retirer les anciens listeners
+    if (increaseQtyBtn) {
+      const newInc = increaseQtyBtn.cloneNode(true);
+      increaseQtyBtn.replaceWith(newInc);
+      newInc.addEventListener("click", () => { currentQuantity++; updateQtyUI(); });
+    }
+    if (decreaseQtyBtn) {
+      const newDec = decreaseQtyBtn.cloneNode(true);
+      decreaseQtyBtn.replaceWith(newDec);
+      newDec.addEventListener("click", () => {
+        if (currentQuantity > 1) { currentQuantity--; updateQtyUI(); }
+      });
+    }
+
+    // Charge les teintes
+    try {
+      const res    = await fetch(`${B}/includes/get_shades.php?product_id=${button.dataset.productId}`);
+      const shades = await res.json();
+
+      if (shadeOptionsEl) shadeOptionsEl.innerHTML = "";
+
+      if (!shades.length) {
+        if (shadeOptionsEl) shadeOptionsEl.innerHTML = "<p>Aucune teinte disponible.</p>";
+      } else {
+        shades.forEach(s => {
+          const option = document.createElement("div");
+          option.className = "shade-option";
+          const color = document.createElement("span");
+          color.className = "shade-color";
+          color.style.backgroundColor = s.code_couleur;
+          option.appendChild(color);
+          option.addEventListener("click", () => {
+            shadeOptionsEl.querySelectorAll(".shade-option").forEach(o => o.classList.remove("selected"));
+            option.classList.add("selected");
+            selectedShade = s.nom_teinte;
+            const label = document.getElementById("selectedShadeName");
+            if (label) label.textContent = s.nom_teinte;
+          });
+          shadeOptionsEl.appendChild(option);
+        });
+      }
+    } catch (err) {
+      console.error("Erreur teintes", err);
+      if (shadeOptionsEl) shadeOptionsEl.innerHTML = "<p>Erreur de chargement.</p>";
+    }
+
+    // Contexte wishlist
+    modal.dataset.fromWishlist = button.dataset.fromWishlist || "";
+    modal.dataset.wishlistKey  = button.dataset.wishlistKey  || "";
+
+    // Bouton "Ajouter" — clone pour retirer les anciens listeners
+    if (addFromModalBtn) {
+      const newAdd = addFromModalBtn.cloneNode(true);
+      addFromModalBtn.replaceWith(newAdd);
+      newAdd.addEventListener("click", () => {
+        if (!selectedShade)  { alert("Veuillez choisir une teinte."); return; }
+        if (!currentProduct) return;
+        addToCart({ ...currentProduct, quantity: currentQuantity, shade: selectedShade });
+
+        if (modal.dataset.fromWishlist === "1") {
+          const wl  = JSON.parse(localStorage.getItem("wishlist")) || {};
+          const key = modal.dataset.wishlistKey;
+          if (wl[key]) { delete wl[key]; localStorage.setItem("wishlist", JSON.stringify(wl)); }
+          renderWishlist();
+        }
+        closeModal();
+      });
+    }
+
+    openModal();
+  }
+
+  function openModal() {
+    if (!modal) return;
+    modal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeModal() {
+    if (!modal) return;
+    modal.style.display = "none";
+    document.body.style.overflow = "auto";
+  }
+
+  if (modal) {
+    const closeModalBtn = modal.querySelector(".close-product-modal");
+    closeModalBtn?.addEventListener("click", closeModal);
+    modal.addEventListener("click", e => e.target === modal && closeModal());
+  }
+
+
+  // ═══════════════════════════════════════════════════════════
+  // ─── DISPATCHER PRINCIPAL : choose-shade-btn ──────────────
+  // ═══════════════════════════════════════════════════════════
+  //
+  // Règle :
+  //   • Modale productModal  → wishlist  (fromWishlist=1)
+  //                         → index / hype / tout hors catalogue
+  //   • Picker inline        → catalogue (.products-grid présent)
+  //                           sauf si le bouton est dans la modale
+  //                           ou dans la vue rapide
   //
 
   document.body.addEventListener("click", async e => {
     const shadeBtn = e.target.closest(".choose-shade-btn");
-    // Ignore si c'est le bouton de la modale ou de la vue rapide
     if (!shadeBtn) return;
+
+    // Ignore les boutons à l'intérieur des modales gérées séparément
     if (shadeBtn.closest("#productModal") || shadeBtn.closest(".qv-modal")) return;
+
     e.preventDefault();
     e.stopPropagation();
+
     if (isOutOfStock(shadeBtn)) return;
 
-    const card       = shadeBtn.closest(".product-card");
-    const productInfo = card?.querySelector(".product-info");
-    if (!productInfo) return;
+    const fromWishlist  = shadeBtn.dataset.fromWishlist === "1";
+    const inCatalogue   = isCataloguePage && !fromWishlist;
 
-    // Évite d'ouvrir plusieurs pickers sur la même carte
-    if (productInfo.querySelector(".inline-shade-picker")) return;
+    if (inCatalogue) {
+      // ── Picker inline (page catalogue uniquement) ────────
+      const card        = shadeBtn.closest(".product-card");
+      const productInfo = card?.querySelector(".product-info");
+      if (!productInfo) return;
 
-    const productId = shadeBtn.dataset.productId;
-    const name      = shadeBtn.dataset.name;
-    const price     = parseFloat((shadeBtn.dataset.price || "0").replace(",", "."));
-    const imageRaw  = shadeBtn.dataset.image_url || shadeBtn.dataset.imageUrl;
-    const image     = normalizeImage(imageRaw);
-    const stock     = parseInt(shadeBtn.dataset.stock, 10);
+      // Évite d'ouvrir plusieurs pickers sur la même carte
+      if (productInfo.querySelector(".inline-shade-picker")) return;
 
-    // Masque le bouton d'origine le temps du picker
-    shadeBtn.style.display = "none";
+      const productId = shadeBtn.dataset.productId;
+      const name      = shadeBtn.dataset.name;
+      const price     = parseFloat((shadeBtn.dataset.price || "0").replace(",", "."));
+      const imageRaw  = shadeBtn.dataset.image_url || shadeBtn.dataset.imageUrl;
+      const image     = normalizeImage(imageRaw);
+      const stock     = parseInt(shadeBtn.dataset.stock, 10);
 
-    // Conteneur picker
-    const picker = document.createElement("div");
-    picker.className = "inline-shade-picker";
-    picker.innerHTML = `
-      <div class="isp-label">Choisir une teinte</div>
-      <div class="isp-dots"></div>
-      <div class="isp-selected-name"></div>
-      <div class="isp-actions">
-        <button class="isp-add-btn" disabled>
-          <i class="fas fa-shopping-bag"></i> Ajouter au panier
-        </button>
-        <button class="isp-cancel" title="Annuler">✕</button>
-      </div>
-    `;
-    productInfo.appendChild(picker);
+      shadeBtn.style.display = "none";
 
-    const dotsEl       = picker.querySelector(".isp-dots");
-    const selectedName = picker.querySelector(".isp-selected-name");
-    const addBtn       = picker.querySelector(".isp-add-btn");
-    const cancelBtn    = picker.querySelector(".isp-cancel");
+      const picker = document.createElement("div");
+      picker.className = "inline-shade-picker";
+      picker.innerHTML = `
+        <div class="isp-label">Choisir une teinte</div>
+        <div class="isp-dots"></div>
+        <div class="isp-selected-name"></div>
+        <div class="isp-actions">
+          <button class="isp-add-btn" disabled>
+            <i class="fas fa-shopping-bag"></i> Ajouter au panier
+          </button>
+          <button class="isp-cancel" title="Annuler">✕</button>
+        </div>
+      `;
+      productInfo.appendChild(picker);
 
-    // Annulation : restaure le bouton d'origine
-    cancelBtn.addEventListener("click", e => {
-      e.preventDefault();
-      e.stopPropagation();
-      picker.remove();
-      shadeBtn.style.display = "";
-    });
+      const dotsEl       = picker.querySelector(".isp-dots");
+      const selectedName = picker.querySelector(".isp-selected-name");
+      const addBtn       = picker.querySelector(".isp-add-btn");
+      const cancelBtn    = picker.querySelector(".isp-cancel");
 
-    // Charge les teintes depuis l'API
-    dotsEl.innerHTML = `<span class="isp-loading">Chargement…</span>`;
-    let shades = [];
-    try {
-      const res = await fetch(`${B}/includes/get_shades.php?product_id=${productId}`);
-      shades    = await res.json();
-    } catch {
-      dotsEl.innerHTML = `<span class="isp-loading">Erreur de chargement.</span>`;
-      return;
-    }
-
-    dotsEl.innerHTML = "";
-    let selectedShade = null;
-
-    if (!shades.length) {
-      // Aucune teinte en base → ajout direct sans teinte
-      dotsEl.innerHTML = `<span class="isp-loading">Aucune teinte.</span>`;
-      addBtn.disabled  = false;
-    } else {
-      shades.forEach(s => {
-        const dot = document.createElement("span");
-        dot.className        = "isp-dot";
-        dot.title            = s.nom_teinte;
-        dot.style.background = s.code_couleur || "#ccc";
-
-        dot.addEventListener("click", e => {
-          e.preventDefault();
-          e.stopPropagation();
-          dotsEl.querySelectorAll(".isp-dot").forEach(d => d.classList.remove("active"));
-          dot.classList.add("active");
-          selectedShade         = s.nom_teinte;
-          selectedName.textContent = s.nom_teinte;
-          addBtn.disabled       = false;
-        });
-
-        dotsEl.appendChild(dot);
+      cancelBtn.addEventListener("click", e => {
+        e.preventDefault();
+        e.stopPropagation();
+        picker.remove();
+        shadeBtn.style.display = "";
       });
-    }
 
-    // Ajout au panier depuis le picker
-    addBtn.addEventListener("click", e => {
-      e.preventDefault();
-      e.stopPropagation();
-      addToCart({ productId, name, price, image, quantity: 1, shade: selectedShade });
-      picker.remove();
-      shadeBtn.style.display = "";
-    });
+      dotsEl.innerHTML = `<span class="isp-loading">Chargement…</span>`;
+      let shades = [];
+      try {
+        const res = await fetch(`${B}/includes/get_shades.php?product_id=${productId}`);
+        shades    = await res.json();
+      } catch {
+        dotsEl.innerHTML = `<span class="isp-loading">Erreur de chargement.</span>`;
+        return;
+      }
+
+      dotsEl.innerHTML = "";
+      let selectedShade = null;
+
+      if (!shades.length) {
+        dotsEl.innerHTML = `<span class="isp-loading">Aucune teinte.</span>`;
+        addBtn.disabled  = false;
+      } else {
+        shades.forEach(s => {
+          const dot = document.createElement("span");
+          dot.className        = "isp-dot";
+          dot.title            = s.nom_teinte;
+          dot.style.background = s.code_couleur || "#ccc";
+
+          dot.addEventListener("click", e => {
+            e.preventDefault();
+            e.stopPropagation();
+            dotsEl.querySelectorAll(".isp-dot").forEach(d => d.classList.remove("active"));
+            dot.classList.add("active");
+            selectedShade            = s.nom_teinte;
+            selectedName.textContent = s.nom_teinte;
+            addBtn.disabled          = false;
+          });
+
+          dotsEl.appendChild(dot);
+        });
+      }
+
+      addBtn.addEventListener("click", e => {
+        e.preventDefault();
+        e.stopPropagation();
+        addToCart({ productId, name, price, image, quantity: 1, shade: selectedShade });
+        picker.remove();
+        shadeBtn.style.display = "";
+      });
+
+    } else {
+      // ── Modale (index, wishlist, ou toute page hors catalogue) ─
+      openShadeModal(shadeBtn);
+    }
   });
 
 
   // ═══════════════════════════════════════════════════════════
   // ─── VUE RAPIDE — SÉLECTION DE TEINTE ────────────────────
   // ═══════════════════════════════════════════════════════════
-  //
-  // Les swatches dans la modale aperçu rapide permettent de
-  // sélectionner une teinte, puis le bouton "Ajouter au panier"
-  // ajoute le produit avec la teinte choisie.
-  //
 
   (function setupQuickViewCart() {
     const overlay    = document.getElementById("qvOverlay");
@@ -290,18 +438,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const cartBtn    = document.getElementById("qvCartBtn");
     const shadesRow  = document.getElementById("qvShadesRow");
 
-    // État interne de la vue rapide
     let qvState = {
-      productId:   null,
-      name:        null,
-      price:       null,
-      image:       null,
-      stock:       0,
-      hasShades:   false,
+      productId:     null,
+      name:          null,
+      price:         null,
+      image:         null,
+      stock:         0,
+      hasShades:     false,
       selectedShade: null,
     };
 
-    // Expose openQV globalement pour le code PHP/inline
     window._qvOpenCallback = function(btn) {
       const id        = btn.dataset.productId;
       const name      = btn.dataset.name;
@@ -314,19 +460,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const url       = btn.dataset.url;
       const desc      = btn.dataset.description || "";
 
-      // Réinitialise la teinte sélectionnée
       qvState = { productId: id, name, price, image: normalizeImage(image), stock, hasShades, selectedShade: null };
 
-      // Image
       const imgEl = document.getElementById("qvImg");
       imgEl.src = ""; requestAnimationFrame(() => { imgEl.src = image; imgEl.alt = name; });
 
-      // Textes de base
       document.getElementById("qvBrand").textContent = brand || "";
       document.getElementById("qvName").textContent  = name;
       document.getElementById("qvDescription").textContent = desc;
 
-      // Prix
       const priceEl = document.getElementById("qvPrice");
       if (!isNaN(oldPrice) && oldPrice > price) {
         priceEl.innerHTML =
@@ -336,7 +478,6 @@ document.addEventListener("DOMContentLoaded", () => {
         priceEl.innerHTML = `<span class="qv-normal">${fmtDA(price)}</span>`;
       }
 
-      // Badge + stock
       const badge      = document.getElementById("qvBadge");
       const stockDot   = document.getElementById("qvStockDot");
       const stockLabel = document.getElementById("qvStockLabel");
@@ -354,10 +495,8 @@ document.addEventListener("DOMContentLoaded", () => {
         stockLabel.textContent = "En stock";
       }
 
-      // Lien fiche
       document.getElementById("qvDetailLink").href = url;
 
-      // Teintes
       const shadesBlock = document.getElementById("qvShadesBlock");
       shadesRow.innerHTML = "";
 
@@ -365,7 +504,6 @@ document.addEventListener("DOMContentLoaded", () => {
       try { shades = JSON.parse(btn.dataset.shades || "[]"); } catch {}
 
       if (hasShades && shades.length) {
-        // Label de teinte sélectionnée
         let labelEl = document.getElementById("qvSelectedShadeName");
         if (!labelEl) {
           labelEl = document.createElement("span");
@@ -386,7 +524,6 @@ document.addEventListener("DOMContentLoaded", () => {
             dot.classList.add("active");
             qvState.selectedShade = s.nom_teinte;
             labelEl.textContent   = s.nom_teinte;
-            // Active le bouton panier dès qu'une teinte est choisie
             updateQvCartBtn();
           });
 
@@ -398,21 +535,18 @@ document.addEventListener("DOMContentLoaded", () => {
         shadesBlock.style.display = "none";
       }
 
-      // Bouton panier initial
       updateQvCartBtn();
 
-      // Ouvre la modale
       overlay.classList.add("active");
       document.body.style.overflow = "hidden";
       closeBtn.focus();
     };
 
-    // Met à jour l'état du bouton panier de la vue rapide
     function updateQvCartBtn() {
       const { stock, hasShades, selectedShade } = qvState;
-      const outOfStock     = stock === 0;
-      const needsShade     = hasShades && !selectedShade;
-      const disabled       = outOfStock || needsShade;
+      const outOfStock = stock === 0;
+      const needsShade = hasShades && !selectedShade;
+      const disabled   = outOfStock || needsShade;
 
       cartBtn.disabled  = disabled;
       cartBtn.className = "qv-cart-btn";
@@ -426,12 +560,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // Clic sur le bouton panier de la vue rapide
     cartBtn.addEventListener("click", () => {
       const { productId, name, price, image, stock, hasShades, selectedShade } = qvState;
       if (stock === 0) return;
       if (hasShades && !selectedShade) {
-        // Secoue le bloc teintes pour indiquer qu'il faut choisir
         const shadesBlock = document.getElementById("qvShadesBlock");
         shadesBlock?.classList.add("qv-shake");
         setTimeout(() => shadesBlock?.classList.remove("qv-shake"), 500);
@@ -462,132 +594,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-
-  // ─── MODAL TEINTES (product.php / wishlist) ───────────────
-  const modal = document.getElementById("productModal");
-
-  if (modal) {
-    const productNameEl   = modal.querySelector("#productName");
-    const productPriceEl  = modal.querySelector("#productPrice");
-    const productImageEl  = modal.querySelector("#productMainImage");
-    const shadeOptionsEl  = modal.querySelector("#shadeOptions");
-    const addFromModalBtn = modal.querySelector("#addToCartFromModal");
-    const closeModalBtn   = modal.querySelector(".close-product-modal");
-    const qtyEl           = modal.querySelector("#quantity");
-    const increaseQtyBtn  = modal.querySelector("#increaseQty");
-    const decreaseQtyBtn  = modal.querySelector("#decreaseQty");
-    const thumbsEl        = modal.querySelector("#productThumbnails");
-
-    let currentProduct  = null;
-    let selectedShade   = null;
-    let currentQuantity = 1;
-
-    const updateQuantityUI = () => { if (qtyEl) qtyEl.textContent = currentQuantity; };
-
-    const openModal = () => {
-      currentQuantity = 1;
-      updateQuantityUI();
-      modal.style.display = "flex";
-      document.body.style.overflow = "hidden";
-    };
-
-    const closeModal = () => {
-      modal.style.display = "none";
-      document.body.style.overflow = "auto";
-      selectedShade = null;
-      currentProduct = null;
-      currentQuantity = 1;
-    };
-
-    closeModalBtn?.addEventListener("click", closeModal);
-    modal.addEventListener("click", e => e.target === modal && closeModal());
-    increaseQtyBtn?.addEventListener("click", () => { currentQuantity++; updateQuantityUI(); });
-    decreaseQtyBtn?.addEventListener("click", () => {
-      if (currentQuantity > 1) { currentQuantity--; updateQuantityUI(); }
-    });
-
-    addFromModalBtn?.addEventListener("click", () => {
-      if (!selectedShade)  { alert("Veuillez choisir une teinte."); return; }
-      if (!currentProduct) return;
-      addToCart({ ...currentProduct, quantity: currentQuantity, shade: selectedShade });
-
-      if (modal.dataset.fromWishlist === "1") {
-        const wl  = JSON.parse(localStorage.getItem("wishlist")) || {};
-        const key = modal.dataset.wishlistKey;
-        if (wl[key]) { delete wl[key]; localStorage.setItem("wishlist", JSON.stringify(wl)); }
-        renderWishlist();
-      }
-      closeModal();
-    });
-
-    async function openShadeModal(button) {
-      const data = getProductData(button);
-      if (!data) return;
-
-      currentProduct  = data;
-      selectedShade   = null;
-      currentQuantity = 1;
-      updateQuantityUI();
-
-      const viewLink = document.getElementById("viewFullDetails");
-      if (viewLink) viewLink.href = `${B}/product.php?id=${data.productId}`;
-
-      if (productNameEl)  productNameEl.textContent  = data.name;
-      if (productPriceEl) productPriceEl.textContent = `${data.price.toFixed(2)} DA`;
-      if (productImageEl) productImageEl.src          = data.image;
-      if (thumbsEl)       thumbsEl.innerHTML          = "";
-      if (shadeOptionsEl) shadeOptionsEl.innerHTML    = "<p>Chargement…</p>";
-
-      try {
-        const res    = await fetch(`${B}/includes/get_shades.php?product_id=${button.dataset.productId}`);
-        const shades = await res.json();
-
-        shadeOptionsEl.innerHTML = "";
-
-        if (!shades.length) {
-          shadeOptionsEl.innerHTML = "<p>Aucune teinte disponible.</p>";
-        } else {
-          shades.forEach(s => {
-            const option = document.createElement("div");
-            option.className = "shade-option";
-            const color = document.createElement("span");
-            color.className = "shade-color";
-            color.style.backgroundColor = s.code_couleur;
-            option.appendChild(color);
-            option.addEventListener("click", () => {
-              shadeOptionsEl.querySelectorAll(".shade-option").forEach(o => o.classList.remove("selected"));
-              option.classList.add("selected");
-              selectedShade = s.nom_teinte;
-              const label = document.getElementById("selectedShadeName");
-              if (label) label.textContent = s.nom_teinte;
-            });
-            shadeOptionsEl.appendChild(option);
-          });
-        }
-
-        modal.dataset.fromWishlist = button.dataset.fromWishlist || "";
-        modal.dataset.wishlistKey  = button.dataset.wishlistKey  || "";
-        openModal();
-
-      } catch (err) {
-        console.error("Erreur teintes", err);
-        if (shadeOptionsEl) shadeOptionsEl.innerHTML = "<p>Erreur de chargement.</p>";
-      }
-    }
-
-    // Listener choose-shade-btn dans la modale produit uniquement
-    document.body.addEventListener("click", e => {
-      const shadeBtn = e.target.closest(".choose-shade-btn");
-      if (!shadeBtn) return;
-      if (shadeBtn.closest("#productModal") || shadeBtn.closest(".qv-modal")) return;
-      // Déjà géré par le listener inline-shade-picker ci-dessus
-      // Ce listener ne traite QUE les boutons de la wishlist (fromWishlist)
-      if (shadeBtn.dataset.fromWishlist !== "1") return;
-      e.preventDefault();
-      if (isOutOfStock(shadeBtn)) return;
-      openShadeModal(shadeBtn);
-    });
-  }
 
   // ─── AJOUT PANIER DIRECT — avec vérification stock ───
   document.body.addEventListener("click", e => {
@@ -647,9 +653,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function applyFilters() {
     let visible = cards.filter(card => {
-      if (filterSale.checked  && card.dataset.sale  !== "1") return false;
+      if (filterSale.checked   && card.dataset.sale  !== "1") return false;
       if (filterStock?.checked && card.closest(".product-card-link")?.dataset.instock === "0") return false;
-      if (filterBrand.value   && card.dataset.brand !== filterBrand.value) return false;
+      if (filterBrand.value    && card.dataset.brand !== filterBrand.value) return false;
       return true;
     });
 

@@ -131,6 +131,7 @@ if ($categorie === 'Tous') {
         $productId  = $product['id'];
         $stock      = (int)($product['stock'] ?? 0);
         $outOfStock = $stock === 0;
+        $productUrl = $b . '/product.php?id=' . $productId;
 
         $imagePath = empty($product['image_url']) ? $b . '/images/placeholder.jpg'
           : (str_starts_with($product['image_url'], 'http') ? $product['image_url'] : $b . '/images/' . basename($product['image_url']));
@@ -144,118 +145,124 @@ if ($categorie === 'Tous') {
         $oldPrice = $product['old_price'] ?? '';
       ?>
 
-      <a href="<?= $b ?>/product.php?id=<?= $productId ?>"
-         class="product-card-link"
-         data-instock="<?= $outOfStock ? '0' : '1' ?>">
+      <!-- ✦ Plus de <a> englobant — navigation gérée sur image + titre uniquement ✦ -->
+      <div class="product-card"
+           data-price="<?= $product['price'] ?>"
+           data-brand="<?= htmlspecialchars($product['marque'] ?? '') ?>"
+           data-sale="<?= !empty($product['is_sale']) ? '1' : '0' ?>"
+           data-stock="<?= $stock ?>"
+           data-instock="<?= $outOfStock ? '0' : '1' ?>">
 
-        <div class="product-card"
-             data-price="<?= $product['price'] ?>"
-             data-brand="<?= htmlspecialchars($product['marque'] ?? '') ?>"
-             data-sale="<?= !empty($product['is_sale']) ? '1' : '0' ?>"
-             data-stock="<?= $stock ?>">
+        <div class="product-image-wrapper">
 
-          <div class="product-image-wrapper">
+          <?php if ($outOfStock): ?>
+            <span class="badge-oos">Rupture</span>
+          <?php elseif ($stock <= 5): ?>
+            <span class="badge-low">Stock limité</span>
+          <?php endif; ?>
 
-            <?php if ($outOfStock): ?>
-              <span class="badge-oos">Rupture</span>
-            <?php elseif ($stock <= 5): ?>
-              <span class="badge-low">Stock limité</span>
-            <?php endif; ?>
-
+          <!-- Image cliquable → fiche produit -->
+          <a href="<?= $productUrl ?>" class="product-card-img-link" tabindex="-1">
             <img src="<?= htmlspecialchars($imagePath) ?>"
                  alt="<?= htmlspecialchars($product['name']) ?>"
                  class="<?= $outOfStock ? 'img-out-of-stock' : '' ?>">
+          </a>
 
-            <!-- Wishlist -->
-            <button class="add-to-wishlist"
+          <!-- Wishlist -->
+          <button class="add-to-wishlist"
+                  data-product-id="<?= $productId ?>"
+                  data-name="<?= htmlspecialchars($product['name']) ?>"
+                  data-price="<?= htmlspecialchars($product['price']) ?>"
+                  data-image_url="<?= htmlspecialchars($imagePath) ?>"
+                  data-has-shades="<?= $hasShades ? 1 : 0 ?>"
+                  type="button"
+                  aria-label="Ajouter aux favoris">
+            <i class="fas fa-heart"></i>
+          </button>
+
+          <!-- Aperçu rapide -->
+          <button class="quick-view-btn"
+                  data-product-id="<?= $productId ?>"
+                  data-name="<?= htmlspecialchars($product['name']) ?>"
+                  data-price="<?= htmlspecialchars($product['price']) ?>"
+                  data-old-price="<?= htmlspecialchars($oldPrice) ?>"
+                  data-image="<?= htmlspecialchars($imagePath) ?>"
+                  data-brand="<?= htmlspecialchars($product['marque'] ?? '') ?>"
+                  data-stock="<?= $stock ?>"
+                  data-has-shades="<?= $hasShades ? 1 : 0 ?>"
+                  data-shades="<?= htmlspecialchars(json_encode($productShades), ENT_QUOTES) ?>"
+                  data-description="<?= htmlspecialchars($product['description'] ?? '') ?>"
+                  data-url="<?= $productUrl ?>"
+                  type="button"
+                  aria-label="Aperçu rapide">
+            <i class="fas fa-eye"></i>
+            <span>Aperçu rapide</span>
+          </button>
+
+        </div><!-- /.product-image-wrapper -->
+
+        <div class="product-info">
+
+          <!-- Titre cliquable → fiche produit -->
+          <a href="<?= $productUrl ?>" class="product-card-title-link">
+            <h3><?= htmlspecialchars($product['name']) ?></h3>
+          </a>
+
+          <p class="price">
+            <?php if (!empty($oldPrice) && $oldPrice > $product['price']): ?>
+              <span class="old-price"><?= number_format($oldPrice, 2, ',', ' ') ?>DA</span>
+              <span class="sale-price"><?= number_format($product['price'], 2, ',', ' ') ?>DA</span>
+            <?php else: ?>
+              <?= number_format($product['price'], 2, ',', ' ') ?>DA
+            <?php endif; ?>
+          </p>
+
+          <!-- Swatches -->
+          <?php if (!empty($productShades)): ?>
+            <div class="card-shades">
+              <?php foreach (array_slice($productShades, 0, 6) as $shade): ?>
+                <span class="card-shade-dot"
+                      style="background:<?= htmlspecialchars($shade['code_couleur'] ?? '#ccc') ?>"
+                      title="<?= htmlspecialchars($shade['nom_teinte']) ?>"></span>
+              <?php endforeach; ?>
+              <?php if (count($productShades) > 6): ?>
+                <span class="card-shade-more">+<?= count($productShades) - 6 ?></span>
+              <?php endif; ?>
+            </div>
+          <?php else: ?>
+            <div class="card-shades card-shades-placeholder"></div>
+          <?php endif; ?>
+
+          <!-- Bouton panier / teinte -->
+          <?php if ($hasShades): ?>
+            <button class="choose-shade-btn"
                     data-product-id="<?= $productId ?>"
                     data-name="<?= htmlspecialchars($product['name']) ?>"
                     data-price="<?= htmlspecialchars($product['price']) ?>"
                     data-image_url="<?= htmlspecialchars($imagePath) ?>"
-                    data-has-shades="<?= $hasShades ? 1 : 0 ?>"
+                    data-stock="<?= $stock ?>"
                     type="button"
-                    aria-label="Ajouter aux favoris">
-              <i class="fas fa-heart"></i>
+                    <?= $outOfStock ? 'disabled' : '' ?>>
+              <i class="fas fa-<?= $outOfStock ? 'ban' : 'palette' ?>"></i>
+              <?= $outOfStock ? 'Rupture de stock' : 'Choisir une teinte' ?>
             </button>
-
-            <!-- ✦ BOUTON APERÇU RAPIDE ✦ -->
-            <button class="quick-view-btn"
+          <?php else: ?>
+            <button class="add-to-cart"
                     data-product-id="<?= $productId ?>"
                     data-name="<?= htmlspecialchars($product['name']) ?>"
                     data-price="<?= htmlspecialchars($product['price']) ?>"
-                    data-old-price="<?= htmlspecialchars($oldPrice) ?>"
-                    data-image="<?= htmlspecialchars($imagePath) ?>"
-                    data-brand="<?= htmlspecialchars($product['marque'] ?? '') ?>"
+                    data-image_url="<?= htmlspecialchars($imagePath) ?>"
                     data-stock="<?= $stock ?>"
-                    data-has-shades="<?= $hasShades ? 1 : 0 ?>"
-                    data-shades="<?= htmlspecialchars(json_encode($productShades), ENT_QUOTES) ?>"
-                    data-description="<?= htmlspecialchars($product['description'] ?? '') ?>"
-                    data-url="<?= $b ?>/product.php?id=<?= $productId ?>"
                     type="button"
-                    aria-label="Aperçu rapide">
-              <i class="fas fa-eye"></i>
-              <span>Aperçu rapide</span>
+                    <?= $outOfStock ? 'disabled' : '' ?>>
+              <i class="fas fa-<?= $outOfStock ? 'ban' : 'shopping-bag' ?>"></i>
+              <?= $outOfStock ? 'Rupture de stock' : 'Ajouter au panier' ?>
             </button>
+          <?php endif; ?>
 
-          </div><!-- /.product-image-wrapper -->
+        </div><!-- /.product-info -->
 
-          <div class="product-info">
-            <h3><?= htmlspecialchars($product['name']) ?></h3>
-
-            <p class="price">
-              <?php if (!empty($oldPrice) && $oldPrice > $product['price']): ?>
-                <span class="old-price"><?= number_format($oldPrice, 2, ',', ' ') ?>DA</span>
-                <span class="sale-price"><?= number_format($product['price'], 2, ',', ' ') ?>DA</span>
-              <?php else: ?>
-                <?= number_format($product['price'], 2, ',', ' ') ?>DA
-              <?php endif; ?>
-            </p>
-
-            <!-- ✦ SWATCHES SUR LA CARTE ✦ -->
-             <?php if (!empty($productShades)): ?>
-     <div class="card-shades">
-       <?php foreach (array_slice($productShades, 0, 6) as $shade): ?>
-         <span class="card-shade-dot"
-               style="background:<?= htmlspecialchars($shade['code_couleur'] ?? '#ccc') ?>"
-               title="<?= htmlspecialchars($shade['nom_teinte']) ?>"></span>
-       <?php endforeach; ?>
-       <?php if (count($productShades) > 6): ?>
-         <span class="card-shade-more">+<?= count($productShades) - 6 ?></span>
-       <?php endif; ?>
-     </div>
-   <?php else: ?>
-     <div class="card-shades card-shades-placeholder"></div>  <!-- ← AJOUT : placeholder hauteur fixe -->
-   <?php endif; ?>
-
-            <?php if ($hasShades): ?>
-              <button class="choose-shade-btn"
-                      data-product-id="<?= $productId ?>"
-                      data-name="<?= htmlspecialchars($product['name']) ?>"
-                      data-price="<?= htmlspecialchars($product['price']) ?>"
-                      data-image_url="<?= htmlspecialchars($imagePath) ?>"
-                      data-stock="<?= $stock ?>"
-                      type="button"
-                      <?= $outOfStock ? 'disabled' : '' ?>>
-                <i class="fas fa-<?= $outOfStock ? 'ban' : 'palette' ?>"></i>
-                <?= $outOfStock ? 'Rupture de stock' : 'Choisir une teinte' ?>
-              </button>
-            <?php else: ?>
-              <button class="add-to-cart"
-                      data-product-id="<?= $productId ?>"
-                      data-name="<?= htmlspecialchars($product['name']) ?>"
-                      data-price="<?= htmlspecialchars($product['price']) ?>"
-                      data-image_url="<?= htmlspecialchars($imagePath) ?>"
-                      data-stock="<?= $stock ?>"
-                      type="button"
-                      <?= $outOfStock ? 'disabled' : '' ?>>
-                <i class="fas fa-<?= $outOfStock ? 'ban' : 'shopping-bag' ?>"></i>
-                <?= $outOfStock ? 'Rupture de stock' : 'Ajouter au panier' ?>
-              </button>
-            <?php endif; ?>
-          </div>
-
-        </div><!-- /.product-card -->
-      </a><!-- /.product-card-link -->
+      </div><!-- /.product-card -->
 
       <?php endwhile; ?>
 
@@ -265,25 +272,20 @@ if ($categorie === 'Tous') {
 </div><!-- /.page-layout -->
 
 
-<!-- ══════════════════════════════════════════
-     MODALE APERÇU RAPIDE
-═══════════════════════════════════════════ -->
+<!-- ══ MODALE APERÇU RAPIDE ══════════════════════════════════════════ -->
 <div class="qv-overlay" id="qvOverlay" role="dialog" aria-modal="true" aria-label="Aperçu rapide">
   <div class="qv-modal" id="qvModal">
 
     <button class="qv-close" id="qvClose" aria-label="Fermer">&times;</button>
 
-    <!-- Colonne image -->
     <div class="qv-col-image">
       <img id="qvImg" src="" alt="" loading="lazy">
       <span class="qv-badge" id="qvBadge"></span>
     </div>
 
-    <!-- Colonne infos -->
     <div class="qv-col-info">
       <span class="qv-brand" id="qvBrand"></span>
       <h2 class="qv-name" id="qvName"></h2>
-
       <div class="qv-price" id="qvPrice"></div>
 
       <div class="qv-stock-line">
@@ -292,11 +294,8 @@ if ($categorie === 'Tous') {
       </div>
 
       <div class="qv-divider"></div>
-
-      <!-- ✦ DESCRIPTION ✦ -->
       <p class="qv-description" id="qvDescription"></p>
 
-      <!-- ✦ TEINTES ✦ -->
       <div class="qv-shades-block" id="qvShadesBlock">
         <span class="qv-shades-title">Teintes disponibles</span>
         <div class="qv-shades-row" id="qvShadesRow"></div>
@@ -312,11 +311,10 @@ if ($categorie === 'Tous') {
 
   </div>
 </div>
-<!-- /MODALE -->
 
 
 <script>
-/* ══ Sidebar mobile ══════════════════════════════════════════ */
+/* ══ Sidebar filtres mobile ══════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   const sidebar   = document.getElementById('filterSidebar');
   const toggleBtn = document.querySelector('.filter-toggle-btn');
@@ -342,23 +340,13 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
   const grid        = document.querySelector('.products-grid');
   const viewButtons = document.querySelectorAll('.view-btn');
-
   viewButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       viewButtons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      grid.classList.remove('products-list');
-      if (btn.dataset.view === 'list') grid.classList.add('products-list');
+      grid.classList.toggle('products-list', btn.dataset.view === 'list');
     });
   });
-});
-
-/* ══ Empêche propagation sur boutons d'action ═══════════════ */
-document.addEventListener('click', e => {
-  if (e.target.closest('.add-to-wishlist, .add-to-cart, .choose-shade-btn, .quick-view-btn')) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
 });
 
 /* ══ APERÇU RAPIDE ═══════════════════════════════════════════ */
@@ -368,7 +356,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const cartBtn    = document.getElementById('qvCartBtn');
   const detailLink = document.getElementById('qvDetailLink');
 
-  /* Ouvre la modale avec les données du bouton */
+  function fmtDA(v) {
+    return Number(v).toLocaleString('fr-DZ', { minimumFractionDigits: 2 }) + ' DA';
+  }
+
   function openQV(btn) {
     const id          = btn.dataset.productId;
     const name        = btn.dataset.name;
@@ -383,33 +374,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* Image */
     const imgEl = document.getElementById('qvImg');
-    imgEl.src = '';
-    requestAnimationFrame(() => { imgEl.src = image; imgEl.alt = name; });
+    imgEl.src = ''; requestAnimationFrame(() => { imgEl.src = image; imgEl.alt = name; });
 
     /* Textes */
-    document.getElementById('qvBrand').textContent = brand || '';
-    document.getElementById('qvName').textContent  = name;
-
-    /* Description */
+    document.getElementById('qvBrand').textContent       = brand || '';
+    document.getElementById('qvName').textContent        = name;
     document.getElementById('qvDescription').textContent = description;
+
+    /* Prix */
+    const priceEl = document.getElementById('qvPrice');
+    priceEl.innerHTML = (!isNaN(oldPrice) && oldPrice > price)
+      ? `<span class="qv-old">${fmtDA(oldPrice)}</span><span class="qv-current">${fmtDA(price)}</span>`
+      : `<span class="qv-normal">${fmtDA(price)}</span>`;
+
+    /* Stock */
+    const badge      = document.getElementById('qvBadge');
+    const stockDot   = document.getElementById('qvStockDot');
+    const stockLabel = document.getElementById('qvStockLabel');
+    if (stock === 0) {
+      badge.textContent = 'Rupture'; badge.className = 'qv-badge qv-badge--oos';
+      stockDot.className = 'qv-stock-dot qv-dot--out'; stockLabel.textContent = 'Rupture de stock';
+    } else if (stock <= 5) {
+      badge.textContent = 'Stock limité'; badge.className = 'qv-badge qv-badge--low';
+      stockDot.className = 'qv-stock-dot qv-dot--low';
+      stockLabel.textContent = `Seulement ${stock} restant${stock > 1 ? 's' : ''}`;
+    } else {
+      badge.textContent = ''; badge.className = 'qv-badge';
+      stockDot.className = 'qv-stock-dot qv-dot--in'; stockLabel.textContent = 'En stock';
+    }
 
     /* Teintes */
     const shadesBlock = document.getElementById('qvShadesBlock');
     const shadesRow   = document.getElementById('qvShadesRow');
     shadesRow.innerHTML = '';
-
     let shades = [];
     try { shades = JSON.parse(btn.dataset.shades || '[]'); } catch {}
+
+    let qvSelectedShade = null;
 
     if (hasShades && shades.length) {
       shades.forEach(s => {
         const dot = document.createElement('span');
-        dot.className        = 'qv-shade-dot';
-        dot.title            = s.nom_teinte || '';
+        dot.className = 'qv-shade-dot';
+        dot.title     = s.nom_teinte || '';
         dot.style.background = s.code_couleur || '#ccc';
         dot.addEventListener('click', () => {
           shadesRow.querySelectorAll('.qv-shade-dot').forEach(d => d.classList.remove('active'));
           dot.classList.add('active');
+          qvSelectedShade = s.nom_teinte;
+          updateQvBtn();
         });
         shadesRow.appendChild(dot);
       });
@@ -418,58 +431,40 @@ document.addEventListener('DOMContentLoaded', () => {
       shadesBlock.style.display = 'none';
     }
 
-    /* Prix */
-    const priceEl = document.getElementById('qvPrice');
-    if (!isNaN(oldPrice) && oldPrice > price) {
-      priceEl.innerHTML =
-        `<span class="qv-old">${fmtDA(oldPrice)}</span>
-         <span class="qv-current">${fmtDA(price)}</span>`;
-    } else {
-      priceEl.innerHTML = `<span class="qv-normal">${fmtDA(price)}</span>`;
-    }
-
-    /* Badge image + stock */
-    const badge      = document.getElementById('qvBadge');
-    const stockDot   = document.getElementById('qvStockDot');
-    const stockLabel = document.getElementById('qvStockLabel');
-
-    if (stock === 0) {
-      badge.textContent      = 'Rupture';
-      badge.className        = 'qv-badge qv-badge--oos';
-      stockDot.className     = 'qv-stock-dot qv-dot--out';
-      stockLabel.textContent = 'Rupture de stock';
-    } else if (stock <= 5) {
-      badge.textContent      = 'Stock limité';
-      badge.className        = 'qv-badge qv-badge--low';
-      stockDot.className     = 'qv-stock-dot qv-dot--low';
-      stockLabel.textContent = `Seulement ${stock} restant${stock > 1 ? 's' : ''}`;
-    } else {
-      badge.textContent      = '';
-      badge.className        = 'qv-badge';
-      stockDot.className     = 'qv-stock-dot qv-dot--in';
-      stockLabel.textContent = 'En stock';
-    }
-
     /* Bouton panier */
-    cartBtn.disabled   = stock === 0;
-    cartBtn.className  = 'qv-cart-btn ' + (hasShades ? 'choose-shade-btn' : 'add-to-cart');
-    cartBtn.innerHTML  = stock === 0
-      ? '<i class="fas fa-ban"></i> Rupture de stock'
-      : hasShades
-        ? '<i class="fas fa-palette"></i> Choisir une teinte'
-        : '<i class="fas fa-shopping-bag"></i> Ajouter au panier';
+    function updateQvBtn() {
+      const needsShade = hasShades && !qvSelectedShade;
+      cartBtn.disabled  = stock === 0 || needsShade;
+      cartBtn.innerHTML = stock === 0
+        ? '<i class="fas fa-ban"></i> Rupture de stock'
+        : needsShade
+          ? '<i class="fas fa-palette"></i> Sélectionnez une teinte'
+          : '<i class="fas fa-shopping-bag"></i> Ajouter au panier';
+    }
+    updateQvBtn();
 
-    /* Data pour shop.js */
-    cartBtn.dataset.productId = id;
-    cartBtn.dataset.name      = name;
-    cartBtn.dataset.price     = price;
-    cartBtn.dataset.imageUrl  = image;
-    cartBtn.dataset.stock     = stock;
+    /* Clic panier depuis la modale */
+    const newCartBtn = cartBtn.cloneNode(true); // retire anciens listeners
+    cartBtn.replaceWith(newCartBtn);
+    newCartBtn.addEventListener('click', () => {
+      if (stock === 0) return;
+      if (hasShades && !qvSelectedShade) {
+        shadesBlock.classList.add('qv-shake');
+        setTimeout(() => shadesBlock.classList.remove('qv-shake'), 500);
+        return;
+      }
+      window.addToCart({
+        productId: id,
+        name,
+        price,
+        image,
+        quantity:  1,
+        shade:     qvSelectedShade || null
+      });
+      closeQV();
+    });
 
-    /* Lien fiche */
     detailLink.href = url;
-
-    /* Ouvre */
     overlay.classList.add('active');
     document.body.style.overflow = 'hidden';
     closeBtn.focus();
@@ -480,21 +475,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.style.overflow = '';
   }
 
-  /* Format montant algérien */
-  function fmtDA(v) {
-    return v.toLocaleString('fr-DZ', { minimumFractionDigits: 2 }) + ' DA';
-  }
-
-  /* Listeners */
   document.querySelectorAll('.quick-view-btn').forEach(btn => {
-    btn.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); openQV(btn); });
+    btn.addEventListener('click', e => { e.stopPropagation(); openQV(btn); });
   });
 
   closeBtn.addEventListener('click', closeQV);
   overlay.addEventListener('click', e => { if (e.target === overlay) closeQV(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeQV(); });
-
-  /* Ferme aussi si shop.js dispatch un event "addedToCart" */
   document.addEventListener('addedToCart', closeQV);
 });
 </script>
