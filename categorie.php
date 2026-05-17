@@ -3,14 +3,32 @@ include 'includes/db.php';
 include_once 'includes/config.php';
 $b = BASE_URL;
 
-$categorie = $_GET['categorie'] ?? 'Tous';
+$categorie     = $_GET['categorie']     ?? 'Tous';
+$sous_categorie = $_GET['sous_categorie'] ?? '';
 
+/* ── Requête produits ── */
 if ($categorie === 'Tous') {
     $query = $pdo->query("SELECT * FROM products ORDER BY id ASC");
+} elseif ($sous_categorie !== '') {
+    $stmt = $pdo->prepare("SELECT * FROM products WHERE categorie = :categorie AND sous_categorie = :sous ORDER BY id ASC");
+    $stmt->execute(['categorie' => $categorie, 'sous' => $sous_categorie]);
+    $query = $stmt;
 } else {
     $stmt = $pdo->prepare("SELECT * FROM products WHERE categorie = :categorie ORDER BY id ASC");
     $stmt->execute(['categorie' => $categorie]);
     $query = $stmt;
+}
+
+/* ── Récupère les sous-catégories disponibles pour cette catégorie ── */
+$sous_cats = [];
+if ($categorie !== 'Tous') {
+    $scStmt = $pdo->prepare(
+        "SELECT DISTINCT sous_categorie FROM products
+         WHERE categorie = :categorie AND sous_categorie IS NOT NULL AND sous_categorie <> ''
+         ORDER BY sous_categorie ASC"
+    );
+    $scStmt->execute(['categorie' => $categorie]);
+    $sous_cats = $scStmt->fetchAll(PDO::FETCH_COLUMN);
 }
 ?>
 <!DOCTYPE html>
@@ -22,6 +40,76 @@ if ($categorie === 'Tous') {
   <link rel="stylesheet" href="<?= $b ?>/sidebar.css?v=<?= time() ?>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="icon" type="image/png" href="<?= $b ?>/images/logofib.png">
+
+  <style>
+  /* ── Sous-catégories pills ── */
+  .sous-cats-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 0 0 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(68,11,25,.12);
+  }
+
+  .sous-cat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 18px;
+    border: 1px solid rgba(68,11,25,.25);
+    border-radius: 999px;
+    background: transparent;
+    color: #6e1a2e;
+    font-family: 'Jost', system-ui, sans-serif;
+    font-size: .7rem;
+    font-weight: 500;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      background .22s ease,
+      border-color .22s ease,
+      color .22s ease,
+      box-shadow .22s ease,
+      transform .2s ease;
+    white-space: nowrap;
+  }
+
+  .sous-cat-pill:hover {
+    border-color: #440B19;
+    color: #440B19;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(68,11,25,.12);
+  }
+
+  .sous-cat-pill.active {
+    background: #440B19;
+    border-color: #440B19;
+    color: #fff;
+    box-shadow: 0 4px 18px rgba(68,11,25,.22);
+  }
+
+  .sous-cat-pill .pill-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 99px;
+    background: rgba(68,11,25,.12);
+    font-size: .58rem;
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+
+  .sous-cat-pill.active .pill-count {
+    background: rgba(255,255,255,.22);
+  }
+  </style>
 </head>
 <body>
 
@@ -96,7 +184,7 @@ if ($categorie === 'Tous') {
   <div class="filter-overlay"></div>
 
   <section class="products-section">
-    <h1><?= htmlspecialchars($categorie) ?></h1>
+    <h1><?= htmlspecialchars($categorie) ?><?= $sous_categorie ? ' — ' . htmlspecialchars($sous_categorie) : '' ?></h1>
 
     <!-- Breadcrumb -->
     <nav class="breadcrumb">
@@ -105,9 +193,38 @@ if ($categorie === 'Tous') {
         <span>Tous les produits</span>
       <?php else: ?>
         <a href="<?= $b ?>/categorie.php?categorie=Tous">Tous</a> &gt;
-        <span><?= htmlspecialchars($categorie) ?></span>
+        <?php if ($sous_categorie): ?>
+          <a href="<?= $b ?>/categorie.php?categorie=<?= urlencode($categorie) ?>"><?= htmlspecialchars($categorie) ?></a> &gt;
+          <span><?= htmlspecialchars($sous_categorie) ?></span>
+        <?php else: ?>
+          <span><?= htmlspecialchars($categorie) ?></span>
+        <?php endif; ?>
       <?php endif; ?>
     </nav>
+
+    <!-- ── Sous-catégories pills ── -->
+    <?php if (!empty($sous_cats)): ?>
+    <div class="sous-cats-bar">
+      <!-- Pill "Tout" -->
+      <a href="<?= $b ?>/categorie.php?categorie=<?= urlencode($categorie) ?>"
+         class="sous-cat-pill <?= $sous_categorie === '' ? 'active' : '' ?>">
+        Tout
+      </a>
+
+      <?php foreach ($sous_cats as $sc):
+        /* Compte les produits par sous-catégorie */
+        $cntStmt = $pdo->prepare("SELECT COUNT(*) FROM products WHERE categorie = ? AND sous_categorie = ?");
+        $cntStmt->execute([$categorie, $sc]);
+        $cnt = (int)$cntStmt->fetchColumn();
+      ?>
+      <a href="<?= $b ?>/categorie.php?categorie=<?= urlencode($categorie) ?>&sous_categorie=<?= urlencode($sc) ?>"
+         class="sous-cat-pill <?= $sous_categorie === $sc ? 'active' : '' ?>">
+        <?= htmlspecialchars($sc) ?>
+        <span class="pill-count"><?= $cnt ?></span>
+      </a>
+      <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
 
     <button class="filter-toggle-btn" id="filterToggleBtn">
       <i class="fas fa-sliders-h"></i> Filtres
@@ -145,7 +262,6 @@ if ($categorie === 'Tous') {
         $oldPrice = $product['old_price'] ?? '';
       ?>
 
-      <!-- ✦ Plus de <a> englobant — navigation gérée sur image + titre uniquement ✦ -->
       <div class="product-card"
            data-price="<?= $product['price'] ?>"
            data-brand="<?= htmlspecialchars($product['marque'] ?? '') ?>"
@@ -161,14 +277,12 @@ if ($categorie === 'Tous') {
             <span class="badge-low">Stock limité</span>
           <?php endif; ?>
 
-          <!-- Image cliquable → fiche produit -->
           <a href="<?= $productUrl ?>" class="product-card-img-link" tabindex="-1">
             <img src="<?= htmlspecialchars($imagePath) ?>"
                  alt="<?= htmlspecialchars($product['name']) ?>"
                  class="<?= $outOfStock ? 'img-out-of-stock' : '' ?>">
           </a>
 
-          <!-- Wishlist -->
           <button class="add-to-wishlist"
                   data-product-id="<?= $productId ?>"
                   data-name="<?= htmlspecialchars($product['name']) ?>"
@@ -180,7 +294,6 @@ if ($categorie === 'Tous') {
             <i class="fas fa-heart"></i>
           </button>
 
-          <!-- Aperçu rapide -->
           <button class="quick-view-btn"
                   data-product-id="<?= $productId ?>"
                   data-name="<?= htmlspecialchars($product['name']) ?>"
@@ -199,11 +312,10 @@ if ($categorie === 'Tous') {
             <span>Aperçu rapide</span>
           </button>
 
-        </div><!-- /.product-image-wrapper -->
+        </div>
 
         <div class="product-info">
 
-          <!-- Titre cliquable → fiche produit -->
           <a href="<?= $productUrl ?>" class="product-card-title-link">
             <h3><?= htmlspecialchars($product['name']) ?></h3>
           </a>
@@ -217,7 +329,6 @@ if ($categorie === 'Tous') {
             <?php endif; ?>
           </p>
 
-          <!-- Swatches -->
           <?php if (!empty($productShades)): ?>
             <div class="card-shades">
               <?php foreach (array_slice($productShades, 0, 6) as $shade): ?>
@@ -233,7 +344,6 @@ if ($categorie === 'Tous') {
             <div class="card-shades card-shades-placeholder"></div>
           <?php endif; ?>
 
-          <!-- Bouton panier / teinte -->
           <?php if ($hasShades): ?>
             <button class="choose-shade-btn"
                     data-product-id="<?= $productId ?>"
@@ -260,16 +370,16 @@ if ($categorie === 'Tous') {
             </button>
           <?php endif; ?>
 
-        </div><!-- /.product-info -->
+        </div>
 
-      </div><!-- /.product-card -->
+      </div>
 
       <?php endwhile; ?>
 
-    </div><!-- /.products-grid -->
+    </div>
   </section>
 
-</div><!-- /.page-layout -->
+</div>
 
 
 <!-- ══ MODALE APERÇU RAPIDE ══════════════════════════════════════════ -->
@@ -372,22 +482,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const url         = btn.dataset.url;
     const description = btn.dataset.description || '';
 
-    /* Image */
     const imgEl = document.getElementById('qvImg');
     imgEl.src = ''; requestAnimationFrame(() => { imgEl.src = image; imgEl.alt = name; });
 
-    /* Textes */
     document.getElementById('qvBrand').textContent       = brand || '';
     document.getElementById('qvName').textContent        = name;
     document.getElementById('qvDescription').textContent = description;
 
-    /* Prix */
     const priceEl = document.getElementById('qvPrice');
     priceEl.innerHTML = (!isNaN(oldPrice) && oldPrice > price)
       ? `<span class="qv-old">${fmtDA(oldPrice)}</span><span class="qv-current">${fmtDA(price)}</span>`
       : `<span class="qv-normal">${fmtDA(price)}</span>`;
 
-    /* Stock */
     const badge      = document.getElementById('qvBadge');
     const stockDot   = document.getElementById('qvStockDot');
     const stockLabel = document.getElementById('qvStockLabel');
@@ -403,7 +509,6 @@ document.addEventListener('DOMContentLoaded', () => {
       stockDot.className = 'qv-stock-dot qv-dot--in'; stockLabel.textContent = 'En stock';
     }
 
-    /* Teintes */
     const shadesBlock = document.getElementById('qvShadesBlock');
     const shadesRow   = document.getElementById('qvShadesRow');
     shadesRow.innerHTML = '';
@@ -431,7 +536,6 @@ document.addEventListener('DOMContentLoaded', () => {
       shadesBlock.style.display = 'none';
     }
 
-    /* Bouton panier */
     function updateQvBtn() {
       const needsShade = hasShades && !qvSelectedShade;
       cartBtn.disabled  = stock === 0 || needsShade;
@@ -443,8 +547,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     updateQvBtn();
 
-    /* Clic panier depuis la modale */
-    const newCartBtn = cartBtn.cloneNode(true); // retire anciens listeners
+    const newCartBtn = cartBtn.cloneNode(true);
     cartBtn.replaceWith(newCartBtn);
     newCartBtn.addEventListener('click', () => {
       if (stock === 0) return;
@@ -453,14 +556,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => shadesBlock.classList.remove('qv-shake'), 500);
         return;
       }
-      window.addToCart({
-        productId: id,
-        name,
-        price,
-        image,
-        quantity:  1,
-        shade:     qvSelectedShade || null
-      });
+      window.addToCart({ productId: id, name, price, image, quantity: 1, shade: qvSelectedShade || null });
       closeQV();
     });
 

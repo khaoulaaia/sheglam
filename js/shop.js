@@ -3,7 +3,25 @@
  * BASE_URL est injecté par PHP dans chaque page via :
  *   <script>const BASE_URL = "<?= $b ?>";</script>
  */
+// ─── BADGE PANIER — global ────────────────────────────
+function bumpCartBadge() {
+  const cart  = JSON.parse(localStorage.getItem("cart") || "{}");
+  const total = Object.values(cart).reduce((s, i) => s + (i.quantity || 0), 0);
 
+  ["cartCountBadge", "cartCountBadgeMobile"].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = total > 0 ? total : "0";
+    el.style.display = total > 0 ? "flex" : "none";  // cache le badge si 0
+    el.classList.remove("bump");
+    void el.offsetWidth;
+    el.classList.add("bump");
+    el.addEventListener("animationend", () => el.classList.remove("bump"), { once: true });
+  });
+}
+
+// Appel immédiat au chargement de la page
+document.addEventListener("DOMContentLoaded", bumpCartBadge);
 document.addEventListener("DOMContentLoaded", () => {
 
   const B = (typeof BASE_URL !== "undefined") ? BASE_URL : "";
@@ -52,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // ─── PANIER — AJOUT ──────────────────────────────────
- window.addToCart = function({ productId, name, price, image, quantity = 1, shade = null }) {
+ window.addToCart = function({ productId, name, price, image, quantity = 1, shade = null, _originEl = null }) {
   const key = buildKey(productId, shade);
   if (cart[key]) {
     cart[key].quantity += quantity;
@@ -60,10 +78,63 @@ document.addEventListener("DOMContentLoaded", () => {
     cart[key] = { productId, name, price, image_url: image, shade, quantity };
   }
   saveCart();
-  window.openCart?.();
-  window.renderCart();
-  document.dispatchEvent(new CustomEvent("addedToCart"));
+
+  // ── Fly to cart ──
+  if (_originEl) flyToCart(_originEl, image, () => {
+    window.openCart?.();
+    window.renderCart();
+    document.dispatchEvent(new CustomEvent("addedToCart"));
+  });
+  else {
+    window.openCart?.();
+    window.renderCart();
+    document.dispatchEvent(new CustomEvent("addedToCart"));
+  }
 };
+function flyToCart(originEl, imgSrc, onDone) {
+  const cartIconEl = document.querySelector(
+    "#cartIconDesktop, .icons a[href='/cart.php'], .bottom-bar-item[href='/cart.php']"
+  );
+  if (!cartIconEl) { onDone(); return; }
+
+  const or = originEl.getBoundingClientRect();
+  const cr = cartIconEl.getBoundingClientRect();
+
+  const fly = document.createElement("img");
+  fly.className = "fly-item";
+  fly.src = imgSrc;
+
+  const startX = or.left + or.width  / 2 - 30;
+  const startY = or.top  + or.height / 2 - 30;
+  const endX   = cr.left + cr.width  / 2 - 30;
+  const endY   = cr.top  + cr.height / 2 - 30;
+
+  fly.style.left = startX + "px";
+  fly.style.top  = startY + "px";
+  document.body.appendChild(fly);
+
+  const dur = 1100;   // ← était 680, maintenant 1100ms
+  const t0  = performance.now();
+
+  (function step(now) {
+    const t    = Math.min((now - t0) / dur, 1);
+    const ease = t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
+    const arc  = -160 * Math.sin(Math.PI * t);   // ← arc plus prononcé
+    const scale   = 1 - 0.55 * ease;
+    const opacity = t < 0.75 ? 1 : 1 - ((t - 0.75) / 0.25);
+
+    fly.style.transform = `translate(${(endX-startX)*ease}px, ${(endY-startY)*ease + arc}px) scale(${scale})`;
+    fly.style.opacity   = opacity;
+
+    if (t < 1) {
+      requestAnimationFrame(step);
+    } else {
+      fly.remove();
+      bumpCartBadge();
+      onDone();
+    }
+  })(t0);
+}
 
   // ─── PANIER — RENDU ──────────────────────────────────
   window.renderCart = () => {
@@ -410,14 +481,14 @@ document.addEventListener("DOMContentLoaded", () => {
           dotsEl.appendChild(dot);
         });
       }
-
-      addBtn.addEventListener("click", e => {
-        e.preventDefault();
-        e.stopPropagation();
-        addToCart({ productId, name, price, image, quantity: 1, shade: selectedShade });
-        picker.remove();
-        shadeBtn.style.display = "";
-      });
+addBtn.addEventListener("click", e => {
+  e.preventDefault();
+  e.stopPropagation();
+  const imgEl = card?.querySelector("img");   // ← ligne ajoutée
+  addToCart({ productId, name, price, image, quantity: 1, shade: selectedShade, _originEl: imgEl || addBtn });
+  picker.remove();
+  shadeBtn.style.display = "";
+});
 
     } else {
       // ── Modale (index, wishlist, ou toute page hors catalogue) ─
@@ -559,19 +630,19 @@ document.addEventListener("DOMContentLoaded", () => {
         cartBtn.innerHTML = `<i class="fas fa-shopping-bag"></i> Ajouter au panier`;
       }
     }
-
-    cartBtn.addEventListener("click", () => {
-      const { productId, name, price, image, stock, hasShades, selectedShade } = qvState;
-      if (stock === 0) return;
-      if (hasShades && !selectedShade) {
-        const shadesBlock = document.getElementById("qvShadesBlock");
-        shadesBlock?.classList.add("qv-shake");
-        setTimeout(() => shadesBlock?.classList.remove("qv-shake"), 500);
-        return;
-      }
-      addToCart({ productId, name, price, image, quantity: 1, shade: selectedShade });
-      closeQV();
-    });
+cartBtn.addEventListener("click", () => {
+  const { productId, name, price, image, stock, hasShades, selectedShade } = qvState;
+  if (stock === 0) return;
+  if (hasShades && !selectedShade) {
+    const shadesBlock = document.getElementById("qvShadesBlock");
+    shadesBlock?.classList.add("qv-shake");
+    setTimeout(() => shadesBlock?.classList.remove("qv-shake"), 500);
+    return;
+  }
+  const imgEl = document.getElementById("qvImg");   // ← ligne ajoutée
+  addToCart({ productId, name, price, image, quantity: 1, shade: selectedShade, _originEl: imgEl });
+  closeQV();
+});
 
     function closeQV() {
       overlay.classList.remove("active");
@@ -594,22 +665,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-
-  // ─── AJOUT PANIER DIRECT — avec vérification stock ───
-  document.body.addEventListener("click", e => {
-    const addBtn = e.target.closest(".add-to-cart");
-    if (!addBtn) return;
-    if (addBtn.closest("#productModal") || addBtn.closest(".qv-modal") || addBtn.closest(".inline-shade-picker")) return;
-    e.preventDefault();
-    if (isOutOfStock(addBtn)) return;
-    const data = getProductData(addBtn);
-    if (!data) return;
-    const wrapper  = addBtn.closest(".add-to-cart-wrapper");
-    const qtyInput = wrapper?.querySelector("input[name='quantity']");
-    const quantity = qtyInput ? Math.max(1, parseInt(qtyInput.value) || 1) : 1;
-    addToCart({ ...data, quantity });
-    if (qtyInput) qtyInput.value = 1;
-  });
+// ─── AJOUT PANIER DIRECT — avec vérification stock ───
+document.body.addEventListener("click", e => {
+  const addBtn = e.target.closest(".add-to-cart");
+  if (!addBtn) return;
+  if (addBtn.closest("#productModal") || addBtn.closest(".qv-modal") || addBtn.closest(".inline-shade-picker")) return;
+  e.preventDefault();
+  if (isOutOfStock(addBtn)) return;
+  const data = getProductData(addBtn);
+  if (!data) return;
+  const wrapper  = addBtn.closest(".add-to-cart-wrapper");
+  const qtyInput = wrapper?.querySelector("input[name='quantity']");
+  const quantity = qtyInput ? Math.max(1, parseInt(qtyInput.value) || 1) : 1;
+  const imgEl    = addBtn.closest(".product-card")?.querySelector("img");   // ← ligne ajoutée
+  addToCart({ ...data, quantity, _originEl: imgEl || addBtn });
+  if (qtyInput) qtyInput.value = 1;
+});
 
   // ─── CHECKOUT ────────────────────────────────────────
   document.body.addEventListener("click", e => {
@@ -627,6 +698,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ─── INIT ────────────────────────────────────────────
   window.renderCart();
   updateCartTotal();
+  bumpCartBadge();
 
 });
 

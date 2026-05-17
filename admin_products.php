@@ -1,7 +1,7 @@
 <?php
 // ============================================
 //  SheGlamour — Gestion Produits v3
-//  Avec image par teinte
+//  Avec image par teinte + sous_categorie
 // ============================================
 include_once __DIR__ . '/includes/db.php';
 include_once __DIR__ . '/includes/config.php';
@@ -146,12 +146,10 @@ if (isset($_GET['delete'])) {
         $imgRow->execute([$id]);
         deleteFile($imgRow->fetchColumn());
 
-        // Supprimer images des teintes
         $shImgs = $pdo->prepare("SELECT image FROM teintes WHERE product_id = ?");
         $shImgs->execute([$id]);
         foreach ($shImgs->fetchAll(PDO::FETCH_COLUMN) as $si) deleteFile($si);
 
-        // Supprimer images galerie
         $galImgs = $pdo->prepare("SELECT image FROM product_images WHERE product_id = ?");
         $galImgs->execute([$id]);
         foreach ($galImgs->fetchAll(PDO::FETCH_COLUMN) as $gi) deleteFile($gi);
@@ -166,16 +164,17 @@ if (isset($_GET['delete'])) {
 
 // ── Création produit complet ──────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'create_full') {
-    $name        = trim($_POST['name']        ?? '');
-    $description = trim($_POST['description'] ?? '');
-    $price       = (float) str_replace(',', '.', $_POST['price'] ?? 0);
-    $old_price   = (float) str_replace(',', '.', $_POST['old_price'] ?? 0);
-    $stock       = (int)  ($_POST['stock']    ?? 0);
-    $categorie   = trim($_POST['categorie']   ?? '');
-    $marque      = trim($_POST['marque']      ?? '');
-    $has_shades  = isset($_POST['has_shades']) ? 1 : 0;
-    $active      = isset($_POST['active'])    ? 1 : 0;
-    $shadesJson  = $_POST['shades_data']      ?? '[]';
+    $name          = trim($_POST['name']          ?? '');
+    $description   = trim($_POST['description']   ?? '');
+    $price         = (float) str_replace(',', '.', $_POST['price']     ?? 0);
+    $old_price     = (float) str_replace(',', '.', $_POST['old_price'] ?? 0);
+    $stock         = (int)  ($_POST['stock']       ?? 0);
+    $categorie     = trim($_POST['categorie']      ?? '');
+    $sous_categorie= trim($_POST['sous_categorie'] ?? '');
+    $marque        = trim($_POST['marque']         ?? '');
+    $has_shades    = isset($_POST['has_shades'])   ? 1 : 0;
+    $active        = isset($_POST['active'])       ? 1 : 0;
+    $shadesJson    = $_POST['shades_data']         ?? '[]';
 
     if (!$name || $price <= 0) {
         $error = "Le nom et le prix sont obligatoires.";
@@ -183,11 +182,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creat
         $imageUrl = uploadImage('image');
         if (!$error) {
             try {
-                $pdo->prepare("INSERT INTO products (name, description, price, old_price, stock, categorie, marque, has_shades, active, image_url) VALUES (?,?,?,?,?,?,?,?,?,?)")
-                    ->execute([$name, $description, $price, $old_price ?: null, $stock, $categorie, $marque, $has_shades, $active, $imageUrl]);
+                $pdo->prepare("INSERT INTO products (name, description, price, old_price, stock, categorie, sous_categorie, marque, has_shades, active, image_url) VALUES (?,?,?,?,?,?,?,?,?,?,?)")
+                    ->execute([$name, $description, $price, $old_price ?: null, $stock, $categorie, $sous_categorie, $marque, $has_shades, $active, $imageUrl]);
                 $newId = $pdo->lastInsertId();
 
-                // Teintes
                 $shades = json_decode($shadesJson, true) ?: [];
                 foreach ($shades as $idx => $sh) {
                     $nom   = trim($sh['nom']   ?? '');
@@ -202,7 +200,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creat
                 }
                 if ($shades) $pdo->prepare("UPDATE products SET has_shades=1 WHERE id=?")->execute([$newId]);
 
-                // Images galerie
                 $uploadDir = __DIR__ . '/images/';
                 if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
                 if (!empty($_FILES['extra_images']['name'][0])) {
@@ -224,25 +221,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creat
 
 // ── Mise à jour produit ───────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update_product') {
-    $id          = (int)   $_POST['id'];
-    $name        = trim($_POST['name']        ?? '');
-    $description = trim($_POST['description'] ?? '');
-    $price       = (float) str_replace(',', '.', $_POST['price']     ?? 0);
-    $old_price   = (float) str_replace(',', '.', $_POST['old_price'] ?? 0);
-    $stock       = (int)  ($_POST['stock']    ?? 0);
-    $categorie   = trim($_POST['categorie']   ?? '');
-    $marque      = trim($_POST['marque']      ?? '');
-    $has_shades  = isset($_POST['has_shades']) ? 1 : 0;
-    $active      = isset($_POST['active'])    ? 1 : 0;
+    $id            = (int)   $_POST['id'];
+    $name          = trim($_POST['name']          ?? '');
+    $description   = trim($_POST['description']   ?? '');
+    $price         = (float) str_replace(',', '.', $_POST['price']     ?? 0);
+    $old_price     = (float) str_replace(',', '.', $_POST['old_price'] ?? 0);
+    $stock         = (int)  ($_POST['stock']       ?? 0);
+    $categorie     = trim($_POST['categorie']      ?? '');
+    $sous_categorie= trim($_POST['sous_categorie'] ?? '');
+    $marque        = trim($_POST['marque']         ?? '');
+    $has_shades    = isset($_POST['has_shades'])   ? 1 : 0;
+    $active        = isset($_POST['active'])       ? 1 : 0;
 
     if (!$name || $price <= 0) { $error = "Le nom et le prix sont obligatoires."; }
     else {
         $existingImg = $_POST['existing_image'] ?? null;
-        $newImg = uploadImage('image', $existingImg);
+        $newImg  = uploadImage('image', $existingImg);
         $imageUrl = $newImg ?: $existingImg;
         try {
-            $pdo->prepare("UPDATE products SET name=?, description=?, price=?, old_price=?, stock=?, categorie=?, marque=?, has_shades=?, active=?, image_url=? WHERE id=?")
-                ->execute([$name, $description, $price, $old_price ?: null, $stock, $categorie, $marque, $has_shades, $active, $imageUrl, $id]);
+            $pdo->prepare("UPDATE products SET name=?, description=?, price=?, old_price=?, stock=?, categorie=?, sous_categorie=?, marque=?, has_shades=?, active=?, image_url=? WHERE id=?")
+                ->execute([$name, $description, $price, $old_price ?: null, $stock, $categorie, $sous_categorie, $marque, $has_shades, $active, $imageUrl, $id]);
             header("Location: admin_products.php?edit=$id&success=" . urlencode("Produit mis à jour."));
             exit;
         } catch (Exception $e) { $error = "Erreur BDD : " . $e->getMessage(); }
@@ -273,11 +271,13 @@ if (isset($_GET['edit'])) {
 }
 
 // ── Liste produits ────────────────────────────────────────────────────────────
-$search    = trim($_GET['q']   ?? '');
-$catFilter = trim($_GET['cat'] ?? '');
+$search         = trim($_GET['q']        ?? '');
+$catFilter      = trim($_GET['cat']      ?? '');
+$sousCatFilter  = trim($_GET['sous_cat'] ?? '');
 $where = []; $params = [];
-if ($search)    { $where[] = "(name ILIKE ? OR description ILIKE ?)"; $params[] = "%$search%"; $params[] = "%$search%"; }
-if ($catFilter) { $where[] = "categorie = ?"; $params[] = $catFilter; }
+if ($search)        { $where[] = "(name ILIKE ? OR description ILIKE ?)"; $params[] = "%$search%"; $params[] = "%$search%"; }
+if ($catFilter)     { $where[] = "categorie = ?";      $params[] = $catFilter; }
+if ($sousCatFilter) { $where[] = "sous_categorie = ?"; $params[] = $sousCatFilter; }
 $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 $productsStmt = $pdo->prepare("SELECT * FROM products $whereSql ORDER BY id DESC");
 $productsStmt->execute($params);
@@ -292,11 +292,12 @@ if ($products) {
     foreach ($sc->fetchAll(PDO::FETCH_ASSOC) as $r) $shadeCountMap[$r['product_id']] = (int)$r['cnt'];
 }
 
-$categories    = $pdo->query("SELECT DISTINCT categorie FROM products WHERE categorie IS NOT NULL AND categorie != '' ORDER BY categorie")->fetchAll(PDO::FETCH_COLUMN);
-$marques       = $pdo->query("SELECT DISTINCT marque    FROM products WHERE marque    IS NOT NULL AND marque    != '' ORDER BY marque")->fetchAll(PDO::FETCH_COLUMN);
-$totalProducts = count($products);
-$totalStock    = array_sum(array_column($products, 'stock'));
-$activeCount   = count(array_filter($products, fn($p) => $p['active']));
+$categories     = $pdo->query("SELECT DISTINCT categorie     FROM products WHERE categorie     IS NOT NULL AND categorie     != '' ORDER BY categorie")->fetchAll(PDO::FETCH_COLUMN);
+$sous_categories= $pdo->query("SELECT DISTINCT sous_categorie FROM products WHERE sous_categorie IS NOT NULL AND sous_categorie != '' ORDER BY sous_categorie")->fetchAll(PDO::FETCH_COLUMN);
+$marques        = $pdo->query("SELECT DISTINCT marque        FROM products WHERE marque        IS NOT NULL AND marque        != '' ORDER BY marque")->fetchAll(PDO::FETCH_COLUMN);
+$totalProducts  = count($products);
+$totalStock     = array_sum(array_column($products, 'stock'));
+$activeCount    = count(array_filter($products, fn($p) => $p['active']));
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -412,7 +413,7 @@ textarea.fi{resize:vertical;min-height:80px}
 
 /* ── TABLE ── */
 .tbl-wrap{overflow-x:auto}
-.tbl{width:100%;border-collapse:collapse;min-width:780px}
+.tbl{width:100%;border-collapse:collapse;min-width:860px}
 .tbl th{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:0 12px 13px;text-align:left;border-bottom:2px solid var(--border)}
 .tbl th:first-child{padding-left:0}
 .tbl td{padding:12px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13px;color:var(--text2)}
@@ -427,6 +428,7 @@ textarea.fi{resize:vertical;min-height:80px}
 .bdg-sh{background:var(--plum-bg);color:var(--plum);border:1px solid var(--plum-lt);text-decoration:none;transition:background .15s}
 .bdg-sh:hover{background:var(--plum-lt)}
 .bdg-brand{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-lt)}
+.bdg-scat{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-lt)}
 .stk-lo{color:var(--red);font-weight:800}
 .stk-ok{color:var(--green);font-weight:800}
 .stk-md{color:var(--amber);font-weight:800}
@@ -526,7 +528,7 @@ code{color:var(--rose);font-size:10px;font-family:monospace}
     <a class="nav-item active" href="admin_products.php"><span>✦</span> Produits</a>
     <a class="nav-item" href="index.php" target="_blank"><span>↗</span> Voir la boutique</a>
   </nav>
-  <div class="sidebar-footer">SheGlamour Admin · v3.0</div>
+  <div class="sidebar-footer">SheGlamour Admin · v3.1</div>
 </aside>
 
 <main class="main">
@@ -592,15 +594,21 @@ code{color:var(--rose);font-size:10px;font-family:monospace}
           </div>
 
           <div class="fg">
+            <label class="fl">Marque</label>
+            <input type="text" name="marque" class="fi" value="<?= htmlspecialchars($editProduct['marque'] ?? '') ?>" list="marqList" placeholder="Ex: L'Oréal…">
+            <datalist id="marqList"><?php foreach ($marques as $m): ?><option value="<?= htmlspecialchars($m) ?>"><?php endforeach; ?></datalist>
+          </div>
+
+          <div class="fg">
             <label class="fl">Catégorie</label>
             <input type="text" name="categorie" class="fi" value="<?= htmlspecialchars($editProduct['categorie'] ?? '') ?>" list="catList" placeholder="Ex: Lèvres…">
             <datalist id="catList"><?php foreach ($categories as $c): ?><option value="<?= htmlspecialchars($c) ?>"><?php endforeach; ?></datalist>
           </div>
 
           <div class="fg">
-            <label class="fl">Marque</label>
-            <input type="text" name="marque" class="fi" value="<?= htmlspecialchars($editProduct['marque'] ?? '') ?>" list="marqList" placeholder="Ex: L'Oréal…">
-            <datalist id="marqList"><?php foreach ($marques as $m): ?><option value="<?= htmlspecialchars($m) ?>"><?php endforeach; ?></datalist>
+            <label class="fl">Sous-catégorie</label>
+            <input type="text" name="sous_categorie" class="fi" value="<?= htmlspecialchars($editProduct['sous_categorie'] ?? '') ?>" list="sousCatList" placeholder="Ex: Rouge à lèvres…">
+            <datalist id="sousCatList"><?php foreach ($sous_categories as $sc): ?><option value="<?= htmlspecialchars($sc) ?>"><?php endforeach; ?></datalist>
           </div>
 
           <div class="fg full" style="gap:12px">
@@ -662,7 +670,6 @@ code{color:var(--rose);font-size:10px;font-family:monospace}
 
         <?php else: ?>
 
-          <!-- Liste teintes existantes -->
           <?php if ($editTeintes): ?>
           <div class="sh-grid">
             <?php foreach ($editTeintes as $t):
@@ -699,7 +706,6 @@ code{color:var(--rose);font-size:10px;font-family:monospace}
             <p style="color:var(--muted);font-size:13px;text-align:center;padding:10px 0 16px">Aucune teinte. Ajoutez-en une ci-dessous.</p>
           <?php endif; ?>
 
-          <!-- Formulaire ajout / édition teinte -->
           <div class="sh-form">
             <div style="font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px" id="shLbl">
               + Nouvelle teinte
@@ -707,7 +713,7 @@ code{color:var(--rose);font-size:10px;font-family:monospace}
             <form method="POST" enctype="multipart/form-data">
               <input type="hidden" name="action"               value="save_shade">
               <input type="hidden" name="product_id"           value="<?= $editProduct['id'] ?>">
-              <input type="hidden" name="shade_id"             id="shId"         value="<?= $editShade ? $editShade['id'] : '' ?>">
+              <input type="hidden" name="shade_id"             id="shId"          value="<?= $editShade ? $editShade['id'] : '' ?>">
               <input type="hidden" name="existing_shade_image" id="shExistingImg" value="<?= $editShade ? htmlspecialchars($editShade['image'] ?? '') : '' ?>">
 
               <div class="form-3">
@@ -872,7 +878,7 @@ code{color:var(--rose);font-size:10px;font-family:monospace}
           <span class="srch-ico">🔍</span>
           <input type="text" name="q" class="fi" placeholder="Rechercher un produit…" value="<?= htmlspecialchars($search) ?>">
         </div>
-        <select name="cat" class="fi" style="width:170px" onchange="this.form.submit()">
+        <select name="cat" class="fi" style="width:160px" onchange="this.form.submit()">
           <option value="">Toutes catégories</option>
           <?php foreach ($categories as $cat): ?>
             <option value="<?= htmlspecialchars($cat) ?>" <?= $catFilter === $cat ? 'selected' : '' ?>>
@@ -880,8 +886,16 @@ code{color:var(--rose);font-size:10px;font-family:monospace}
             </option>
           <?php endforeach; ?>
         </select>
+        <select name="sous_cat" class="fi" style="width:170px" onchange="this.form.submit()">
+          <option value="">Toutes sous-catégories</option>
+          <?php foreach ($sous_categories as $sc): ?>
+            <option value="<?= htmlspecialchars($sc) ?>" <?= $sousCatFilter === $sc ? 'selected' : '' ?>>
+              <?= htmlspecialchars($sc) ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
         <button type="submit" class="btn btn-ghost">Filtrer</button>
-        <?php if ($search || $catFilter): ?>
+        <?php if ($search || $catFilter || $sousCatFilter): ?>
           <a href="admin_products.php" class="btn btn-ghost">✕ Réinitialiser</a>
         <?php endif; ?>
       </div>
@@ -894,6 +908,7 @@ code{color:var(--rose);font-size:10px;font-family:monospace}
           <th>Nom</th>
           <th>Marque</th>
           <th>Catégorie</th>
+          <th>Sous-catégorie</th>
           <th>Prix</th>
           <th>Stock</th>
           <th>Teintes</th>
@@ -915,11 +930,11 @@ code{color:var(--rose);font-size:10px;font-family:monospace}
               <?php endif; ?>
             </td>
             <td>
-              <div style="font-weight:700;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)">
+              <div style="font-weight:700;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)">
                 <?= htmlspecialchars($p['name']) ?>
               </div>
               <?php if ($p['description'] ?? ''): ?>
-              <div style="font-size:11px;color:var(--muted);margin-top:2px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+              <div style="font-size:11px;color:var(--muted);margin-top:2px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
                 <?= htmlspecialchars($p['description']) ?>
               </div>
               <?php endif; ?>
@@ -930,6 +945,11 @@ code{color:var(--rose);font-size:10px;font-family:monospace}
               <?php else: ?><span style="color:var(--muted2)">—</span><?php endif; ?>
             </td>
             <td style="color:var(--muted);font-size:12px"><?= $p['categorie'] ? htmlspecialchars($p['categorie']) : '—' ?></td>
+            <td>
+              <?php if (!empty($p['sous_categorie'])): ?>
+                <span class="bdg bdg-scat"><?= htmlspecialchars($p['sous_categorie']) ?></span>
+              <?php else: ?><span style="color:var(--muted2)">—</span><?php endif; ?>
+            </td>
             <td style="font-weight:800;color:var(--rose);white-space:nowrap">
               <?= number_format($p['price'], 2, ',', ' ') ?> DA
             </td>
@@ -959,7 +979,7 @@ code{color:var(--rose);font-size:10px;font-family:monospace}
           </tr>
           <?php endforeach; ?>
           <?php if (!$products): ?>
-            <tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted)">Aucun produit trouvé</td></tr>
+            <tr><td colspan="10" style="text-align:center;padding:40px;color:var(--muted)">Aucun produit trouvé</td></tr>
           <?php endif; ?>
         </tbody>
       </table>
@@ -1017,14 +1037,19 @@ code{color:var(--rose);font-size:10px;font-family:monospace}
             <input type="number" name="stock" class="fi" value="0" min="0">
           </div>
           <div class="fg">
+            <label class="fl">Marque</label>
+            <input type="text" name="marque" class="fi" placeholder="Ex: L'Oréal, NYX…" list="addMarqList">
+            <datalist id="addMarqList"><?php foreach ($marques as $m): ?><option value="<?= htmlspecialchars($m) ?>"><?php endforeach; ?></datalist>
+          </div>
+          <div class="fg">
             <label class="fl">Catégorie</label>
             <input type="text" name="categorie" class="fi" placeholder="Ex: Lèvres, Yeux…" list="addCatList">
             <datalist id="addCatList"><?php foreach ($categories as $c): ?><option value="<?= htmlspecialchars($c) ?>"><?php endforeach; ?></datalist>
           </div>
           <div class="fg">
-            <label class="fl">Marque</label>
-            <input type="text" name="marque" class="fi" placeholder="Ex: L'Oréal, NYX…" list="addMarqList">
-            <datalist id="addMarqList"><?php foreach ($marques as $m): ?><option value="<?= htmlspecialchars($m) ?>"><?php endforeach; ?></datalist>
+            <label class="fl">Sous-catégorie</label>
+            <input type="text" name="sous_categorie" class="fi" placeholder="Ex: Rouge à lèvres…" list="addSousCatList">
+            <datalist id="addSousCatList"><?php foreach ($sous_categories as $sc): ?><option value="<?= htmlspecialchars($sc) ?>"><?php endforeach; ?></datalist>
           </div>
           <div class="fg full" style="gap:11px">
             <label class="fl">Options</label>
@@ -1061,11 +1086,9 @@ code{color:var(--rose);font-size:10px;font-family:monospace}
           Ajoutez autant de teintes que nécessaire. Chaque teinte peut avoir sa propre image, son stock et son prix.
         </p>
 
-        <!-- Liste des teintes ajoutées -->
         <div id="mShList" class="m-sh-list"></div>
         <p id="noShMsg" style="font-size:12px;color:var(--muted2);text-align:center;padding:10px 0">Aucune teinte ajoutée.</p>
 
-        <!-- Formulaire ajout teinte -->
         <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-top:4px">
           <div class="step-hd" style="margin-bottom:10px">+ Ajouter une teinte</div>
           <div class="form-3">
@@ -1105,10 +1128,7 @@ code{color:var(--rose);font-size:10px;font-family:monospace}
           </div>
         </div>
 
-        <!-- Strip d'aperçu des images de teintes -->
         <div class="shade-file-strip" id="shadeFileStrip"></div>
-
-        <!-- Input caché qui regroupe les fichiers images (rempli par JS via DataTransfer) -->
         <input type="file" name="shade_images[]" id="shadeImagesHidden"
                multiple accept="image/*" style="display:none">
 
@@ -1201,13 +1221,13 @@ function previewGalleryModal(input) {
 /* ════════════════════════════════
    GESTION TEINTES (MODAL CRÉATION)
 ════════════════════════════════ */
-let shades    = [];
-let shadeFiles = {}; // index => File object
+let shades     = [];
+let shadeFiles = {};
 
 function addShade() {
   const nom  = document.getElementById('mShNom').value.trim();
   const code = document.getElementById('mShCol').value;
-  const stk  = parseInt(document.getElementById('mShStk').value)  || 0;
+  const stk  = parseInt(document.getElementById('mShStk').value)   || 0;
   const prix = parseFloat(document.getElementById('mShPrix').value) || 0;
   const fileInput = document.getElementById('mShImg');
   if (!nom) { alert('Entrez un nom pour la teinte.'); return; }
@@ -1218,7 +1238,6 @@ function addShade() {
   shades.push({ nom, code, stock: stk, prix, hasImg });
   if (hasImg) shadeFiles[idx] = fileInput.files[0];
 
-  // Reset champs
   document.getElementById('mShNom').value  = '';
   document.getElementById('mShStk').value  = '0';
   document.getElementById('mShPrix').value = '0';
@@ -1232,7 +1251,6 @@ function addShade() {
 
 function removeShade(i) {
   shades.splice(i, 1);
-  // Réindexer shadeFiles
   const newFiles = {};
   Object.entries(shadeFiles).forEach(([k, v]) => {
     const ki = parseInt(k);
@@ -1245,9 +1263,9 @@ function removeShade(i) {
 }
 
 function renderShades() {
-  const list = document.getElementById('mShList');
-  const msg  = document.getElementById('noShMsg');
-  const cnt  = document.getElementById('cnt-sh');
+  const list  = document.getElementById('mShList');
+  const msg   = document.getElementById('noShMsg');
+  const cnt   = document.getElementById('cnt-sh');
   const strip = document.getElementById('shadeFileStrip');
 
   document.getElementById('shadesData').value = JSON.stringify(shades);
@@ -1277,7 +1295,6 @@ function renderShades() {
     </div>`;
   }).join('');
 
-  // Afficher les aperçus images dans les rows
   Object.entries(shadeFiles).forEach(([k, file]) => {
     const thumb = document.getElementById('shThumb_' + k);
     if (!thumb || !file) return;
@@ -1286,7 +1303,6 @@ function renderShades() {
     r.readAsDataURL(file);
   });
 
-  // Strip aperçu sous le formulaire d'ajout
   strip.innerHTML = '';
   Object.entries(shadeFiles).forEach(([k, file]) => {
     if (!file) return;
@@ -1310,13 +1326,8 @@ function syncShadeFilesInput() {
   const input = document.getElementById('shadeImagesHidden');
   if (!input || typeof DataTransfer === 'undefined') return;
   const dt = new DataTransfer();
-  // On insère les fichiers DANS L'ORDRE des index de shades
   shades.forEach((_, idx) => {
     if (shadeFiles[idx]) dt.items.add(shadeFiles[idx]);
-    else {
-      // Fichier "vide" : on pousse un fichier blanc pour maintenir l'index
-      // (le serveur PHP vérifiera UPLOAD_ERR_OK, donc un fichier vide sera ignoré)
-    }
   });
   try { input.files = dt.files; } catch(e) {}
 }
@@ -1333,7 +1344,6 @@ function loadShade(sh) {
   document.getElementById('shExistingImg').value = sh.image  || '';
   document.getElementById('colSw').style.background = sh.code_couleur;
 
-  // Aperçu image actuelle
   const wrap = document.getElementById('shCurrentImgWrap');
   const prev = document.getElementById('shImgPrev');
   if (wrap) {

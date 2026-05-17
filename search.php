@@ -1,7 +1,9 @@
 <?php
 $q = trim($_GET['q'] ?? '');
+?><?php
+$b = rtrim((isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'], '/');
+$q = trim($_GET['q'] ?? '');
 ?>
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -11,7 +13,7 @@ $q = trim($_GET['q'] ?? '');
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="index.css?v=<?php echo time(); ?>">
 <link rel="icon" type="image/png" href="<?= $b ?>/images/logofib.png">
-
+<script src="/js/shop.js" defer></script>
 <style>
 /* ============================= */
 /* BASE */
@@ -257,27 +259,35 @@ a:active {
 
 <div id="results" class="search-grid"></div>
 
-<script>
-fetch("/includes/search_products.php?query=<?= urlencode($q) ?>")
+<script>fetch("/includes/search_products.php?query=<?= urlencode($q) ?>")
   .then(res => res.json())
   .then(data => {
     const results = document.getElementById("results");
-
     if (!data.length) {
       results.innerHTML = `<p class="no-result">Aucun produit trouvé.</p>`;
       return;
     }
-
-    results.innerHTML = data.map(p => `
-      <a href="/product.php?id=${p.id}" class="search-card">
-        <img src="${p.image_url}" alt="${p.name}">
-        <h3>${p.name}</h3>
-        <div class="search-price">${parseFloat(p.price).toFixed(2)}DA</div>
-        <span class="search-btn">Voir le produit</span>
-      </a>
-    `).join("");
+    results.innerHTML = data.map(p => {
+      // Normalise le chemin : enlève tout préfixe et reconstruit proprement
+      const filename = p.image_url
+        ? p.image_url.split('/').pop().split('\\').pop()
+        : 'placeholder.jpg';
+      const imgSrc = `/images/${filename}`;
+      return `
+        <a href="/product.php?id=${p.id}" class="search-card">
+          <img src="${imgSrc}" alt="${p.name}" 
+               onerror="this.src='/images/placeholder.jpg'; this.onerror=null;">
+          <h3>${p.name}</h3>
+          <div class="search-price">${parseFloat(p.price).toFixed(2)} DA</div>
+          <span class="search-btn">Voir le produit</span>
+        </a>
+      `;
+    }).join("");
+  })
+  .catch(() => {
+    document.getElementById("results").innerHTML = 
+      `<p class="no-result">Erreur lors de la recherche.</p>`;
   });
 </script>
-
 </body>
 </html>
