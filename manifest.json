@@ -1,0 +1,26 @@
+{
+  "name": "SheGlamour Admin",
+  "short_name": "SheGlamour",
+  "description": "Tableau de bord administration SheGlamour",
+  "start_url": "/dashboard.php",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background": "transparent",
+  "theme_color": "#c4697a",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Ccircle cx='96' cy='96' r='96' fill='%23c4697a'/%3E%3Cpath d='M96 28C67 28 44 51 44 80c0 17 8 32 20 42v42h64v-42c12-10 20-25 20-42 0-29-23-52-52-52z' fill='%23f5c6cd'/%3E%3Cpath d='M96 48c-18 0-32 14-32 32 0 11 5 20 13 26v38h38v-38c8-6 13-15 13-26 0-18-14-32-32-32z' fill='%23e8899a'/%3E%3Ccircle cx='96' cy='80' r='20' fill='%23fff'/%3E%3Ccircle cx='88' cy='73' rx='7' ry='7' fill='%23fff' opacity='.4'/%3E%3Crect x='76' y='138' width='40' height='10' rx='5' fill='%23fff' opacity='.8'/%3E%3Crect x='82' y='148' width='28' height='8' rx='4' fill='%23fff' opacity='.5'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Ccircle cx='256' cy='256' r='256' fill='%23c4697a'/%3E%3Cpath d='M256 75C183 75 124 134 124 207c0 45 21 85 54 111v112h156v-112c33-26 54-66 54-111 0-73-59-132-132-132z' fill='%23f5c6cd'/%3E%3Cpath d='M256 128c-44 0-79 35-79 79 0 27 13 51 33 66v97h92v-97c20-15 33-39 33-66 0-44-35-79-79-79z' fill='%23e8899a'/%3E%3Ccircle cx='256' cy='207' r='48' fill='%23fff'/%3E%3Crect x='206' y='368' width='100' height='24' rx='12' fill='%23fff' opacity='.8'/%3E%3Crect x='218' y='392' width='76' height='18' rx='9' fill='%23fff' opacity='.5'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "lang": "fr"
+}
