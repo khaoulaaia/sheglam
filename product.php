@@ -145,9 +145,7 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
       <!-- Badge stock — mis à jour par JS quand une teinte est choisie -->
       <span class="stock-badge <?= $hasShades ? 'neutral' : ($outOfStock ? 'out' : ($stock <= 5 ? 'low' : 'in')) ?>"
             id="stockBadge">
-        <?php if ($hasShades): ?>
-          <i class="fas fa-palette"></i> Choisissez une teinte
-        <?php elseif ($outOfStock): ?>
+        <?php if ($outOfStock): ?>
           <i class="fas fa-times-circle"></i> Rupture de stock
         <?php elseif ($stock <= 5): ?>
           <i class="fas fa-exclamation-circle"></i> Plus que <?= $stock ?> en stock
@@ -180,8 +178,6 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
         </span>
         <span id="currentPriceEl"><?= number_format($basePrice, 2, ',', ' ') ?> DA</span>
       </p>
-
-      <p class="description"><?= htmlspecialchars($product['description']) ?></p>
 
       <!-- ── Boutons action ────────────────────────────────────────────── -->
       <div class="product-actions">
@@ -253,7 +249,10 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
                 <?= ($outOfStock && !$hasShades) ? 'disabled style="opacity:.5;cursor:not-allowed"' : '' ?>>
           <i class="fas fa-bolt"></i> Acheter maintenant
         </button>
-
+        
+<p class="description">
+  <?= nl2br(htmlspecialchars($product['description'])) ?>
+</p>
       </div><!-- .product-actions -->
 
       <!-- Partage -->
