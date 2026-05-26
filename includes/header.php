@@ -25,31 +25,14 @@
   --sans:       'Jost', system-ui, sans-serif;
   --ease:       cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --dur:        .38s;
-
-  /* ── Safe area (iPhone home bar) ── */
   --sai-bottom: env(safe-area-inset-bottom, 0px);
   --sai-top:    env(safe-area-inset-top,    0px);
-
-  /* ── Bottom bar height ── */
-  --bb-height: 62px;
+  --bb-height:  62px;
 }
 
-/* ═══════════════════════════════════
-   RESET
-═══════════════════════════════════ */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
 html { -webkit-text-size-adjust: 100%; }
-
-body {
-  font-family: var(--sans);
-  color: var(--text);
-  background: var(--white);
-  min-height: 200vh;
-  /* espace en bas = bottom bar + safe-area */
-  padding-bottom: 0;
-}
-
+body { font-family: var(--sans); color: var(--text); background: var(--white); min-height: 200vh; padding-bottom: 0; }
 a { text-decoration: none; color: inherit; }
 
 /* ═══════════════════════════════════
@@ -66,10 +49,7 @@ a { text-decoration: none; color: inherit; }
   padding: 0 5%;
   z-index: 2000;
   background: transparent;
-  transition:
-    background var(--dur) var(--ease),
-    box-shadow  var(--dur) var(--ease),
-    height      var(--dur) var(--ease);
+  transition: background var(--dur) var(--ease), box-shadow var(--dur) var(--ease), height var(--dur) var(--ease);
 }
 
 .header::after {
@@ -128,9 +108,8 @@ a { text-decoration: none; color: inherit; }
   height: 100%;
 }
 
-/* ── Wrapper de chaque item nav (pour positionner le mega-menu) ── */
 .nav-item {
-  position: static; /* mega-menu s'attache au header, pas à l'item */
+  position: static;
   height: 100%;
   display: flex;
   align-items: center;
@@ -171,30 +150,25 @@ a { text-decoration: none; color: inherit; }
 ═══════════════════════════════════ */
 .mega-menu {
   position: fixed;
-  top: 64px; /* colle sous le header scrolled */
+  top: 64px;
   left: 0;
   width: 100%;
   background: var(--cream);
   border-top: 1px solid var(--border);
   box-shadow: 0 20px 60px rgba(68,11,25,.10);
   z-index: 1900;
-  /* Animation */
   opacity: 0;
   transform: translateY(-8px);
   pointer-events: none;
-  transition:
-    opacity .28s var(--ease),
-    transform .28s var(--ease);
+  transition: opacity .28s var(--ease), transform .28s var(--ease);
 }
 
-/* Visible quand l'item est survolé */
 .nav-item:hover .mega-menu {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
 }
 
-/* Mega-menu ouvert → header forcé opaque même si pas encore scrollé */
 .header.mega-open {
   background: var(--cream) !important;
   box-shadow: 0 1px 0 var(--border), 0 10px 40px rgba(68, 11, 25, 0.06) !important;
@@ -206,12 +180,9 @@ a { text-decoration: none; color: inherit; }
 .header.mega-open .icons a { color: var(--bordeaux) !important; }
 
 .header.mega-open .nav-item > a::after { background: var(--bordeaux) !important; }
-
 .header.mega-open .menu-toggle span { background: var(--bordeaux) !important; }
-
 .header.mega-open #openSearch { color: var(--bordeaux) !important; }
 
-/* ── Position mega-menu selon état header ── */
 .header:not(.scrolled):not(.mega-open) .mega-menu { top: 72px; }
 .header.mega-open .mega-menu { top: 64px; }
 
@@ -223,7 +194,6 @@ a { text-decoration: none; color: inherit; }
   gap: 0;
 }
 
-/* ── Titre de la catégorie parente ── */
 .mega-title {
   width: 160px;
   flex-shrink: 0;
@@ -257,14 +227,10 @@ a { text-decoration: none; color: inherit; }
   gap: 6px;
   transition: color var(--dur), gap var(--dur);
 }
-.mega-title a.voir-tout::after {
-  content: '→';
-  transition: transform var(--dur);
-}
+.mega-title a.voir-tout::after { content: '→'; transition: transform var(--dur); }
 .mega-title a.voir-tout:hover { color: var(--bordeaux); }
 .mega-title a.voir-tout:hover::after { transform: translateX(4px); }
 
-/* ── Grille de sous-catégories ── */
 .mega-grid {
   flex: 1;
   padding-left: 36px;
@@ -276,7 +242,6 @@ a { text-decoration: none; color: inherit; }
 }
 .mega-grid::-webkit-scrollbar { display: none; }
 
-/* ── Carte sous-catégorie ── */
 .mega-card {
   flex: 1;
   min-width: 120px;
@@ -289,10 +254,7 @@ a { text-decoration: none; color: inherit; }
   color: var(--bordeaux);
   padding: 12px 10px 14px;
   border: 1px solid transparent;
-  transition:
-    border-color .25s var(--ease),
-    background .25s var(--ease),
-    transform .3s var(--ease);
+  transition: border-color .25s var(--ease), background .25s var(--ease), transform .3s var(--ease);
 }
 
 .mega-card:hover {
@@ -364,8 +326,7 @@ a { text-decoration: none; color: inherit; }
 #openSearch { color: var(--white) !important; }
 .header.scrolled #openSearch { color: var(--bordeaux) !important; }
 
-/* ── Badge panier desktop ── */
-.icons a[href="/cart.php"] { position: relative; }
+.icons a[href*="cart"] { position: relative; }
 
 .cart-count-badge {
   position: absolute;
@@ -463,7 +424,6 @@ a { text-decoration: none; color: inherit; }
   image-rendering: crisp-edges;
 }
 
-/* ── Tabs ── */
 .mobile-tabs { display: flex; border-bottom: 1px solid var(--border); }
 
 .tab-btn {
@@ -512,7 +472,6 @@ a { text-decoration: none; color: inherit; }
   margin-top: auto;
 }
 
-/* ── Fermer ── */
 .mobile-close {
   width: 34px; height: 34px;
   background: transparent;
@@ -564,15 +523,8 @@ a { text-decoration: none; color: inherit; }
 
 /* ═══════════════════════════════════
    BOTTOM BAR MOBILE
-   ── Correction du vide sous la barre ──
-   On utilise un wrapper qui :
-     1. occupe la hauteur fixe + la safe-area
-     2. a un fond plein qui couvre la zone sous le trait
-   Le contenu est centré dans les 62px fixes.
 ═══════════════════════════════════ */
-.mobile-bottom-bar {
-  display: none; /* affiché via media query */
-}
+.mobile-bottom-bar { display: none; }
 
 @media (max-width: 1024px) {
   .mobile-bottom-bar {
@@ -580,14 +532,11 @@ a { text-decoration: none; color: inherit; }
     position: fixed;
     bottom: 0; left: 0;
     width: 100%;
-    /* Hauteur totale = barre cliquable + safe-area iPhone */
     height: calc(var(--bb-height) + var(--sai-bottom));
-    /* Contenu aligné en haut dans les 62 px, pas dans la safe-area */
     align-items: flex-start;
     padding-top: 0;
     padding-left: 8px;
     padding-right: 8px;
-    /* Safe-area en bas = fond seulement, pas de contenu dedans */
     padding-bottom: var(--sai-bottom);
     background: var(--cream);
     border-top: 1px solid var(--border);
@@ -595,17 +544,14 @@ a { text-decoration: none; color: inherit; }
     z-index: 2900;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    /* Transition scroll hide/show */
     transition: transform .35s var(--ease);
     will-change: transform;
   }
 
-  /* Cachée en scrollant vers le bas */
   .mobile-bottom-bar.hidden {
     transform: translateY(calc(100% + var(--sai-bottom)));
   }
 
-  /* Couleur de fond identique sous la safe-area (évite le flash blanc) */
   @supports (padding-bottom: env(safe-area-inset-bottom)) {
     body::after {
       content: '';
@@ -620,12 +566,9 @@ a { text-decoration: none; color: inherit; }
     }
   }
 
-  body {
-    padding-bottom: calc(var(--bb-height) + var(--sai-bottom));
-  }
+  body { padding-bottom: calc(var(--bb-height) + var(--sai-bottom)); }
 }
 
-/* ── Items de la bottom bar ── */
 .bottom-bar-item {
   position: relative;
   flex: 1;
@@ -634,7 +577,6 @@ a { text-decoration: none; color: inherit; }
   align-items: center;
   justify-content: center;
   gap: 4px;
-  /* hauteur cliquable strictement sur les 62px, safe-area exclue */
   height: var(--bb-height);
   text-decoration: none;
   color: var(--bordeaux-l);
@@ -660,7 +602,6 @@ a { text-decoration: none; color: inherit; }
   background: var(--border);
 }
 
-/* ── Badge bottom bar ── */
 .bottom-bar-item .badge {
   display: none;
   position: absolute;
@@ -785,7 +726,6 @@ a { text-decoration: none; color: inherit; }
 
 .search-results-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 22px; }
 
-/* ── Search product card ── */
 .search-product {
   display: flex;
   flex-direction: column;
@@ -819,7 +759,7 @@ a { text-decoration: none; color: inherit; }
 .search-product strong { font-family: var(--sans); font-size: 11px; font-weight: 500; color: var(--bordeaux-l); letter-spacing: .08em; }
 
 /* ═══════════════════════════════════
-   FLY TO CART
+   FLY TO CART + BACK TO TOP
 ═══════════════════════════════════ */
 .fly-item {
   position: fixed;
@@ -840,12 +780,8 @@ a { text-decoration: none; color: inherit; }
   100% { transform: scale(1); }
 }
 
-/* ═══════════════════════════════════
-   BACK TO TOP
-═══════════════════════════════════ */
 .back-to-top {
   position: fixed;
-  /* Au-dessus de la bottom bar sur mobile, sinon coin bas-droite */
   right: 20px;
   bottom: calc(var(--bb-height) + var(--sai-bottom) + 16px);
   width: 44px; height: 44px;
@@ -858,44 +794,25 @@ a { text-decoration: none; color: inherit; }
   align-items: center;
   justify-content: center;
   z-index: 2800;
-  /* Caché par défaut */
   opacity: 0;
   pointer-events: none;
   transform: translateY(12px);
-  transition:
-    opacity .3s var(--ease),
-    transform .3s var(--ease),
-    background .2s var(--ease),
-    box-shadow .2s var(--ease);
+  transition: opacity .3s var(--ease), transform .3s var(--ease), background .2s var(--ease), box-shadow .2s var(--ease);
   box-shadow: 0 4px 18px rgba(68,11,25,.25);
 }
 
-.back-to-top.visible {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-
-.back-to-top:hover {
-  background: var(--bordeaux-s);
-  box-shadow: 0 8px 28px rgba(68,11,25,.35);
-  transform: translateY(-2px);
-}
-
+.back-to-top.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.back-to-top:hover { background: var(--bordeaux-s); box-shadow: 0 8px 28px rgba(68,11,25,.35); transform: translateY(-2px); }
 .back-to-top svg { width: 20px; height: 20px; display: block; }
 
-/* Sur desktop, placer la flèche un peu plus bas (pas de bottom bar) */
 @media (min-width: 1025px) {
-  .back-to-top {
-    bottom: 28px;
-  }
+  .back-to-top { bottom: 28px; }
 }
 
 /* ═══════════════════════════════════
    RESPONSIVE ≤ 1024px
 ═══════════════════════════════════ */
 @media (max-width: 1024px) {
-
   .navbar-desktop { display: none; }
 
   .header {
@@ -913,7 +830,6 @@ a { text-decoration: none; color: inherit; }
   }
 
   .logo img { height: 36px; max-width: 200px; }
-
   .menu-toggle { display: flex; }
 
   .icons {
@@ -924,7 +840,6 @@ a { text-decoration: none; color: inherit; }
 
   .icons .hide-mobile { display: none; }
 
-  /* Search overlay plein écran sur mobile */
   .search-overlay        { height: 100%; }
   .search-container      { padding: 78px 20px 120px; }
   .search-layout         { display: block; }
@@ -941,10 +856,8 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* ═══════════════════════════════════
-   MENU MOBILE — ACCORDÉON SOUS-CATÉGORIES
+   ACCORDÉON SOUS-CATÉGORIES MOBILE
 ═══════════════════════════════════ */
-
-/* Parent avec chevron */
 .mobile-cat-parent {
   display: flex;
   align-items: center;
@@ -973,7 +886,6 @@ a { text-decoration: none; color: inherit; }
   flex-shrink: 0;
 }
 
-/* Chevron */
 .mobile-cat-chevron {
   width: 28px; height: 28px;
   display: flex;
@@ -984,10 +896,8 @@ a { text-decoration: none; color: inherit; }
   transition: transform var(--dur) var(--ease), color var(--dur);
 }
 .mobile-cat-chevron svg { width: 14px; height: 14px; display: block; }
-
 .mobile-cat-parent.open .mobile-cat-chevron { transform: rotate(180deg); color: var(--bordeaux); }
 
-/* Sous-catégories : scroll horizontal */
 .mobile-sub-cats {
   display: none;
   overflow-x: auto;
@@ -1002,7 +912,6 @@ a { text-decoration: none; color: inherit; }
 .mobile-sub-cats::-webkit-scrollbar { display: none; }
 .mobile-sub-cats.open { display: flex; }
 
-/* Carte sous-catégorie mobile */
 .mobile-sub-card {
   flex-shrink: 0;
   width: 80px;
@@ -1050,7 +959,7 @@ a { text-decoration: none; color: inherit; }
 
   <nav class="navbar-desktop">
 
-    <!-- YEUX -->
+    <!-- ══ YEUX ══════════════════════════════════════════ -->
     <div class="nav-item">
       <a href="/categorie.php?categorie=Yeux">Yeux</a>
       <div class="mega-menu">
@@ -1060,24 +969,20 @@ a { text-decoration: none; color: inherit; }
             <a href="/categorie.php?categorie=Yeux" class="voir-tout">Voir tout</a>
           </div>
           <div class="mega-grid">
-            <a href="/categorie.php?categorie=Mascara" class="mega-card">
-              <img class="mega-card-img" src="/images/mascara.jpg" alt="Mascara" />
+            <a href="/categorie.php?categorie=Yeux&sous_categorie=Mascara" class="mega-card">
+              <img class="mega-card-img" src="/images/a7b4040e3bec3804a84236b940d2b23e.jpg" alt="Mascara" />
               <span class="mega-card-label">Mascara</span>
             </a>
-            <a href="/categorie.php?categorie=Eyeliner" class="mega-card">
-              <img class="mega-card-img" src="/images/eyeliner.jpg" alt="Eyeliner" />
+            <a href="/categorie.php?categorie=Yeux&sous_categorie=Eyeliner" class="mega-card">
+              <img class="mega-card-img" src="/images/f979aee3ba578f3909000067185b3316.jpg" alt="Eyeliner" />
               <span class="mega-card-label">Eyeliner</span>
             </a>
-            <a href="/categorie.php?categorie=Fard+à+paupières" class="mega-card">
-              <img class="mega-card-img" src="/images/eyeshadow.jpg" alt="Fard à paupières" />
+            <a href="/categorie.php?categorie=Yeux&sous_categorie=Fard+%C3%A0+paupi%C3%A8res" class="mega-card">
+              <img class="mega-card-img" src="/images/10ed1abc6626c9825706865840932cb6.jpg" alt="Fard à paupières" />
               <span class="mega-card-label">Fards à paupières</span>
             </a>
-            <a href="/categorie.php?categorie=Sourcils" class="mega-card">
-              <img class="mega-card-img" src="/images/sourcils.jpg" alt="Sourcils" />
-              <span class="mega-card-label">Sourcils</span>
-            </a>
-            <a href="/categorie.php?categorie=Faux+cils" class="mega-card">
-              <img class="mega-card-img" src="/images/fauxcils.jpg" alt="Faux cils" />
+            <a href="/categorie.php?categorie=Yeux&sous_categorie=Faux+cils" class="mega-card">
+              <img class="mega-card-img" src="/images/1809c840f477f5615588b0078d11d850.jpg" alt="Faux cils" />
               <span class="mega-card-label">Faux cils</span>
             </a>
           </div>
@@ -1085,38 +990,38 @@ a { text-decoration: none; color: inherit; }
       </div>
     </div>
 
-    <!-- LÈVRES -->
+    <!-- ══ LÈVRES ═════════════════════════════════════════ -->
     <div class="nav-item">
-      <a href="/categorie.php?categorie=Lèvres">Lèvres</a>
+      <a href="/categorie.php?categorie=L%C3%A8vres">Lèvres</a>
       <div class="mega-menu">
         <div class="mega-inner">
           <div class="mega-title">
             <span>Lèvres</span>
-            <a href="/categorie.php?categorie=Lèvres" class="voir-tout">Voir tout</a>
+            <a href="/categorie.php?categorie=L%C3%A8vres" class="voir-tout">Voir tout</a>
           </div>
           <div class="mega-grid">
-            <a href="/categorie.php?categorie=Rouge+à+lèvres" class="mega-card">
-              <img class="mega-card-img" src="/images/lips.jpg" alt="Rouge à lèvres" />
+            <a href="/categorie.php?categorie=L%C3%A8vres&sous_categorie=Rouge+%C3%A0+l%C3%A8vres" class="mega-card">
+              <img class="mega-card-img" src="/images/6689817b3ba3826c16ddd11397b7b6cd.jpg" alt="Rouge à lèvres" />
               <span class="mega-card-label">Rouge à lèvres</span>
             </a>
-            <a href="/categorie.php?categorie=Lip+gloss" class="mega-card">
-              <img class="mega-card-img" src="/images/lipgloss.jpg" alt="Lip gloss" />
+            <a href="/categorie.php?categorie=L%C3%A8vres&sous_categorie=Lip+gloss" class="mega-card">
+              <img class="mega-card-img" src="/images/4b8e450988049db493c7b314bd8e836a.jpg" alt="Lip gloss" />
               <span class="mega-card-label">Lip gloss</span>
             </a>
-            <a href="/categorie.php?categorie=Crayon+lèvres" class="mega-card">
-              <img class="mega-card-img" src="/images/lipliner.jpg" alt="Crayon lèvres" />
+            <a href="/categorie.php?categorie=L%C3%A8vres&sous_categorie=Crayon+l%C3%A8vres" class="mega-card">
+              <img class="mega-card-img" src="/images/999fba89e55fd0f749cbf578ea6d4da1.jpg" alt="Crayon lèvres" />
               <span class="mega-card-label">Crayon lèvres</span>
             </a>
-            <a href="/categorie.php?categorie=Baume" class="mega-card">
-              <img class="mega-card-img" src="/images/baume.jpg" alt="Baume" />
-              <span class="mega-card-label">Baume</span>
+            <a href="/categorie.php?categorie=L%C3%A8vres&sous_categorie=Huile+hydratante" class="mega-card">
+              <img class="mega-card-img" src="/images/ae4a7ac3ca9e2c14534b68d3c7c006bc.jpg" alt="Huile hydratante" />
+              <span class="mega-card-label">Huile hydratante</span>
             </a>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- TEINT -->
+    <!-- ══ TEINT ══════════════════════════════════════════ -->
     <div class="nav-item">
       <a href="/categorie.php?categorie=Teint">Teint</a>
       <div class="mega-menu">
@@ -1126,24 +1031,24 @@ a { text-decoration: none; color: inherit; }
             <a href="/categorie.php?categorie=Teint" class="voir-tout">Voir tout</a>
           </div>
           <div class="mega-grid">
-            <a href="/categorie.php?categorie=Fond+de+teint" class="mega-card">
+            <a href="/categorie.php?categorie=Teint&sous_categorie=Fond+de+teint" class="mega-card">
               <img class="mega-card-img" src="/images/teint.jpg" alt="Fond de teint" />
               <span class="mega-card-label">Fond de teint</span>
             </a>
-            <a href="/categorie.php?categorie=Blush" class="mega-card">
+            <a href="/categorie.php?categorie=Teint&sous_categorie=Blush" class="mega-card">
               <img class="mega-card-img" src="/images/blush.jpg" alt="Blush" />
               <span class="mega-card-label">Blush</span>
             </a>
-            <a href="/categorie.php?categorie=Highlighter" class="mega-card">
-              <img class="mega-card-img" src="/images/highlighter.jpg" alt="Highlighter" />
+            <a href="/categorie.php?categorie=Teint&sous_categorie=Highlighter" class="mega-card">
+              <img class="mega-card-img" src="/images/fa150d075d6691f0fcdbd87b3511174b.jpg" alt="Highlighter" />
               <span class="mega-card-label">Highlighter</span>
             </a>
-            <a href="/categorie.php?categorie=Poudre" class="mega-card">
-              <img class="mega-card-img" src="/images/poudre.jpg" alt="Poudre" />
+            <a href="/categorie.php?categorie=Teint&sous_categorie=Poudre" class="mega-card">
+              <img class="mega-card-img" src="/images/21394e84db546002b26ba61876ef3aa6.jpg" alt="Poudre" />
               <span class="mega-card-label">Poudre</span>
             </a>
-            <a href="/categorie.php?categorie=Contour" class="mega-card">
-              <img class="mega-card-img" src="/images/contour.jpg" alt="Contour" />
+            <a href="/categorie.php?categorie=Teint&sous_categorie=Contour" class="mega-card">
+              <img class="mega-card-img" src="/images/6756bb764fc537b8c2e0e70ad5303e69.jpg" alt="Contour" />
               <span class="mega-card-label">Contour</span>
             </a>
           </div>
@@ -1151,7 +1056,7 @@ a { text-decoration: none; color: inherit; }
       </div>
     </div>
 
-    <!-- ACCESSOIRES -->
+    <!-- ══ ACCESSOIRES ════════════════════════════════════ -->
     <div class="nav-item">
       <a href="/categorie.php?categorie=Accessoires">Accessoires</a>
       <div class="mega-menu">
@@ -1161,16 +1066,16 @@ a { text-decoration: none; color: inherit; }
             <a href="/categorie.php?categorie=Accessoires" class="voir-tout">Voir tout</a>
           </div>
           <div class="mega-grid">
-            <a href="/categorie.php?categorie=Pinceaux" class="mega-card">
-              <img class="mega-card-img" src="/images/acc.jpg" alt="Pinceaux" />
+            <a href="/categorie.php?categorie=Accessoires&sous_categorie=Pinceaux" class="mega-card">
+              <img class="mega-card-img" src="/images/7d48cbfe3ea32dfd182662c4b2467f54.jpg" alt="Pinceaux" />
               <span class="mega-card-label">Pinceaux</span>
             </a>
-            <a href="/categorie.php?categorie=Éponges" class="mega-card">
-              <img class="mega-card-img" src="/images/eponge.jpg" alt="Éponges" />
+            <a href="/categorie.php?categorie=Accessoires&sous_categorie=%C3%89ponges" class="mega-card">
+              <img class="mega-card-img" src="/images/acc.jpg" alt="Éponges" />
               <span class="mega-card-label">Éponges</span>
             </a>
-            <a href="/categorie.php?categorie=Trousses" class="mega-card">
-              <img class="mega-card-img" src="/images/trousse.jpg" alt="Trousses" />
+            <a href="/categorie.php?categorie=Accessoires&sous_categorie=Trousses" class="mega-card">
+              <img class="mega-card-img" src="/images/da358e248c5b2797bc679b6ea06f2d38.jpg" alt="Trousses" />
               <span class="mega-card-label">Trousses</span>
             </a>
           </div>
@@ -1191,7 +1096,7 @@ a { text-decoration: none; color: inherit; }
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
       </svg>
     </a>
-    <a href="/cart.php" class="hide-mobile" id="cartIconDesktop" aria-label="Panier">
+    <a href="/cart.php" class="hide-mobile" id="cartIconDesktop" aria-label="Panier" style="position:relative">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
         <line x1="3" y1="6" x2="21" y2="6"/>
@@ -1268,7 +1173,7 @@ a { text-decoration: none; color: inherit; }
 
   <div class="tab-content active" id="categories">
 
-    <!-- YEUX -->
+    <!-- ── YEUX ─────────────────────────────────────── -->
     <div class="mobile-cat-parent" data-sub="sub-yeux">
       <a href="/categorie.php?categorie=Yeux" class="mobile-cat-parent-left" onclick="event.stopPropagation()">
         <img src="/images/eyes.jpg" alt="Yeux" /><span>Yeux</span>
@@ -1278,16 +1183,15 @@ a { text-decoration: none; color: inherit; }
       </span>
     </div>
     <div class="mobile-sub-cats" id="sub-yeux">
-      <a href="/categorie.php?categorie=Mascara"        class="mobile-sub-card"><img src="/images/mascara.jpg"   alt="Mascara" /><span>Mascara</span></a>
-      <a href="/categorie.php?categorie=Eyeliner"       class="mobile-sub-card"><img src="/images/eyeliner.jpg"  alt="Eyeliner" /><span>Eyeliner</span></a>
-      <a href="/categorie.php?categorie=Fard+à+paupières" class="mobile-sub-card"><img src="/images/eyeshadow.jpg" alt="Fards" /><span>Fards</span></a>
-      <a href="/categorie.php?categorie=Sourcils"       class="mobile-sub-card"><img src="/images/sourcils.jpg"  alt="Sourcils" /><span>Sourcils</span></a>
-      <a href="/categorie.php?categorie=Faux+cils"      class="mobile-sub-card"><img src="/images/fauxcils.jpg"  alt="Faux cils" /><span>Faux cils</span></a>
+      <a href="/categorie.php?categorie=Yeux&sous_categorie=Mascara"               class="mobile-sub-card"><img src="/images/a7b4040e3bec3804a84236b940d2b23e.jpg" alt="Mascara" /><span>Mascara</span></a>
+      <a href="/categorie.php?categorie=Yeux&sous_categorie=Eyeliner"              class="mobile-sub-card"><img src="/images/f979aee3ba578f3909000067185b3316.jpg" alt="Eyeliner" /><span>Eyeliner</span></a>
+      <a href="/categorie.php?categorie=Yeux&sous_categorie=Fard+%C3%A0+paupi%C3%A8res" class="mobile-sub-card"><img src="/images/10ed1abc6626c9825706865840932cb6.jpg" alt="Fards" /><span>Fards</span></a>
+      <a href="/categorie.php?categorie=Yeux&sous_categorie=Faux+cils"             class="mobile-sub-card"><img src="/images/1809c840f477f5615588b0078d11d850.jpg" alt="Faux cils" /><span>Faux cils</span></a>
     </div>
 
-    <!-- LÈVRES -->
+    <!-- ── LÈVRES ────────────────────────────────────── -->
     <div class="mobile-cat-parent" data-sub="sub-levres">
-      <a href="/categorie.php?categorie=Lèvres" class="mobile-cat-parent-left" onclick="event.stopPropagation()">
+      <a href="/categorie.php?categorie=L%C3%A8vres" class="mobile-cat-parent-left" onclick="event.stopPropagation()">
         <img src="/images/lips.jpg" alt="Lèvres" /><span>Lèvres</span>
       </a>
       <span class="mobile-cat-chevron">
@@ -1295,13 +1199,13 @@ a { text-decoration: none; color: inherit; }
       </span>
     </div>
     <div class="mobile-sub-cats" id="sub-levres">
-      <a href="/categorie.php?categorie=Rouge+à+lèvres" class="mobile-sub-card"><img src="/images/lips.jpg"     alt="Rouge à lèvres" /><span>Rouge à lèvres</span></a>
-      <a href="/categorie.php?categorie=Lip+gloss"      class="mobile-sub-card"><img src="/images/lipgloss.jpg" alt="Lip gloss" /><span>Lip gloss</span></a>
-      <a href="/categorie.php?categorie=Crayon+lèvres"  class="mobile-sub-card"><img src="/images/lipliner.jpg" alt="Crayon" /><span>Crayon lèvres</span></a>
-      <a href="/categorie.php?categorie=Baume"          class="mobile-sub-card"><img src="/images/baume.jpg"    alt="Baume" /><span>Baume</span></a>
+      <a href="/categorie.php?categorie=L%C3%A8vres&sous_categorie=Rouge+%C3%A0+l%C3%A8vres" class="mobile-sub-card"><img src="/images/6689817b3ba3826c16ddd11397b7b6cd.jpg" alt="Rouge" /><span>Rouge à lèvres</span></a>
+      <a href="/categorie.php?categorie=L%C3%A8vres&sous_categorie=Lip+gloss"                class="mobile-sub-card"><img src="/images/4b8e450988049db493c7b314bd8e836a.jpg" alt="Lip gloss" /><span>Lip gloss</span></a>
+      <a href="/categorie.php?categorie=L%C3%A8vres&sous_categorie=Crayon+l%C3%A8vres"      class="mobile-sub-card"><img src="/images/999fba89e55fd0f749cbf578ea6d4da1.jpg" alt="Crayon" /><span>Crayon lèvres</span></a>
+      <a href="/categorie.php?categorie=L%C3%A8vres&sous_categorie=Huile+hydratante"        class="mobile-sub-card"><img src="/images/ae4a7ac3ca9e2c14534b68d3c7c006bc.jpg" alt="Huile" /><span>Huile hydratante</span></a>
     </div>
 
-    <!-- TEINT -->
+    <!-- ── TEINT ──────────────────────────────────────── -->
     <div class="mobile-cat-parent" data-sub="sub-teint">
       <a href="/categorie.php?categorie=Teint" class="mobile-cat-parent-left" onclick="event.stopPropagation()">
         <img src="/images/teint.jpg" alt="Teint" /><span>Teint</span>
@@ -1311,14 +1215,14 @@ a { text-decoration: none; color: inherit; }
       </span>
     </div>
     <div class="mobile-sub-cats" id="sub-teint">
-      <a href="/categorie.php?categorie=Fond+de+teint" class="mobile-sub-card"><img src="/images/teint.jpg"       alt="Fond de teint" /><span>Fond de teint</span></a>
-      <a href="/categorie.php?categorie=Blush"          class="mobile-sub-card"><img src="/images/blush.jpg"       alt="Blush" /><span>Blush</span></a>
-      <a href="/categorie.php?categorie=Highlighter"    class="mobile-sub-card"><img src="/images/highlighter.jpg" alt="Highlighter" /><span>Highlighter</span></a>
-      <a href="/categorie.php?categorie=Poudre"         class="mobile-sub-card"><img src="/images/poudre.jpg"      alt="Poudre" /><span>Poudre</span></a>
-      <a href="/categorie.php?categorie=Contour"        class="mobile-sub-card"><img src="/images/contour.jpg"     alt="Contour" /><span>Contour</span></a>
+      <a href="/categorie.php?categorie=Teint&sous_categorie=Fond+de+teint" class="mobile-sub-card"><img src="/images/teint.jpg"                              alt="Fond de teint" /><span>Fond de teint</span></a>
+      <a href="/categorie.php?categorie=Teint&sous_categorie=Blush"         class="mobile-sub-card"><img src="/images/blush.jpg"                              alt="Blush" /><span>Blush</span></a>
+      <a href="/categorie.php?categorie=Teint&sous_categorie=Highlighter"   class="mobile-sub-card"><img src="/images/fa150d075d6691f0fcdbd87b3511174b.jpg" alt="Highlighter" /><span>Highlighter</span></a>
+      <a href="/categorie.php?categorie=Teint&sous_categorie=Poudre"        class="mobile-sub-card"><img src="/images/21394e84db546002b26ba61876ef3aa6.jpg" alt="Poudre" /><span>Poudre</span></a>
+      <a href="/categorie.php?categorie=Teint&sous_categorie=Contour"       class="mobile-sub-card"><img src="/images/6756bb764fc537b8c2e0e70ad5303e69.jpg" alt="Contour" /><span>Contour</span></a>
     </div>
 
-    <!-- ACCESSOIRES -->
+    <!-- ── ACCESSOIRES ────────────────────────────────── -->
     <div class="mobile-cat-parent" data-sub="sub-acc">
       <a href="/categorie.php?categorie=Accessoires" class="mobile-cat-parent-left" onclick="event.stopPropagation()">
         <img src="/images/acc.jpg" alt="Accessoires" /><span>Accessoires</span>
@@ -1328,18 +1232,18 @@ a { text-decoration: none; color: inherit; }
       </span>
     </div>
     <div class="mobile-sub-cats" id="sub-acc">
-      <a href="/categorie.php?categorie=Pinceaux" class="mobile-sub-card"><img src="/images/acc.jpg"     alt="Pinceaux" /><span>Pinceaux</span></a>
-      <a href="/categorie.php?categorie=Éponges"  class="mobile-sub-card"><img src="/images/eponge.jpg"  alt="Éponges" /><span>Éponges</span></a>
-      <a href="/categorie.php?categorie=Trousses" class="mobile-sub-card"><img src="/images/trousse.jpg" alt="Trousses" /><span>Trousses</span></a>
+      <a href="/categorie.php?categorie=Accessoires&sous_categorie=Pinceaux"         class="mobile-sub-card"><img src="/images/7d48cbfe3ea32dfd182662c4b2467f54.jpg" alt="Pinceaux" /><span>Pinceaux</span></a>
+      <a href="/categorie.php?categorie=Accessoires&sous_categorie=%C3%89ponges"     class="mobile-sub-card"><img src="/images/acc.jpg"                              alt="Éponges" /><span>Éponges</span></a>
+      <a href="/categorie.php?categorie=Accessoires&sous_categorie=Trousses"         class="mobile-sub-card"><img src="/images/da358e248c5b2797bc679b6ea06f2d38.jpg" alt="Trousses" /><span>Trousses</span></a>
     </div>
 
-  </div>
+  </div><!-- #categories -->
 
   <div class="tab-content" id="brands">
-    <a href="/marque.php?marque=VelvetLab">VelvetLab</a>
-    <a href="/marque.php?marque=Rare%20Beauty">Rare Beauty</a>
-    <a href="/marque.php?marque=Maybelline">Maybelline</a>
-    <a href="/marque.php?marque=Huda%20Beauty">Huda Beauty</a>
+    <a href="/marque.php?marque=VelvetLab"        class="menu-item">VelvetLab</a>
+    <a href="/marque.php?marque=Rare%20Beauty"    class="menu-item">Rare Beauty</a>
+    <a href="/marque.php?marque=Maybelline"       class="menu-item">Maybelline</a>
+    <a href="/marque.php?marque=Huda%20Beauty"    class="menu-item">Huda Beauty</a>
   </div>
 
   <div class="mobile-footer">Beauté éditée avec soin ✦</div>
@@ -1388,7 +1292,7 @@ a { text-decoration: none; color: inherit; }
 
 
 <!-- =============================================
-     SCRIPTS
+     SCRIPTS (identiques à l'original)
 ============================================= -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -1408,9 +1312,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const mobileTagsBox = document.querySelector(".search-mobile-tags");
   const backToTop     = document.getElementById("backToTop");
 
-  /* ─────────────────────────────────
-     Scroll : header + swap logo + back-to-top
-  ───────────────────────────────── */
+  /* ── Scroll ── */
   const onScroll = () => {
     const scrolled = window.scrollY > 30;
     header.classList.toggle("scrolled", scrolled);
@@ -1424,19 +1326,11 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
-  /* Back to top — smooth scroll */
-  backToTop.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
+  backToTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 
-  /* ─────────────────────────────────
-     Bottom bar : masquer en descendant, afficher en remontant
-     Chrome Android redimensionne le viewport quand sa barre UI
-     disparaît → faux scroll "vers le haut" de quelques px.
-     On ignore les delta < THRESHOLD pour filtrer ce bruit.
-  ───────────────────────────────── */
+  /* ── Bottom bar hide on scroll down ── */
   const bottomBar = document.querySelector(".mobile-bottom-bar");
-  const THRESHOLD = 8; // px minimum pour considérer un vrai scroll
+  const THRESHOLD = 8;
   let lastScrollY = window.scrollY;
   let ticking = false;
 
@@ -1446,26 +1340,16 @@ document.addEventListener("DOMContentLoaded", () => {
     requestAnimationFrame(() => {
       const currentY = window.scrollY;
       const delta    = currentY - lastScrollY;
-
       if (Math.abs(delta) >= THRESHOLD) {
-        if (delta > 0 && currentY > 60) {
-          // Descente réelle → on cache
-          bottomBar.classList.add("hidden");
-        } else if (delta < 0) {
-          // Remontée réelle → on affiche
-          bottomBar.classList.remove("hidden");
-        }
+        if (delta > 0 && currentY > 60) bottomBar.classList.add("hidden");
+        else if (delta < 0)             bottomBar.classList.remove("hidden");
         lastScrollY = currentY;
       }
-
       ticking = false;
     });
   }, { passive: true });
 
-  /* ─────────────────────────────────
-     Mega-menu : force le header opaque à l'ouverture
-     (le hover CSS ne couvre pas le panel hors header)
-  ───────────────────────────────── */
+  /* ── Mega-menu : force header opaque ── */
   document.querySelectorAll(".nav-item").forEach(item => {
     item.addEventListener("mouseenter", () => {
       header.classList.add("mega-open");
@@ -1477,50 +1361,27 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  /* ─────────────────────────────────
-     Accordéon sous-catégories mobile
-  ───────────────────────────────── */
+  /* ── Accordéon sous-cats mobile ── */
   document.querySelectorAll(".mobile-cat-parent").forEach(parent => {
     parent.addEventListener("click", () => {
       const subId  = parent.dataset.sub;
       const sub    = document.getElementById(subId);
       const isOpen = sub.classList.contains("open");
-
-      // Ferme tous les autres
       document.querySelectorAll(".mobile-sub-cats.open").forEach(el => el.classList.remove("open"));
       document.querySelectorAll(".mobile-cat-parent.open").forEach(el => el.classList.remove("open"));
-
-      // Toggle celui-ci
-      if (!isOpen) {
-        sub.classList.add("open");
-        parent.classList.add("open");
-      }
+      if (!isOpen) { sub.classList.add("open"); parent.classList.add("open"); }
     });
   });
 
-  /* ─────────────────────────────────
-     Menu mobile
-  ───────────────────────────────── */
-  const openMenu = () => {
-    menuToggle.classList.add("active");
-    navbar.classList.add("active");
-    menuOverlay.classList.add("active");
-    document.body.style.overflow = "hidden";
-  };
-  const closeMenu = () => {
-    menuToggle.classList.remove("active");
-    navbar.classList.remove("active");
-    menuOverlay.classList.remove("active");
-    document.body.style.overflow = "";
-  };
+  /* ── Menu mobile ── */
+  const openMenu  = () => { menuToggle.classList.add("active"); navbar.classList.add("active"); menuOverlay.classList.add("active"); document.body.style.overflow = "hidden"; };
+  const closeMenu = () => { menuToggle.classList.remove("active"); navbar.classList.remove("active"); menuOverlay.classList.remove("active"); document.body.style.overflow = ""; };
 
   menuToggle.addEventListener("click",  () => navbar.classList.contains("active") ? closeMenu() : openMenu());
   menuOverlay.addEventListener("click", closeMenu);
   mobileClose.addEventListener("click", closeMenu);
 
-  /* ─────────────────────────────────
-     Tabs menu mobile
-  ───────────────────────────────── */
+  /* ── Tabs ── */
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
@@ -1530,9 +1391,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  /* ─────────────────────────────────
-     Recherches récentes
-  ───────────────────────────────── */
+  /* ── Recherches récentes ── */
   const getRecent  = () => JSON.parse(localStorage.getItem("recentSearches") || "[]");
   const saveRecent = (term) => {
     let list = getRecent();
@@ -1571,9 +1430,7 @@ document.addEventListener("DOMContentLoaded", () => {
     bindTagRedirect(mobileTagsBox);
   };
 
-  /* ─────────────────────────────────
-     Search overlay
-  ───────────────────────────────── */
+  /* ── Search overlay ── */
   openSearch.addEventListener("click", () => {
     searchOverlay.classList.add("active");
     document.body.style.overflow = "hidden";
@@ -1596,9 +1453,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  /* ─────────────────────────────────
-     Live search
-  ───────────────────────────────── */
+  /* ── Live search ── */
   let timer;
   input.addEventListener("input", () => {
     clearTimeout(timer);
@@ -1641,7 +1496,6 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 <script>
-  /* Badge panier — appelle bumpCartBadge() si définie dans shop.js */
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
       typeof bumpCartBadge === "function" && bumpCartBadge();

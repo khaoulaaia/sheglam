@@ -134,24 +134,27 @@ $topProducts = $pdo->query("
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 // ─── TOP TEINTES ──────────────────────────────────────────────────────────────
+
 $topShades = $pdo->query("
     SELECT oi.shade, oi.name AS product_name,
            SUM(oi.quantity) AS qty,
            SUM(oi.quantity * oi.unit_price) AS revenue,
-           t.code_couleur
+           t.code_couleur,
+           t.image AS shade_image
     FROM order_items oi
     LEFT JOIN teintes t ON t.nom_teinte = oi.shade
                        AND t.product_id = (
                            SELECT id FROM products WHERE name = oi.name LIMIT 1
                        )
     WHERE oi.shade IS NOT NULL AND oi.shade != ''
-    GROUP BY oi.shade, oi.name, t.code_couleur
+    GROUP BY oi.shade, oi.name, t.code_couleur, t.image
     ORDER BY qty DESC LIMIT 6
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 // ─── STOCK CRITIQUE ───────────────────────────────────────────────────────────
 $lowStockShades = $pdo->query("
-    SELECT t.nom_teinte, t.code_couleur, t.stock, t.prix,
+    SELECT t.nom_teinte, t.code_couleur, t.image AS shade_image,
+           t.stock, t.prix,
            p.name AS product_name, p.id AS product_id
     FROM teintes t
     JOIN products p ON p.id = t.product_id
@@ -199,6 +202,15 @@ function stockBadge($stock) {
     if ((int)$stock === 0) return "<span class='badge bdg-red'>Épuisé</span>";
     if ((int)$stock <= 3)  return "<span class='badge bdg-red'>Critique</span>";
     return "<span class='badge bdg-amber'>Faible</span>";
+}
+function shadeVisual(?string $image, ?string $couleur, string $baseUrl = '', int $size = 15, string $extra = ''): string {
+    $s = "width:{$size}px;height:{$size}px;border-radius:50%;border:2px solid #ede5de;display:inline-block;vertical-align:middle;overflow:hidden;flex-shrink:0;{$extra}";
+    if ($image) {
+        $src = str_starts_with($image, 'http') ? $image : $baseUrl . '/images/' . basename($image);
+        return "<span style=\"{$s}\"><img src=\"" . htmlspecialchars($src) . "\" alt=\"\" style=\"width:100%;height:100%;object-fit:cover;\"></span>";
+    }
+    $bg = htmlspecialchars($couleur ?? '#cccccc');
+    return "<span style=\"{$s}background:{$bg}\"></span>";
 }
 ?>
 <!DOCTYPE html>
@@ -881,21 +893,28 @@ body {
         <span style="font-size:11px;color:var(--muted)">par quantité</span>
       </div>
       <div class="card-body">
-        <?php if ($topShades): foreach ($topShades as $s): ?>
-        <div class="shade-row">
-          <span class="swatch" style="background:<?= htmlspecialchars($s['code_couleur'] ?? '#ccc') ?>"></span>
-          <div class="shade-info">
-            <div class="shade-name"><?= htmlspecialchars($s['shade']) ?></div>
-            <div class="shade-prod"><?= htmlspecialchars($s['product_name']) ?></div>
-          </div>
-          <div style="text-align:right">
-            <div class="shade-qty"><?= $s['qty'] ?> vendus</div>
-            <div style="font-size:11px;color:var(--muted)"><?= number_format($s['revenue'],0,',',' ') ?> DA</div>
-          </div>
-        </div>
-        <?php endforeach; else: ?>
-          <p class="empty">Aucune vente de teinte</p>
-        <?php endif; ?>
+       
+<?php if ($topShades): foreach ($topShades as $s): ?>
+<div class="shade-row">
+  <!-- Visuel : image OU couleur -->
+  <?= shadeVisual($s['shade_image'] ?? null, $s['code_couleur'] ?? null, $b, 36) ?>
+  <div class="shade-info">
+    <div class="shade-name"><?= htmlspecialchars($s['shade']) ?></div>
+    <div class="shade-prod"><?= htmlspecialchars($s['product_name']) ?></div>
+  </div>
+  <div style="text-align:right">
+    <div class="shade-qty"><?= $s['qty'] ?> vendus</div>
+    <div style="font-size:11px;color:var(--muted)"><?= number_format($s['revenue'],0,',',' ') ?> DA</div>
+    <?php if (!($s['shade_image'] ?? null) && ($s['code_couleur'] ?? null)): ?>
+      <div style="font-size:10px;color:var(--muted2)"><?= htmlspecialchars($s['code_couleur']) ?></div>
+    <?php elseif ($s['shade_image'] ?? null): ?>
+      <div style="font-size:10px;color:var(--blue)">🖼 Image</div>
+    <?php endif; ?>
+  </div>
+</div>
+<?php endforeach; else: ?>
+  <p class="empty">Aucune vente de teinte</p>
+<?php endif; ?>
       </div>
     </div>
 
@@ -905,25 +924,27 @@ body {
         <span style="font-size:11px;color:var(--red);font-weight:700">≤ 5 unités</span>
       </div>
       <div class="card-body">
-        <?php if ($lowStockShades): foreach ($lowStockShades as $s): ?>
-        <div class="stock-row">
-          <span class="swatch" style="background:<?= htmlspecialchars($s['code_couleur'] ?? '#ccc') ?>"></span>
-          <div class="stock-info">
-            <div class="stock-name"><?= htmlspecialchars($s['nom_teinte']) ?></div>
-            <div class="stock-prod">
-              <a href="admin_products.php?id=<?= $s['product_id'] ?>" style="color:var(--muted);text-decoration:none">
-                <?= htmlspecialchars($s['product_name']) ?>
-              </a>
-            </div>
-          </div>
-          <div style="text-align:right">
-            <div class="stock-qty"><?= $s['stock'] ?></div>
-            <?= stockBadge($s['stock']) ?>
-          </div>
-        </div>
-        <?php endforeach; else: ?>
-          <p class="empty" style="color:var(--green)">✅ Tous les stocks sont OK</p>
-        <?php endif; ?>
+       
+<?php if ($lowStockShades): foreach ($lowStockShades as $s): ?>
+<div class="stock-row">
+  <!-- Visuel : image OU couleur -->
+  <?= shadeVisual($s['shade_image'] ?? null, $s['code_couleur'] ?? null, $b, 32) ?>
+  <div class="stock-info">
+    <div class="stock-name"><?= htmlspecialchars($s['nom_teinte']) ?></div>
+    <div class="stock-prod">
+      <a href="admin_products.php?id=<?= $s['product_id'] ?>" style="color:var(--muted);text-decoration:none">
+        <?= htmlspecialchars($s['product_name']) ?>
+      </a>
+    </div>
+  </div>
+  <div style="text-align:right">
+    <div class="stock-qty"><?= $s['stock'] ?></div>
+    <?= stockBadge($s['stock']) ?>
+  </div>
+</div>
+<?php endforeach; else: ?>
+  <p class="empty" style="color:var(--green)">✅ Tous les stocks sont OK</p>
+<?php endif; ?>
       </div>
     </div>
   </div>
