@@ -567,6 +567,7 @@ button { font-family: inherit; cursor: pointer; border: none; }
   border: 1.5px solid var(--bordeaux);
   align-items: stretch;
   margin: 0 var(--section-px);
+  background: #F5F1EE;
 }
 
 .hype-left {

@@ -416,7 +416,6 @@
 /* ═══════════════════════════════════
    MOBILE  (≤ 600 px)
 ═══════════════════════════════════ */
-
 @media (max-width: 600px) {
 
   .product-modal {
@@ -427,82 +426,106 @@
   .product-modal-content {
     width: 100%;
     max-width: 100%;
-    max-height: 94vh;
-
-    padding: 20px 16px 28px;
-    gap: 20px;
+    max-height: 92vh;
+    padding: 16px 14px 24px;
+    gap: 14px;
     flex-direction: column;
+    border-radius: 18px 18px 0 0;
+    overflow-y: auto;
   }
 
+  .close-product-modal {
+    top: 12px;
+    right: 14px;
+    font-size: 22px;
+  }
+
+  /* LEFT : thumbnails en ligne, image compacte */
   .product-modal-left {
     flex-direction: column-reverse;
+    gap: 10px;
   }
 
   .thumbnails {
     flex-direction: row;
     overflow-x: auto;
+    gap: 8px;
     padding-bottom: 2px;
   }
 
   .thumbnails img {
-    width: 58px;
-    height: 58px;
+    width: 52px;
+    height: 52px;
     flex-shrink: 0;
   }
 
   .main-image {
-    min-height: 280px;
-    padding: 16px;
+    min-height: 200px;
+    max-height: 230px;
+    padding: 12px;
+    border-radius: 10px;
   }
 
   .main-image img {
-    max-width: 220px;
+    max-width: 180px;
+  }
+
+  /* RIGHT : tout compact */
+  .product-modal-right {
+    justify-content: flex-start;
   }
 
   .product-modal-right h2 {
-    font-size: 1.35rem;
+    font-size: 1.1rem;
+    margin-bottom: 6px;
   }
 
   .product-modal-right .price {
-    font-size: .95rem;
-    margin-bottom: 18px;
+    font-size: .9rem;
+    margin-bottom: 14px;
+  }
+
+  #shadeSection strong {
+    font-size: .78rem;
   }
 
   .shade-options {
     gap: 8px;
-    margin-bottom: 20px;
+    margin: 8px 0 16px;
   }
 
   .shade-option {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
   }
 
   .shade-color {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
   }
 
   .quantity-selector {
-    gap: 14px;
-    margin-bottom: 22px;
+    gap: 12px;
+    margin-bottom: 16px;
   }
 
   .quantity-selector button {
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
+    width: 34px;
+    height: 34px;
+    font-size: 17px;
+  }
+
+  .quantity-selector span {
+    font-size: .9rem;
   }
 
   .btn-primary {
-    padding: 14px;
+    padding: 13px;
     font-size: .72rem;
   }
 
-  .close-product-modal {
-    top: 16px;
-    right: 16px;
-    font-size: 24px;
+  .view-details-link {
+    font-size: .72rem;
   }
 }
 </style>

@@ -25,6 +25,23 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
   <link rel="stylesheet" href="<?= $b ?>/sidebar.css?v=<?= time() ?>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="icon" type="image/png" href="<?= $b ?>/images/logofib.png">
+  <!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1496845578585995');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 
@@ -147,8 +164,8 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <div class="featured-footer reveal">
-      <a href="<?= $b ?>/catalogue.php?pack=1" class="featured-cta">
-        <span>Voir tous les coffrets</span>
+     <a href="<?= $b ?>/categorie.php?categorie=Tous&pack=1" class="featured-cta">
+          <span>Voir tous les coffrets</span>
         <i class="fa-solid fa-arrow-right"></i>
       </a>
     </div>
@@ -265,8 +282,8 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
     <?php endif; ?>
 
     <div class="featured-footer reveal">
-      <a href="<?= $b ?>/catalogue.php" class="featured-cta">
-        <span>Voir toute la collection</span>
+    <a href="<?= $b ?>/categorie.php?categorie=Tous" class="featured-cta">
+          <span>Voir toute la collection</span>
         <i class="fa-solid fa-arrow-right"></i>
       </a>
     </div>
@@ -374,8 +391,8 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <div class="featured-footer reveal">
-      <a href="<?= $b ?>/catalogue.php?categorie=Tous&soldes=1" class="featured-cta">
-        <span>Voir toutes les promos</span>
+    <a href="<?= $b ?>/categorie.php?categorie=Tous&soldes=1" class="featured-cta">
+          <span>Voir toutes les promos</span>
         <i class="fa-solid fa-arrow-right"></i>
       </a>
     </div>

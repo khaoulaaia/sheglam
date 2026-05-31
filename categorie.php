@@ -5,9 +5,15 @@ $b = BASE_URL;
 
 $categorie      = $_GET['categorie']      ?? 'Tous';
 $sous_categorie = $_GET['sous_categorie'] ?? '';
+$pack           = isset($_GET['pack'])   && $_GET['pack']   == '1';
+$soldes         = isset($_GET['soldes']) && $_GET['soldes']  == '1';
 
 /* ── Requête produits ── */
-if ($categorie === 'Tous') {
+if ($pack) {
+    $query = $pdo->query("SELECT * FROM products WHERE is_pack = TRUE ORDER BY id ASC");
+} elseif ($soldes) {
+    $query = $pdo->query("SELECT * FROM products WHERE old_price IS NOT NULL AND old_price > price ORDER BY id ASC");
+} elseif ($categorie === 'Tous') {
     $query = $pdo->query("SELECT * FROM products ORDER BY id ASC");
 } elseif ($sous_categorie !== '') {
     $stmt = $pdo->prepare("SELECT * FROM products WHERE categorie = :categorie AND sous_categorie = :sous ORDER BY id ASC");
@@ -21,7 +27,7 @@ if ($categorie === 'Tous') {
 
 /* ── Sous-catégories disponibles + compteur ── */
 $sous_cats = [];
-if ($categorie !== 'Tous') {
+if (!$pack && !$soldes && $categorie !== 'Tous') {
     $scStmt = $pdo->prepare(
         "SELECT sous_categorie, COUNT(*) AS cnt
          FROM products
@@ -39,12 +45,30 @@ if ($categorie !== 'Tous') {
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title><?= htmlspecialchars($categorie) ?> - SheGlamour</title>
+  <title>
+    <?= $pack ? 'Coffrets' : ($soldes ? 'Promotions' : htmlspecialchars($categorie)) ?> - SheGlamour
+  </title>
   <link rel="stylesheet" href="<?= $b ?>/categorie.css?v=<?= time() ?>">
   <link rel="stylesheet" href="<?= $b ?>/sidebar.css?v=<?= time() ?>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="icon" type="image/png" href="<?= $b ?>/images/logofib.png">
-
+  <!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1496845578585995');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
   <style>
   .sous-cats-bar {
     display: flex;
@@ -184,14 +208,22 @@ if ($categorie !== 'Tous') {
 
   <section class="products-section">
     <h1>
-      <?= htmlspecialchars($categorie) ?>
-      <?= $sous_categorie ? ' — ' . htmlspecialchars($sous_categorie) : '' ?>
+      <?php
+        if ($pack)               echo 'Coffrets';
+        elseif ($soldes)         echo 'Promotions';
+        elseif ($sous_categorie) echo htmlspecialchars($categorie) . ' — ' . htmlspecialchars($sous_categorie);
+        else                     echo htmlspecialchars($categorie);
+      ?>
     </h1>
 
     <!-- Breadcrumb -->
     <nav class="breadcrumb">
       <a href="<?= $b ?>/index.php">Accueil</a> &gt;
-      <?php if ($categorie === 'Tous'): ?>
+      <?php if ($pack): ?>
+        <span>Coffrets</span>
+      <?php elseif ($soldes): ?>
+        <span>Promotions</span>
+      <?php elseif ($categorie === 'Tous'): ?>
         <span>Tous les produits</span>
       <?php else: ?>
         <a href="<?= $b ?>/categorie.php?categorie=Tous">Tous</a> &gt;
@@ -211,7 +243,6 @@ if ($categorie !== 'Tous') {
     <div class="sous-cats-bar">
 
       <?php
-        /* Compte total de la catégorie parente (pill "Tout") */
         $totalStmt = $pdo->prepare("SELECT COUNT(*) FROM products WHERE categorie = ?");
         $totalStmt->execute([$categorie]);
         $totalCat = (int)$totalStmt->fetchColumn();
@@ -262,23 +293,37 @@ if ($categorie !== 'Tous') {
               ? $product['image_url']
               : $b . '/images/' . basename($product['image_url']));
 
-        /* ── Teintes : on récupère image ET image_url ── */
+        /* ── Teintes : récupère image ET image_url ── */
         $shadeStmt = $pdo->prepare(
             "SELECT nom_teinte, code_couleur, image, image_url
              FROM teintes
              WHERE product_id = ?"
         );
         $shadeStmt->execute([$productId]);
-        $productShades = $shadeStmt->fetchAll(PDO::FETCH_ASSOC);
-        $hasShades     = !empty($productShades);
+        $rawShades = $shadeStmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $oldPrice = $product['old_price'] ?? '';
+        /* ── Normalisation des URLs d'images de teintes ── */
+        $productShades = [];
+        foreach ($rawShades as $shade) {
+            /* Priorité : colonne image > image_url > code_couleur */
+            $rawImg = !empty($shade['image']) ? $shade['image']
+                    : (!empty($shade['image_url']) ? $shade['image_url'] : null);
+
+            $shade['_img_src'] = $rawImg
+                ? (str_starts_with($rawImg, 'http') ? $rawImg : $b . '/images/' . basename($rawImg))
+                : null;
+
+            $productShades[] = $shade;
+        }
+
+        $hasShades = !empty($productShades);
+        $oldPrice  = $product['old_price'] ?? '';
       ?>
 
       <div class="product-card"
            data-price="<?= $product['price'] ?>"
            data-brand="<?= htmlspecialchars($product['marque'] ?? '') ?>"
-           data-sale="<?= !empty($product['is_sale']) ? '1' : '0' ?>"
+           data-sale="<?= (!empty($oldPrice) && $oldPrice > $product['price']) ? '1' : '0' ?>"
            data-stock="<?= $stock ?>"
            data-instock="<?= $outOfStock ? '0' : '1' ?>">
 
@@ -350,27 +395,21 @@ if ($categorie !== 'Tous') {
           <!-- ── Pastilles teintes ── -->
           <?php if (!empty($productShades)): ?>
             <div class="card-shades">
-              <?php foreach (array_slice($productShades, 0, 6) as $shade):
-                /* Priorité : image > image_url > code_couleur */
-                $shadeImg = $shade['image'] ?? $shade['image_url'] ?? null;
-              ?>
-                <?php if ($shadeImg): ?>
-                  <?php
-                    $shadeImgSrc = str_starts_with($shadeImg, 'http')
-                      ? $shadeImg
-                      : $b . '/images/' . basename($shadeImg);
-                  ?>
-                  <span class="card-shade-dot card-shade-dot--img"
-                        title="<?= htmlspecialchars($shade['nom_teinte']) ?>"
-                        style="background-image:url('<?= htmlspecialchars($shadeImgSrc) ?>')">
-                  </span>
-                <?php else: ?>
-                  <span class="card-shade-dot"
-                        style="background:<?= htmlspecialchars($shade['code_couleur'] ?? '#ccc') ?>"
-                        title="<?= htmlspecialchars($shade['nom_teinte']) ?>">
-                  </span>
-                <?php endif; ?>
-              <?php endforeach; ?>
+             <?php foreach (array_slice($productShades, 0, 6) as $shade):
+  $oosClass = (isset($shade['stock']) && (int)$shade['stock'] === 0) ? ' shade-oos' : '';
+?>
+  <?php if ($shade['_img_src']): ?>
+    <span class="card-shade-dot card-shade-dot--img<?= $oosClass ?>"
+          title="<?= htmlspecialchars($shade['nom_teinte']) ?>"
+          style="background-image:url('<?= htmlspecialchars($shade['_img_src']) ?>')">
+    </span>
+  <?php else: ?>
+    <span class="card-shade-dot<?= $oosClass ?>"
+          style="background:<?= htmlspecialchars($shade['code_couleur'] ?? '#ccc') ?>"
+          title="<?= htmlspecialchars($shade['nom_teinte']) ?>">
+    </span>
+  <?php endif; ?>
+<?php endforeach; ?>
               <?php if (count($productShades) > 6): ?>
                 <span class="card-shade-more">+<?= count($productShades) - 6 ?></span>
               <?php endif; ?>
@@ -504,11 +543,12 @@ document.addEventListener('DOMContentLoaded', () => {
     return Number(v).toLocaleString('fr-DZ', { minimumFractionDigits: 2 }) + ' DA';
   }
 
+  /* Priorité : _img_src (déjà calculé côté PHP) > image > image_url > null */
   function shadeImgSrc(shade) {
-    /* Priorité : image > image_url */
+    if (shade._img_src) return shade._img_src;
     const raw = shade.image || shade.image_url || null;
     if (!raw) return null;
-    return raw.startsWith('http') ? raw : BASE + '/images/' + raw;
+    return raw.startsWith('http') ? raw : BASE + '/images/' + raw.split('/').pop();
   }
 
   function openQV(btn) {
@@ -566,12 +606,10 @@ document.addEventListener('DOMContentLoaded', () => {
         dot.title = s.nom_teinte || '';
 
         if (src) {
-          /* teinte image */
-          dot.style.backgroundImage  = `url('${src}')`;
-          dot.style.backgroundSize   = 'cover';
+          dot.style.backgroundImage    = `url('${src}')`;
+          dot.style.backgroundSize     = 'cover';
           dot.style.backgroundPosition = 'center';
         } else {
-          /* teinte couleur */
           dot.style.background = s.code_couleur || '#ccc';
         }
 
