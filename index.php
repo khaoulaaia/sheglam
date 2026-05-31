@@ -632,23 +632,19 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
           <div class="review-avatar">SB</div>
           <div>
             <p class="review-name">Sara B.</p>
-            <p class="review-date review-date--live" data-days="3">
-              Alger — <span class="days-ago"></span>
-            </p>
+            
           </div>
         </div>
       </div>
 
       <div class="review-card">
         <div class="review-stars">★★★★★</div>
-        <p class="review-text">« La livraison a arrivé super vite et l'emballage trop beau, on dirait un cadeau ! Les produits exactement comme les photos, ana radia 100% ! »</p>
+        <p class="review-text">« La livraison a arrivé super vite et l'emballage trop beau, on dirait un cadeau ! Les produits exactement comme les photos, ana radia a 100% ! »</p>
         <div class="review-author">
           <div class="review-avatar">LM</div>
           <div>
             <p class="review-name">Lina M.</p>
-            <p class="review-date review-date--live" data-days="7">
-              Oran — <span class="days-ago"></span>
-            </p>
+            
           </div>
         </div>
       </div>
@@ -660,23 +656,19 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
           <div class="review-avatar">NR</div>
           <div>
             <p class="review-name">Nour R.</p>
-            <p class="review-date review-date--live" data-days="14">
-              Constantine — <span class="days-ago"></span>
-            </p>
+            
           </div>
         </div>
       </div>
 
       <div class="review-card">
         <div class="review-stars">★★★★★</div>
-        <p class="review-text">« J'avais peur de commander en ligne mais SheGlamour m'a convaincue — le mascara c'est le meilleur que j'ai testé ! »</p>
+        <p class="review-text">« J'avais peur de commander en ligne mais SheGlamour m'a convaincue, le mascara c'est le meilleur que j'ai testé ! »</p>
         <div class="review-author">
           <div class="review-avatar">AM</div>
           <div>
             <p class="review-name">Amira M.</p>
-            <p class="review-date review-date--live" data-days="2">
-              Annaba — <span class="days-ago"></span>
-            </p>
+            
           </div>
         </div>
       </div>
@@ -688,23 +680,19 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
           <div class="review-avatar">RK</div>
           <div>
             <p class="review-name">Rania K.</p>
-            <p class="review-date review-date--live" data-days="5">
-              Sétif — <span class="days-ago"></span>
-            </p>
+           
           </div>
         </div>
       </div>
 
       <div class="review-card">
         <div class="review-stars">★★★★★</div>
-        <p class="review-text">« Commande arrivée en 3 jours à Tizi, c'est ouf ! La palette des yeux — les couleurs pigmentées, tient toute la nuit même à la fête. Merci SheGlamour ! »</p>
+        <p class="review-text">« Commande arrivée en 2 jours à Tizi, super rapide yatikom saha »</p>
         <div class="review-author">
           <div class="review-avatar">DH</div>
           <div>
             <p class="review-name">Djamila H.</p>
-            <p class="review-date review-date--live" data-days="10">
-              Tizi Ouzou — <span class="days-ago"></span>
-            </p>
+            
           </div>
         </div>
       </div>

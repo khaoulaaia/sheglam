@@ -8,7 +8,6 @@ $sous_categorie = $_GET['sous_categorie'] ?? '';
 $pack           = isset($_GET['pack'])   && $_GET['pack']   == '1';
 $soldes         = isset($_GET['soldes']) && $_GET['soldes']  == '1';
 
-/* ── Requête produits ── */
 if ($pack) {
     $query = $pdo->query("SELECT * FROM products WHERE is_pack = TRUE ORDER BY id ASC");
 } elseif ($soldes) {
@@ -25,7 +24,6 @@ if ($pack) {
     $query = $stmt;
 }
 
-/* ── Sous-catégories disponibles + compteur ── */
 $sous_cats = [];
 if (!$pack && !$soldes && $categorie !== 'Tous') {
     $scStmt = $pdo->prepare(
@@ -53,84 +51,109 @@ if (!$pack && !$soldes && $categorie !== 'Tous') {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="icon" type="image/png" href="<?= $b ?>/images/logofib.png">
   <!-- Meta Pixel Code -->
-<script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '1496845578585995');
-fbq('track', 'PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
-/></noscript>
-<!-- End Meta Pixel Code -->
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '1496845578585995');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"/></noscript>
+  <!-- End Meta Pixel Code -->
+
   <style>
+  /* ── Pills sous-catégories ── */
   .sous-cats-bar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin: 0 0 24px;
-    padding-bottom: 16px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin: 0 0 24px; padding-bottom: 16px;
     border-bottom: 1px solid rgba(68,11,25,.12);
   }
-
   .sous-cat-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 18px;
-    border: 1px solid rgba(68,11,25,.25);
-    border-radius: 999px;
-    background: transparent;
-    color: #6e1a2e;
-    font-family: var(--sans, 'DM Sans', system-ui, sans-serif);
-    font-size: .7rem;
-    font-weight: 500;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background .22s ease, border-color .22s ease,
-                color .22s ease, box-shadow .22s ease, transform .2s ease;
-    white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 18px; border: 1px solid rgba(68,11,25,.25); border-radius: 999px;
+    background: transparent; color: #6e1a2e;
+    font-size: .7rem; font-weight: 500; letter-spacing: .14em;
+    text-transform: uppercase; text-decoration: none; white-space: nowrap; cursor: pointer;
+    transition: background .22s, border-color .22s, color .22s, box-shadow .22s, transform .2s;
   }
-
   .sous-cat-pill:hover {
-    border-color: #440B19;
-    color: #440B19;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(68,11,25,.12);
+    border-color: #440B19; color: #440B19;
+    transform: translateY(-1px); box-shadow: 0 4px 14px rgba(68,11,25,.12);
   }
-
   .sous-cat-pill.active {
-    background: #440B19;
-    border-color: #440B19;
-    color: #F5F1EE;
+    background: #440B19; border-color: #440B19; color: #F5F1EE;
     box-shadow: 0 4px 18px rgba(68,11,25,.22);
   }
-
   .pill-count {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 5px;
-    border-radius: 99px;
-    background: rgba(68,11,25,.12);
-    font-size: .6rem;
-    font-weight: 600;
-    letter-spacing: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px;
+    background: rgba(68,11,25,.12); font-size: .6rem; font-weight: 600; letter-spacing: 0;
+  }
+  .sous-cat-pill.active .pill-count { background: rgba(255,255,255,.22); }
+
+  /* ── QV shade dots ── */
+  .qv-shade-dot {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 2px solid transparent; cursor: pointer; flex-shrink: 0;
+    position: relative; overflow: hidden; display: inline-block;
+    transition: border-color .2s, transform .2s, box-shadow .2s;
+  }
+  .qv-shade-dot:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(68,11,25,.20); }
+  .qv-shade-dot.active { border-color: #440B19; box-shadow: 0 6px 16px rgba(68,11,25,.28); }
+  .qv-shade-dot img {
+    width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;
+  }
+  .qv-shade-dot--oos { opacity: 0.38; cursor: not-allowed; }
+  .qv-shade-dot--oos::after {
+    content: ''; position: absolute; inset: 0; border-radius: 50%;
+    background: repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(0,0,0,.28) 3px,rgba(0,0,0,.28) 4px);
   }
 
-  .sous-cat-pill.active .pill-count {
-    background: rgba(255,255,255,.22);
+  /* Nom de teinte sélectionnée dans QV */
+  .qv-shades-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .qv-shades-title { font-size: .75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #440B19; }
+  .qv-selected-shade-name { font-size: .82rem; color: #5c1225; font-style: italic; }
+
+  /* ── ISP dots (picker inline) ── */
+  .isp-dot { position: relative; overflow: hidden; }
+  .isp-dot--oos { opacity: 0.38; cursor: not-allowed; }
+  .isp-dot--oos::after {
+    content: ''; position: absolute; inset: 0; border-radius: 50%;
+    background: repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(0,0,0,.28) 3px,rgba(0,0,0,.28) 4px);
+  }
+
+  /* ── Mobile QV ── */
+  @media (max-width: 600px) {
+    .qv-overlay { align-items: flex-end !important; padding: 0 !important; }
+    .qv-modal {
+      width: 100% !important; max-width: 100% !important; max-height: 90vh !important;
+      border-radius: 18px 18px 0 0 !important; flex-direction: column !important;
+      overflow-y: auto; padding: 16px 14px 28px !important; gap: 14px !important;
+    }
+    .qv-col-image {
+      width: 100%; max-height: 220px; display: flex; align-items: center;
+      justify-content: center; border-radius: 10px; overflow: hidden; flex-shrink: 0;
+    }
+    #qvImg { max-height: 200px; width: auto; max-width: 100%; object-fit: contain; }
+    .qv-col-info { width: 100%; }
+    .qv-name { font-size: 1.1rem !important; }
+    .qv-brand { font-size: .7rem !important; }
+    .qv-price { font-size: .95rem !important; }
+    .qv-description {
+      font-size: .82rem;
+      display: -webkit-box; -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .qv-shades-row { gap: 8px; }
+    .qv-shade-dot { width: 30px !important; height: 30px !important; }
+    .qv-cart-btn { width: 100%; padding: 13px !important; font-size: .75rem !important; }
+    .qv-close { top: 12px !important; right: 14px !important; font-size: 22px !important; }
   }
   </style>
 </head>
@@ -146,7 +169,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
   <!-- SIDEBAR FILTRES -->
   <aside class="filter-sidebar" id="filterSidebar">
     <h3>Filtres</h3>
-
     <div class="filter-group">
       <label for="sortPrice">Prix</label>
       <select id="sortPrice">
@@ -155,31 +177,22 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
         <option value="desc">Décroissant</option>
       </select>
     </div>
-
     <div class="filter-group toggle-group">
       <span>Produits en solde</span>
       <label class="switch">
-        <input type="checkbox" id="filterSale">
-        <span class="slider"></span>
+        <input type="checkbox" id="filterSale"><span class="slider"></span>
       </label>
     </div>
-
     <div class="filter-group toggle-group">
       <span>En stock uniquement</span>
       <label class="switch">
-        <input type="checkbox" id="filterInStock">
-        <span class="slider"></span>
+        <input type="checkbox" id="filterInStock"><span class="slider"></span>
       </label>
     </div>
-
     <div class="filter-group">
       <label for="filterBrand">Marque</label>
-      <select id="filterBrand">
-        <option value="">Toutes</option>
-      </select>
+      <select id="filterBrand"><option value="">Toutes</option></select>
     </div>
-
-    <!-- Produits populaires -->
     <div class="filter-group best-sellers">
       <h4>Produits populaires</h4>
       <ul>
@@ -216,7 +229,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
       ?>
     </h1>
 
-    <!-- Breadcrumb -->
     <nav class="breadcrumb">
       <a href="<?= $b ?>/index.php">Accueil</a> &gt;
       <?php if ($pack): ?>
@@ -228,9 +240,7 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
       <?php else: ?>
         <a href="<?= $b ?>/categorie.php?categorie=Tous">Tous</a> &gt;
         <?php if ($sous_categorie): ?>
-          <a href="<?= $b ?>/categorie.php?categorie=<?= urlencode($categorie) ?>">
-            <?= htmlspecialchars($categorie) ?>
-          </a> &gt;
+          <a href="<?= $b ?>/categorie.php?categorie=<?= urlencode($categorie) ?>"><?= htmlspecialchars($categorie) ?></a> &gt;
           <span><?= htmlspecialchars($sous_categorie) ?></span>
         <?php else: ?>
           <span><?= htmlspecialchars($categorie) ?></span>
@@ -238,10 +248,8 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
       <?php endif; ?>
     </nav>
 
-    <!-- ── Pills sous-catégories ── -->
     <?php if (!empty($sous_cats)): ?>
     <div class="sous-cats-bar">
-
       <?php
         $totalStmt = $pdo->prepare("SELECT COUNT(*) FROM products WHERE categorie = ?");
         $totalStmt->execute([$categorie]);
@@ -249,10 +257,8 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
       ?>
       <a href="<?= $b ?>/categorie.php?categorie=<?= urlencode($categorie) ?>"
          class="sous-cat-pill <?= $sous_categorie === '' ? 'active' : '' ?>">
-        Tout
-        <span class="pill-count"><?= $totalCat ?></span>
+        Tout <span class="pill-count"><?= $totalCat ?></span>
       </a>
-
       <?php foreach ($sous_cats as $sc): ?>
       <a href="<?= $b ?>/categorie.php?categorie=<?= urlencode($categorie) ?>&sous_categorie=<?= urlencode($sc['sous_categorie']) ?>"
          class="sous-cat-pill <?= $sous_categorie === $sc['sous_categorie'] ? 'active' : '' ?>">
@@ -260,7 +266,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
         <span class="pill-count"><?= (int)$sc['cnt'] ?></span>
       </a>
       <?php endforeach; ?>
-
     </div>
     <?php endif; ?>
 
@@ -268,7 +273,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
       <i class="fas fa-sliders-h"></i> Filtres
     </button>
 
-    <!-- Contrôles vue -->
     <div class="filter-controls">
       <div class="view-toggle">
         <button class="view-btn active" data-view="grid" title="Grille">
@@ -281,7 +285,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
     </div>
 
     <div class="products-grid">
-
       <?php while ($product = $query->fetch(PDO::FETCH_ASSOC)):
         $productId  = $product['id'];
         $stock      = (int)($product['stock'] ?? 0);
@@ -293,26 +296,24 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
               ? $product['image_url']
               : $b . '/images/' . basename($product['image_url']));
 
-        /* ── Teintes : récupère image ET image_url ── */
-        $shadeStmt = $pdo->prepare(
-            "SELECT nom_teinte, code_couleur, image, image_url
-             FROM teintes
-             WHERE product_id = ?"
-        );
+        /* Teintes — colonnes exactes de la table */
+        $shadeStmt = $pdo->prepare("
+            SELECT nom_teinte, code_couleur,
+                   image,
+                   COALESCE(stock, 0) AS stock
+            FROM teintes
+            WHERE product_id = ?
+        ");
         $shadeStmt->execute([$productId]);
         $rawShades = $shadeStmt->fetchAll(PDO::FETCH_ASSOC);
 
-        /* ── Normalisation des URLs d'images de teintes ── */
         $productShades = [];
         foreach ($rawShades as $shade) {
-            /* Priorité : colonne image > image_url > code_couleur */
-            $rawImg = !empty($shade['image']) ? $shade['image']
-                    : (!empty($shade['image_url']) ? $shade['image_url'] : null);
-
-            $shade['_img_src'] = $rawImg
-                ? (str_starts_with($rawImg, 'http') ? $rawImg : $b . '/images/' . basename($rawImg))
+            $raw = !empty($shade['image']) ? $shade['image'] : null;
+            $shade['_img_src'] = $raw
+                ? (str_starts_with($raw, 'http') ? $raw : $b . '/images/' . basename($raw))
                 : null;
-
+            $shade['stock'] = (int)$shade['stock'];
             $productShades[] = $shade;
         }
 
@@ -328,13 +329,11 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
            data-instock="<?= $outOfStock ? '0' : '1' ?>">
 
         <div class="product-image-wrapper">
-
           <?php if ($outOfStock): ?>
             <span class="badge-oos">Rupture</span>
           <?php elseif ($stock <= 5): ?>
             <span class="badge-low">Stock limité</span>
           <?php endif; ?>
-
           <?php if (!empty($oldPrice) && $oldPrice > $product['price']): ?>
             <?php $pct = round((1 - $product['price'] / $oldPrice) * 100); ?>
             <span class="badge-sale">-<?= $pct ?>%</span>
@@ -352,8 +351,7 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
                   data-price="<?= htmlspecialchars($product['price']) ?>"
                   data-image_url="<?= htmlspecialchars($imagePath) ?>"
                   data-has-shades="<?= $hasShades ? 1 : 0 ?>"
-                  type="button"
-                  aria-label="Ajouter aux favoris">
+                  type="button" aria-label="Ajouter aux favoris">
             <i class="fas fa-heart"></i>
           </button>
 
@@ -369,16 +367,13 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
                   data-shades="<?= htmlspecialchars(json_encode($productShades), ENT_QUOTES) ?>"
                   data-description="<?= htmlspecialchars($product['description'] ?? '') ?>"
                   data-url="<?= $productUrl ?>"
-                  type="button"
-                  aria-label="Aperçu rapide">
+                  type="button" aria-label="Aperçu rapide">
             <i class="fas fa-eye"></i>
             <span>Aperçu rapide</span>
           </button>
-
         </div>
 
         <div class="product-info">
-
           <a href="<?= $productUrl ?>" class="product-card-title-link">
             <h3><?= htmlspecialchars($product['name']) ?></h3>
           </a>
@@ -392,24 +387,24 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
             <?php endif; ?>
           </p>
 
-          <!-- ── Pastilles teintes ── -->
+          <!-- Pastilles teintes -->
           <?php if (!empty($productShades)): ?>
             <div class="card-shades">
-             <?php foreach (array_slice($productShades, 0, 6) as $shade):
-  $oosClass = (isset($shade['stock']) && (int)$shade['stock'] === 0) ? ' shade-oos' : '';
-?>
-  <?php if ($shade['_img_src']): ?>
-    <span class="card-shade-dot card-shade-dot--img<?= $oosClass ?>"
-          title="<?= htmlspecialchars($shade['nom_teinte']) ?>"
-          style="background-image:url('<?= htmlspecialchars($shade['_img_src']) ?>')">
-    </span>
-  <?php else: ?>
-    <span class="card-shade-dot<?= $oosClass ?>"
-          style="background:<?= htmlspecialchars($shade['code_couleur'] ?? '#ccc') ?>"
-          title="<?= htmlspecialchars($shade['nom_teinte']) ?>">
-    </span>
-  <?php endif; ?>
-<?php endforeach; ?>
+              <?php foreach (array_slice($productShades, 0, 6) as $shade):
+                $oosClass = $shade['stock'] === 0 ? ' shade-oos' : '';
+              ?>
+                <?php if ($shade['_img_src']): ?>
+                  <span class="card-shade-dot card-shade-dot--img<?= $oosClass ?>"
+                        title="<?= htmlspecialchars($shade['nom_teinte']) ?>"
+                        style="background-image:url('<?= htmlspecialchars($shade['_img_src']) ?>')">
+                  </span>
+                <?php else: ?>
+                  <span class="card-shade-dot<?= $oosClass ?>"
+                        style="background:<?= htmlspecialchars($shade['code_couleur'] ?? '#ccc') ?>"
+                        title="<?= htmlspecialchars($shade['nom_teinte']) ?>">
+                  </span>
+                <?php endif; ?>
+              <?php endforeach; ?>
               <?php if (count($productShades) > 6): ?>
                 <span class="card-shade-more">+<?= count($productShades) - 6 ?></span>
               <?php endif; ?>
@@ -425,8 +420,7 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
                     data-price="<?= htmlspecialchars($product['price']) ?>"
                     data-image_url="<?= htmlspecialchars($imagePath) ?>"
                     data-stock="<?= $stock ?>"
-                    type="button"
-                    <?= $outOfStock ? 'disabled' : '' ?>>
+                    type="button" <?= $outOfStock ? 'disabled' : '' ?>>
               <i class="fas fa-<?= $outOfStock ? 'ban' : 'palette' ?>"></i>
               <?= $outOfStock ? 'Rupture de stock' : 'Choisir une teinte' ?>
             </button>
@@ -437,52 +431,43 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
                     data-price="<?= htmlspecialchars($product['price']) ?>"
                     data-image_url="<?= htmlspecialchars($imagePath) ?>"
                     data-stock="<?= $stock ?>"
-                    type="button"
-                    <?= $outOfStock ? 'disabled' : '' ?>>
+                    type="button" <?= $outOfStock ? 'disabled' : '' ?>>
               <i class="fas fa-<?= $outOfStock ? 'ban' : 'shopping-bag' ?>"></i>
               <?= $outOfStock ? 'Rupture de stock' : 'Ajouter au panier' ?>
             </button>
           <?php endif; ?>
-
         </div>
       </div>
-
       <?php endwhile; ?>
     </div>
   </section>
-
 </div>
 
-
-<!-- ══ MODALE APERÇU RAPIDE ══════════════════════════════════════════ -->
+<!-- ══ QUICK VIEW ══ -->
 <div class="qv-overlay" id="qvOverlay" role="dialog" aria-modal="true" aria-label="Aperçu rapide">
   <div class="qv-modal" id="qvModal">
-
     <button class="qv-close" id="qvClose" aria-label="Fermer">&times;</button>
-
     <div class="qv-col-image">
       <img id="qvImg" src="" alt="" loading="lazy">
       <span class="qv-badge" id="qvBadge"></span>
     </div>
-
     <div class="qv-col-info">
       <span class="qv-brand" id="qvBrand"></span>
       <h2 class="qv-name" id="qvName"></h2>
       <div class="qv-price" id="qvPrice"></div>
-
       <div class="qv-stock-line">
         <span class="qv-stock-dot" id="qvStockDot"></span>
         <span class="qv-stock-label" id="qvStockLabel"></span>
       </div>
-
       <div class="qv-divider"></div>
       <p class="qv-description" id="qvDescription"></p>
-
       <div class="qv-shades-block" id="qvShadesBlock">
-        <span class="qv-shades-title">Teintes disponibles</span>
+        <div class="qv-shades-header">
+          <span class="qv-shades-title">Teinte :</span>
+          <span class="qv-selected-shade-name" id="qvSelectedShadeName"></span>
+        </div>
         <div class="qv-shades-row" id="qvShadesRow"></div>
       </div>
-
       <div class="qv-actions">
         <button class="qv-cart-btn" id="qvCartBtn" type="button"></button>
         <a class="qv-detail-link" id="qvDetailLink" href="#">
@@ -490,35 +475,23 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
         </a>
       </div>
     </div>
-
   </div>
 </div>
 
-
 <script>
-/* ══ Sidebar filtres mobile ══════════════════════════════════ */
+/* ══ Sidebar filtres mobile ══ */
 document.addEventListener('DOMContentLoaded', () => {
   const sidebar   = document.getElementById('filterSidebar');
   const toggleBtn = document.querySelector('.filter-toggle-btn');
   const overlay   = document.querySelector('.filter-overlay');
-
-  toggleBtn?.addEventListener('click', () => {
-    sidebar.classList.add('active');
-    overlay.classList.add('active');
-  });
-  overlay?.addEventListener('click', () => {
-    sidebar.classList.remove('active');
-    overlay.classList.remove('active');
-  });
+  toggleBtn?.addEventListener('click', () => { sidebar.classList.add('active'); overlay.classList.add('active'); });
+  overlay?.addEventListener('click', () => { sidebar.classList.remove('active'); overlay.classList.remove('active'); });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      sidebar.classList.remove('active');
-      overlay.classList.remove('active');
-    }
+    if (e.key === 'Escape') { sidebar.classList.remove('active'); overlay.classList.remove('active'); }
   });
 });
 
-/* ══ Vue grille / liste ══════════════════════════════════════ */
+/* ══ Vue grille / liste ══ */
 document.addEventListener('DOMContentLoaded', () => {
   const grid        = document.querySelector('.products-grid');
   const viewButtons = document.querySelectorAll('.view-btn');
@@ -530,151 +503,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
-
-/* ══ APERÇU RAPIDE ═══════════════════════════════════════════ */
-document.addEventListener('DOMContentLoaded', () => {
-  const overlay    = document.getElementById('qvOverlay');
-  const closeBtn   = document.getElementById('qvClose');
-  const cartBtn    = document.getElementById('qvCartBtn');
-  const detailLink = document.getElementById('qvDetailLink');
-  const BASE       = '<?= addslashes($b) ?>';
-
-  function fmtDA(v) {
-    return Number(v).toLocaleString('fr-DZ', { minimumFractionDigits: 2 }) + ' DA';
-  }
-
-  /* Priorité : _img_src (déjà calculé côté PHP) > image > image_url > null */
-  function shadeImgSrc(shade) {
-    if (shade._img_src) return shade._img_src;
-    const raw = shade.image || shade.image_url || null;
-    if (!raw) return null;
-    return raw.startsWith('http') ? raw : BASE + '/images/' + raw.split('/').pop();
-  }
-
-  function openQV(btn) {
-    const id          = btn.dataset.productId;
-    const name        = btn.dataset.name;
-    const price       = parseFloat(btn.dataset.price);
-    const oldPrice    = parseFloat(btn.dataset.oldPrice);
-    const image       = btn.dataset.image;
-    const brand       = btn.dataset.brand;
-    const stock       = parseInt(btn.dataset.stock, 10);
-    const hasShades   = btn.dataset.hasShades === '1';
-    const url         = btn.dataset.url;
-    const description = btn.dataset.description || '';
-
-    const imgEl = document.getElementById('qvImg');
-    imgEl.src = ''; requestAnimationFrame(() => { imgEl.src = image; imgEl.alt = name; });
-
-    document.getElementById('qvBrand').textContent       = brand || '';
-    document.getElementById('qvName').textContent        = name;
-    document.getElementById('qvDescription').textContent = description;
-
-    const priceEl = document.getElementById('qvPrice');
-    priceEl.innerHTML = (!isNaN(oldPrice) && oldPrice > price)
-      ? `<span class="qv-old">${fmtDA(oldPrice)}</span><span class="qv-current">${fmtDA(price)}</span>`
-      : `<span class="qv-normal">${fmtDA(price)}</span>`;
-
-    const badge      = document.getElementById('qvBadge');
-    const stockDot   = document.getElementById('qvStockDot');
-    const stockLabel = document.getElementById('qvStockLabel');
-    if (stock === 0) {
-      badge.textContent = 'Rupture'; badge.className = 'qv-badge qv-badge--oos';
-      stockDot.className = 'qv-stock-dot qv-dot--out'; stockLabel.textContent = 'Rupture de stock';
-    } else if (stock <= 5) {
-      badge.textContent = 'Stock limité'; badge.className = 'qv-badge qv-badge--low';
-      stockDot.className = 'qv-stock-dot qv-dot--low';
-      stockLabel.textContent = `Seulement ${stock} restant${stock > 1 ? 's' : ''}`;
-    } else {
-      badge.textContent = ''; badge.className = 'qv-badge';
-      stockDot.className = 'qv-stock-dot qv-dot--in'; stockLabel.textContent = 'En stock';
-    }
-
-    const shadesBlock = document.getElementById('qvShadesBlock');
-    const shadesRow   = document.getElementById('qvShadesRow');
-    shadesRow.innerHTML = '';
-    let shades = [];
-    try { shades = JSON.parse(btn.dataset.shades || '[]'); } catch {}
-
-    let qvSelectedShade = null;
-
-    if (hasShades && shades.length) {
-      shades.forEach(s => {
-        const src = shadeImgSrc(s);
-        const dot = document.createElement('span');
-        dot.className = 'qv-shade-dot';
-        dot.title = s.nom_teinte || '';
-
-        if (src) {
-          dot.style.backgroundImage    = `url('${src}')`;
-          dot.style.backgroundSize     = 'cover';
-          dot.style.backgroundPosition = 'center';
-        } else {
-          dot.style.background = s.code_couleur || '#ccc';
-        }
-
-        dot.addEventListener('click', () => {
-          shadesRow.querySelectorAll('.qv-shade-dot').forEach(d => d.classList.remove('active'));
-          dot.classList.add('active');
-          qvSelectedShade = s.nom_teinte;
-          updateQvBtn();
-        });
-        shadesRow.appendChild(dot);
-      });
-      shadesBlock.style.display = 'flex';
-    } else {
-      shadesBlock.style.display = 'none';
-    }
-
-    function updateQvBtn() {
-      const needsShade = hasShades && !qvSelectedShade;
-      cartBtn.disabled  = stock === 0 || needsShade;
-      cartBtn.innerHTML = stock === 0
-        ? '<i class="fas fa-ban"></i> Rupture de stock'
-        : needsShade
-          ? '<i class="fas fa-palette"></i> Sélectionnez une teinte'
-          : '<i class="fas fa-shopping-bag"></i> Ajouter au panier';
-    }
-    updateQvBtn();
-
-    const newCartBtn = cartBtn.cloneNode(true);
-    cartBtn.replaceWith(newCartBtn);
-    newCartBtn.addEventListener('click', () => {
-      if (stock === 0) return;
-      if (hasShades && !qvSelectedShade) {
-        shadesBlock.classList.add('qv-shake');
-        setTimeout(() => shadesBlock.classList.remove('qv-shake'), 500);
-        return;
-      }
-      window.addToCart({ productId: id, name, price, image, quantity: 1, shade: qvSelectedShade || null });
-      closeQV();
-    });
-
-    detailLink.href = url;
-    overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    closeBtn.focus();
-  }
-
-  function closeQV() {
-    overlay.classList.remove('active');
-    document.body.style.overflow = '';
-  }
-
-  document.querySelectorAll('.quick-view-btn').forEach(btn => {
-    btn.addEventListener('click', e => { e.stopPropagation(); openQV(btn); });
-  });
-
-  closeBtn.addEventListener('click', closeQV);
-  overlay.addEventListener('click', e => { if (e.target === overlay) closeQV(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeQV(); });
-  document.addEventListener('addedToCart', closeQV);
-});
 </script>
 
 <?php include 'includes/product_modal.php'; ?>
 <script src="<?= $b ?>/js/shop.js?v=<?= time() ?>"></script>
 <?php include 'includes/footer.php'; ?>
-
 </body>
 </html>
