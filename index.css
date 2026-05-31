@@ -1514,3 +1514,14 @@ button { font-family: inherit; cursor: pointer; border: none; }
   .hype-products        { grid-template-columns: 1fr; }
   .fp-card              { flex: 0 0 145px; }
 }
+.choose-shade-btn,
+.fp-cart-btn,
+.add-to-cart {
+  white-space: normal;
+  height: auto;
+  min-height: var(--btn-h-sm);
+  padding: 6px 8px;
+  text-align: center;
+  line-height: 1.3;
+  font-size: 8px;
+}

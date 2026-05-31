@@ -750,6 +750,10 @@ body {
     <a class="nav-link" href="admin_products.php">
       <span class="nav-ico">✦</span> Produits
     </a>
+    
+    <a class="nav-link" href="ademin_caisse.php">
+      <span class="nav-ico">✦</span> Caisse
+    </a>
     <a class="nav-link" href="index.php" target="_blank">
       <span class="nav-ico">↗</span> Voir la boutique
     </a>
