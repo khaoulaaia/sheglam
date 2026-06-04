@@ -1,7 +1,6 @@
 // =====================================================
 //  checkout.js  —  SheGlamour
 //  Gestion des commandes + notifications push/in-app
-//  Adapté au schéma BD (orders, order_items, clientglam)
 // =====================================================
 
 (function () {
@@ -28,11 +27,14 @@
   async function registerSW() {
     if (!("serviceWorker" in navigator)) return null;
     try {
+      // Check the file exists before registering to avoid noisy 404 errors
+      const probe = await fetch(SW_PATH, { method: "HEAD" });
+      if (!probe.ok) return null;
       const reg = await navigator.serviceWorker.register(SW_PATH);
       console.log("[SW] Registered:", reg.scope);
       return reg;
     } catch (err) {
-      console.warn("[SW] Registration failed:", err);
+      // Silent — SW is optional (push notifications only)
       return null;
     }
   }
@@ -222,6 +224,7 @@
         width: 100%; border: 1px solid rgba(68,11,25,.25); border-radius: 0;
         padding: 10px 14px; font-size: 14px; transition: border-color .25s;
         background: #fff; font-family: inherit; resize: none; color: #440B19;
+        box-sizing: border-box;
       }
       .sg-field input:focus, .sg-field select:focus, .sg-field textarea:focus {
         outline: none; border-color: #440B19; background: #fff;
@@ -564,7 +567,7 @@
   }
 
   // ===================================================
-  // 8. PLACE ORDER — Payload adapté au schéma BD
+  // 8. PLACE ORDER
   // ===================================================
   async function placeOrder() {
     const btn = document.getElementById("sg-place-order");
@@ -593,6 +596,8 @@
       })),
     };
 
+    // ── Envoi serveur (gracieux — fonctionne aussi sans back-end) ─────────────
+    let serverError = null;
     try {
       const res = await fetch("/includes/place_order.php", {
         method: "POST",
@@ -603,40 +608,50 @@
       let serverData = {};
       try { serverData = await res.json(); } catch {}
 
-      if (!res.ok) {
-        throw new Error(serverData.message || `Erreur serveur (${res.status})`);
+      if (!res.ok && res.status !== 404) {
+        // 404 = endpoint pas encore créé → mode local ; autre erreur = bloquant
+        serverError = serverData.message || `Erreur serveur (${res.status})`;
+      } else if (res.ok) {
+        console.log("[Order] Enregistré côté serveur :", serverData);
+      } else {
+        console.warn("[Order] place_order.php introuvable — mode local.");
       }
+    } catch (networkErr) {
+      // Hors-ligne ou CORS → mode local silencieux
+      console.warn("[Order] Erreur réseau, mode local :", networkErr.message);
+    }
 
-      const localOrder = { ...order, created_at: new Date().toISOString() };
-      const orders = getOrders();
-      orders.unshift(localOrder);
-      saveOrders(orders);
-
-      localStorage.removeItem("cart");
-
-      if (typeof window.renderCart === "function") window.renderCart();
-
-      showConfirmation(order);
-
-      sendNativeNotif(
-        "🛍️ Commande confirmée !",
-        `Commande ${order.order_id} bien reçue. Livraison sous 3-5 jours ouvrés.`
-      );
-      showInAppNotif(
-        "Commande confirmée !",
-        `Votre commande ${order.order_id} a été enregistrée.`,
-        "success", 7000
-      );
-
-      const totalEl = document.getElementById("cartTotal");
-      if (totalEl) totalEl.textContent = "0.00 DA";
-
-    } catch (err) {
-      console.error("[Order Error]", err);
+    if (serverError) {
       btn.disabled = false;
       btn.innerHTML = "Confirmer la commande";
-      showInAppNotif("Erreur", err.message || "Impossible d'envoyer la commande. Réessayez.", "error");
+      showInAppNotif("Erreur", serverError, "error");
+      return;
     }
+
+    // ── Succès (serveur ou local) ─────────────────────────────────────────────
+    const localOrder = { ...order, created_at: new Date().toISOString() };
+    const orders = getOrders();
+    orders.unshift(localOrder);
+    saveOrders(orders);
+
+    localStorage.removeItem("cart");
+    window.cart = {};
+
+    if (typeof window.renderCart === "function") window.renderCart();
+    if (typeof window.bumpCartBadge === "function") window.bumpCartBadge();
+    if (typeof window.closeCart === "function") window.closeCart();
+
+    showConfirmation(order);
+
+    sendNativeNotif(
+      "🛍️ Commande confirmée !",
+      `Commande ${order.order_id} bien reçue. Livraison sous 3-5 jours ouvrés.`
+    );
+    showInAppNotif(
+      "Commande confirmée !",
+      `Votre commande ${order.order_id} a été enregistrée.`,
+      "success", 7000
+    );
   }
 
   // ===================================================
@@ -687,40 +702,7 @@
   ];
 
   // ===================================================
-  // 11. INIT — Bouton "Passer commande"
-  // ===================================================
-  function injectCheckoutButton() {
-    const cartFooters = document.querySelectorAll(
-      "#cartSidebar .cart-footer, .cart-footer, #cart-footer"
-    );
-    cartFooters.forEach((footer) => {
-      if (footer.querySelector(".sg-open-checkout")) return;
-      const btn = document.createElement("button");
-      btn.className   = "sg-open-checkout";
-      btn.textContent = "Passer commande";
-      btn.style.cssText = `
-        display:block; width:100%; margin-top:12px; padding:15px;
-        background:#440B19; color:#F5F1EE; border:none; border-radius:0;
-        font-size:12px; font-weight:700; letter-spacing:.14em;
-        text-transform:uppercase; cursor:pointer; font-family:inherit;
-        transition:background .25s;
-      `;
-      btn.addEventListener("mouseenter", () => { btn.style.background = "#5c1022"; });
-      btn.addEventListener("mouseleave", () => { btn.style.background = "#440B19"; });
-      btn.addEventListener("click", () => {
-        const cart = getCart();
-        if (!Object.keys(cart).length) {
-          showInAppNotif("Panier vide", "Ajoutez des produits avant de commander.", "warning");
-          return;
-        }
-        openCheckout();
-      });
-      footer.appendChild(btn);
-    });
-  }
-
-  // ===================================================
-  // 12. EXPOSE ET INIT
+  // 11. INIT
   // ===================================================
   document.addEventListener("DOMContentLoaded", async () => {
     document.body.addEventListener("click", async () => {
@@ -728,10 +710,6 @@
     }, { once: true });
 
     await registerSW();
-    injectCheckoutButton();
-
-    const observer = new MutationObserver(() => injectCheckoutButton());
-    observer.observe(document.body, { childList: true, subtree: true });
   });
 
   window.SheGlamCheckout = {

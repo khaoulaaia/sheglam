@@ -75,6 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cart[key]) cart[key].quantity += quantity;
     else cart[key] = { productId, name, price, image_url: image, shade, quantity };
     saveCart();
+    bumpCartBadge();
     if (_originEl) flyToCart(_originEl, image, () => {
       window.openCart?.(); window.renderCart();
       document.dispatchEvent(new CustomEvent("addedToCart"));
@@ -686,3 +687,4 @@ document.addEventListener("DOMContentLoaded", () => {
 function fmtDA(v) {
   return Number(v).toLocaleString("fr-DZ", { minimumFractionDigits: 2 }) + " DA";
 }
+window.bumpCartBadge = bumpCartBadge;

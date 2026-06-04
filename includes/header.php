@@ -944,9 +944,6 @@ a { text-decoration: none; color: inherit; }
 </head>
 <body>
 
-<!-- =============================================
-     HEADER
-============================================= -->
 <header class="header" id="header">
 
   <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">
@@ -959,7 +956,6 @@ a { text-decoration: none; color: inherit; }
 
   <nav class="navbar-desktop">
 
-    <!-- ══ YEUX ══════════════════════════════════════════ -->
     <div class="nav-item">
       <a href="/categorie.php?categorie=Yeux">Yeux</a>
       <div class="mega-menu">
@@ -990,7 +986,6 @@ a { text-decoration: none; color: inherit; }
       </div>
     </div>
 
-    <!-- ══ LÈVRES ═════════════════════════════════════════ -->
     <div class="nav-item">
       <a href="/categorie.php?categorie=L%C3%A8vres">Lèvres</a>
       <div class="mega-menu">
@@ -1021,7 +1016,6 @@ a { text-decoration: none; color: inherit; }
       </div>
     </div>
 
-    <!-- ══ TEINT ══════════════════════════════════════════ -->
     <div class="nav-item">
       <a href="/categorie.php?categorie=Teint">Teint</a>
       <div class="mega-menu">
@@ -1056,7 +1050,6 @@ a { text-decoration: none; color: inherit; }
       </div>
     </div>
 
-    <!-- ══ ACCESSOIRES ════════════════════════════════════ -->
     <div class="nav-item">
       <a href="/categorie.php?categorie=Accessoires">Accessoires</a>
       <div class="mega-menu">
@@ -1115,9 +1108,6 @@ a { text-decoration: none; color: inherit; }
 </header>
 
 
-<!-- =============================================
-     BOTTOM BAR MOBILE
-============================================= -->
 <nav class="mobile-bottom-bar" aria-label="Navigation rapide">
   <a href="/wishlist.php" class="bottom-bar-item">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1144,9 +1134,6 @@ a { text-decoration: none; color: inherit; }
 </nav>
 
 
-<!-- =============================================
-     BACK TO TOP
-============================================= -->
 <button class="back-to-top" id="backToTop" aria-label="Retour en haut">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <polyline points="18 15 12 9 6 15"/>
@@ -1154,9 +1141,6 @@ a { text-decoration: none; color: inherit; }
 </button>
 
 
-<!-- =============================================
-     MENU MOBILE (drawer)
-============================================= -->
 <nav class="navbar-mobile" id="navbar">
 
   <div class="mobile-menu-header">
@@ -1173,7 +1157,6 @@ a { text-decoration: none; color: inherit; }
 
   <div class="tab-content active" id="categories">
 
-    <!-- ── YEUX ─────────────────────────────────────── -->
     <div class="mobile-cat-parent" data-sub="sub-yeux">
       <a href="/categorie.php?categorie=Yeux" class="mobile-cat-parent-left" onclick="event.stopPropagation()">
         <img src="/images/eyes.jpg" alt="Yeux" /><span>Yeux</span>
@@ -1189,7 +1172,6 @@ a { text-decoration: none; color: inherit; }
       <a href="/categorie.php?categorie=Yeux&sous_categorie=Faux+cils"             class="mobile-sub-card"><img src="/images/1809c840f477f5615588b0078d11d850.jpg" alt="Faux cils" /><span>Faux cils</span></a>
     </div>
 
-    <!-- ── LÈVRES ────────────────────────────────────── -->
     <div class="mobile-cat-parent" data-sub="sub-levres">
       <a href="/categorie.php?categorie=L%C3%A8vres" class="mobile-cat-parent-left" onclick="event.stopPropagation()">
         <img src="/images/lips.jpg" alt="Lèvres" /><span>Lèvres</span>
@@ -1205,7 +1187,6 @@ a { text-decoration: none; color: inherit; }
       <a href="/categorie.php?categorie=L%C3%A8vres&sous_categorie=Huile+hydratante"        class="mobile-sub-card"><img src="/images/ae4a7ac3ca9e2c14534b68d3c7c006bc.jpg" alt="Huile" /><span>Huile hydratante</span></a>
     </div>
 
-    <!-- ── TEINT ──────────────────────────────────────── -->
     <div class="mobile-cat-parent" data-sub="sub-teint">
       <a href="/categorie.php?categorie=Teint" class="mobile-cat-parent-left" onclick="event.stopPropagation()">
         <img src="/images/teint.jpg" alt="Teint" /><span>Teint</span>
@@ -1222,7 +1203,6 @@ a { text-decoration: none; color: inherit; }
       <a href="/categorie.php?categorie=Teint&sous_categorie=Contour"       class="mobile-sub-card"><img src="/images/6756bb764fc537b8c2e0e70ad5303e69.jpg" alt="Contour" /><span>Contour</span></a>
     </div>
 
-    <!-- ── ACCESSOIRES ────────────────────────────────── -->
     <div class="mobile-cat-parent" data-sub="sub-acc">
       <a href="/categorie.php?categorie=Accessoires" class="mobile-cat-parent-left" onclick="event.stopPropagation()">
         <img src="/images/acc.jpg" alt="Accessoires" /><span>Accessoires</span>
@@ -1237,7 +1217,7 @@ a { text-decoration: none; color: inherit; }
       <a href="/categorie.php?categorie=Accessoires&sous_categorie=Trousses"         class="mobile-sub-card"><img src="/images/da358e248c5b2797bc679b6ea06f2d38.jpg" alt="Trousses" /><span>Trousses</span></a>
     </div>
 
-  </div><!-- #categories -->
+  </div>
 
   <div class="tab-content" id="brands">
     <a href="/marque.php?marque=VelvetLab"        class="menu-item">VelvetLab</a>
@@ -1253,9 +1233,6 @@ a { text-decoration: none; color: inherit; }
 <div class="menu-overlay" id="menuOverlay"></div>
 
 
-<!-- =============================================
-     SEARCH OVERLAY
-============================================= -->
 <div class="search-overlay" id="searchOverlay">
   <button class="close-search" id="closeSearch" aria-label="Fermer">&times;</button>
   <div class="search-container">
@@ -1290,10 +1267,6 @@ a { text-decoration: none; color: inherit; }
   </div>
 </div>
 
-
-<!-- =============================================
-     SCRIPTS (identiques à l'original)
-============================================= -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 

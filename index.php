@@ -1,6 +1,7 @@
 <?php
-include_once 'includes/db.php';
 include_once 'includes/config.php';
+include_once 'includes/db.php';
+
 $b = BASE_URL;
 
 $stmt = $pdo->query("SELECT * FROM products WHERE old_price IS NOT NULL AND old_price > price ORDER BY id ASC LIMIT 8");
@@ -8,9 +9,9 @@ $featured = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $stmtNew = $pdo->query("SELECT id, name, price, old_price, image_url, stock, categorie FROM products ORDER BY id DESC LIMIT 8");
 $newProducts = $stmtNew->fetchAll(PDO::FETCH_ASSOC);
+
 $stmtPacks = $pdo->query("SELECT * FROM products WHERE is_pack = TRUE ORDER BY id DESC LIMIT 8");
 $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
-
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -51,7 +52,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
 <?php include_once 'includes/sidebar.php'; ?>
 <?php include 'includes/header.php'; ?>
 
-<!-- ══ HERO SLIDER ════════════════════════════════════════ -->
 <section class="hero-slider">
   <div class="slide active">
     <picture>
@@ -61,7 +61,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
   </div>
 </section>
 
-<!-- ══ COFFRETS ═══════════════════════════════════════════ -->
 <?php if (!empty($packs)): ?>
 <section class="featured-section coffrets-section" id="coffrets">
   <div class="featured-inner">
@@ -174,7 +173,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
 </section>
 <div class="divider"></div>
 <?php endif; ?>
-<!-- ══ NOUVEAUTÉS ════════════════════════════════════════════ -->
 <section class="featured-section nouveautes-section" id="newProducts">
   <div class="featured-inner">
 
@@ -292,7 +290,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
 </section>
 
 
-<!-- ══ PROMOTIONS ════════════════════════════════════════ -->
 <?php if (!empty($featured)): ?>
 <section class="featured-section" id="featuredProducts">
   <div class="featured-inner">
@@ -402,7 +399,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
 <div class="divider"></div>
 <?php endif; ?>
 
-<!-- ══ CREATE YOUR LOOK ═══════════════════════════════════ -->
 <section class="create-look-section reveal">
   <div class="section-header">
     <h2 class="section-title">Crée ton Look</h2>
@@ -466,7 +462,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
 
 
 
-<!-- ══ WORTH THE HYPE ════════════════════════════════════ -->
 <section class="worth-hype">
 
   <div class="hype-left reveal reveal-left">
@@ -583,7 +578,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
 <div class="divider"></div>
 
 
-<!-- ══ LIVRAISON & CONFIANCE ══════════════════════════════ -->
 <section class="trust-section">
   <div class="trust-inner">
     <div class="trust-item">
@@ -605,7 +599,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
 </section>
 
 
-<!-- ══ AVIS CLIENTS ═══════════════════════════════════════ -->
 <section class="reviews-section">
   <div class="reviews-inner">
 
@@ -705,7 +698,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
 <?php include 'includes/product_modal.php'; ?>
 
 <script>
-/* ── CURSEUR CUSTOM ──────────────────────────────────── */
 (function() {
   const dot  = document.getElementById('cursorDot');
   const ring = document.getElementById('cursorRing');
@@ -724,7 +716,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
   });
 })();
 
-/* ── SLIDER ──────────────────────────────────────────── */
 (function() {
   const slides  = document.querySelectorAll('.slide');
   const dots    = document.querySelectorAll('.slider-dot');
@@ -749,7 +740,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
   autoStart();
 })();
 
-/* ── HEADER SCROLL ───────────────────────────────────── */
 (function() {
   const header     = document.querySelector('.header');
   const headerLogo = document.getElementById('headerLogo');
@@ -762,7 +752,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
   onScroll();
 })();
 
-/* ── SCROLL REVEAL ───────────────────────────────────── */
 (function() {
   const io = new IntersectionObserver(entries => {
     entries.forEach(e => {
@@ -772,7 +761,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 })();
 
-/* ── SPARKLES AU CLIC ────────────────────────────────── */
 document.addEventListener('click', e => {
   for (let i = 0; i < 6; i++) {
     const s = document.createElement('div');
@@ -789,7 +777,6 @@ document.addEventListener('click', e => {
   }
 });
 
-/* ── COMPTEUR CLIENTES ───────────────────────────────── */
 (function() {
   const el = document.getElementById('satisfiedCounter');
   if (!el) return;
@@ -810,7 +797,6 @@ document.addEventListener('click', e => {
   io.observe(el);
 })();
 
-/* ── DATES DYNAMIQUES ────────────────────────────────── */
 (function() {
   document.querySelectorAll('.review-date--live').forEach(el => {
     const days = parseInt(el.dataset.days, 10);
@@ -828,7 +814,7 @@ document.addEventListener('click', e => {
 
 <script>const BASE_URL = "<?= $b ?>";</script>
 <script src="<?= $b ?>/js/shop.js?v=<?= time() ?>"></script>
-<script src="<?= $b ?>/js/checkout.js" defer></script>
+<script src="/js/checkout.js?v=2" defer></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     document.body.style.visibility = 'visible';

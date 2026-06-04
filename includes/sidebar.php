@@ -7,12 +7,23 @@
     <div class="sidebar-content" id="cartItems">
         <p>Votre panier est vide.</p>
     </div>
-    <div class="sidebar-footer">
+    <div class="sidebar-footer" id="cart-footer">
         <div class="cart-total">
             <span>Total</span>
             <strong id="cartTotal">0.00 DA</strong>
         </div>
-        <button class="checkoutBtn">Passer à la caisse</button>
+        <button class="checkoutBtn" onclick="
+            var cart = JSON.parse(localStorage.getItem('cart') || '{}');
+            if (!Object.keys(cart).length) {
+                if (typeof window.showNotif === 'function') {
+                    window.showNotif('Panier vide', 'Ajoutez des produits avant de commander.', 'warning');
+                }
+                return;
+            }
+            if (typeof window.openCheckout === 'function') {
+                window.openCheckout();
+            }
+        ">Passer à la caisse</button>
     </div>
 </div>
 
@@ -53,6 +64,12 @@ window.openWishlist = () => {
     document.getElementById('sidebarOverlay').classList.add('active');
 };
 
+// ── Fermer panier ─────────────────────────────────────────────────────────────
+window.closeCart = () => {
+    document.getElementById('sidebar').classList.remove('active');
+    document.getElementById('sidebarOverlay').classList.remove('active');
+};
+
 // ── Rendu du panier ───────────────────────────────────────────────────────────
 window.renderCart = () => {
     const cartItemsEl = document.getElementById('cartItems');
@@ -77,13 +94,10 @@ window.renderCart = () => {
         const qty   = parseInt(item.quantity)  || 1;
         total += price * qty;
 
-        // Image : priorité à image_url de la teinte (passée lors du addToCart),
-        // fallback sur placeholder
         const imageSrc = (item.image_url && item.image_url.trim())
                        ? item.image_url
                        : '/images/placeholder.jpg';
 
-        // Nom affiché : "Produit — Teinte" si teinte présente
         const displayName = item.shade
                           ? `${item.name} <span class="cart-shade-tag">— ${item.shade}</span>`
                           : item.name;
@@ -107,7 +121,6 @@ window.renderCart = () => {
             </div>
         `;
 
-        // Événements quantité / suppression
         itemEl.querySelector('.increase').addEventListener('click', () => {
             window.cart[key].quantity += 1;
             saveCart();
@@ -128,14 +141,11 @@ window.renderCart = () => {
         cartItemsEl.appendChild(itemEl);
     }
 
-    // Mise à jour du total
     if (cartTotalEl) cartTotalEl.textContent = total.toFixed(2) + ' DA';
 };
 
 // ── Ajouter au panier ─────────────────────────────────────────────────────────
-// Utilisé par product.php (teintes) ET shop.js (catalogue, wishlist…)
 window.addToCart = ({ productId, name, price, image, quantity, shade }) => {
-    // Clé unique : "Produit - Teinte" ou "Produit"
     const key       = shade ? `${name} - ${shade}` : name;
     const image_url = (image && image.trim()) ? image : '/images/placeholder.jpg';
     quantity        = parseInt(quantity) || 1;
@@ -143,7 +153,6 @@ window.addToCart = ({ productId, name, price, image, quantity, shade }) => {
 
     if (window.cart[key]) {
         window.cart[key].quantity += quantity;
-        // Mettre à jour l'image si elle a changé (ex : teinte avec image)
         if (image_url !== '/images/placeholder.jpg') {
             window.cart[key].image_url = image_url;
         }
@@ -203,14 +212,13 @@ window.renderWishlist = () => {
 };
 
 // =============================================================================
-// Listeners DOM — après le chargement de la page
+// Listeners DOM
 // =============================================================================
 document.addEventListener("DOMContentLoaded", function () {
     const overlay         = document.getElementById('sidebarOverlay');
     const sidebar         = document.getElementById('sidebar');
     const wishlistSidebar = document.getElementById('wishlistSidebar');
 
-    // ── Fermeture ─────────────────────────────────────────────────────────────
     document.getElementById('closeSidebar').addEventListener('click', () => {
         sidebar.classList.remove('active');
         overlay.classList.remove('active');
@@ -225,11 +233,7 @@ document.addEventListener("DOMContentLoaded", function () {
         overlay.classList.remove('active');
     });
 
-    // ── Boutons .add-to-cart classiques (pages sans teintes) ──────────────────
-    // Note : sur product.php avec teintes, c'est window.addToCart() qui est
-    // appelé directement depuis le JS inline — ces listeners ne s'en occupent pas.
     document.querySelectorAll('.add-to-cart').forEach(btn => {
-        // Éviter de double-binder le bouton addWithShadeBtn géré par product.php
         if (btn.id === 'addWithShadeBtn') return;
 
         btn.addEventListener('click', () => {
@@ -249,7 +253,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // ── Boutons .add-to-wishlist ──────────────────────────────────────────────
     document.querySelectorAll('.add-to-wishlist').forEach(btn => {
         btn.addEventListener('click', () => {
             const name      = btn.dataset.name;
@@ -265,7 +268,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // ── Initialisation ────────────────────────────────────────────────────────
     window.renderCart();
     window.renderWishlist();
 });
