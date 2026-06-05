@@ -30,7 +30,7 @@
       // Check the file exists before registering to avoid noisy 404 errors
       const probe = await fetch(SW_PATH, { method: "HEAD" });
       if (!probe.ok) return null;
-      const reg = await navigator.serviceWorker.register(SW_PATH);
+      const reg = await navigator.serviceWorker.register('/sw.js');
       console.log("[SW] Registered:", reg.scope);
       return reg;
     } catch (err) {

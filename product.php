@@ -124,32 +124,41 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
 
   <!-- ── COLONNE GAUCHE : galerie ─────────────────────────── -->
   <div class="product-gallery-col">
+<div class="gallery-main-wrap">
+  <?php if ($outOfStock && !$hasShades): ?>
+    <div class="oos-ribbon"><span>Rupture de stock</span></div>
+  <?php endif; ?>
+  <?php if ($baseOldPrice): ?>
+    <?php $pct = round((1 - $basePrice / $baseOldPrice) * 100); ?>
+    <div class="promo-pill">-<?= $pct ?>%</div>
+  <?php endif; ?>
 
-    <div class="gallery-main-wrap">
-      <?php if ($outOfStock && !$hasShades): ?>
-        <div class="oos-ribbon"><span>Rupture de stock</span></div>
-      <?php endif; ?>
+  <!-- Flèches navigation -->
+  <button class="gallery-arrow gallery-arrow--prev" id="galleryPrev" aria-label="Image précédente">
+    <i class="fas fa-chevron-left"></i>
+  </button>
+  <button class="gallery-arrow gallery-arrow--next" id="galleryNext" aria-label="Image suivante">
+    <i class="fas fa-chevron-right"></i>
+  </button>
 
-      <?php if ($baseOldPrice): ?>
-        <?php $pct = round((1 - $basePrice / $baseOldPrice) * 100); ?>
-        <div class="promo-pill">-<?= $pct ?>%</div>
-      <?php endif; ?>
-
-      <div class="gallery-main-inner" id="galleryMainInner">
-        <img id="mainImage"
-             src="<?= htmlspecialchars($additionalImages[0]) ?>"
-             alt="<?= htmlspecialchars($product['name']) ?>"
+  <!-- Track carrousel -->
+  <div class="gallery-track" id="galleryTrack">
+    <?php foreach ($additionalImages as $i => $img): ?>
+      <div class="gallery-slide <?= $i === 0 ? 'active' : '' ?>"
+           data-idx="<?= $i ?>">
+        <img src="<?= htmlspecialchars($img) ?>"
+             alt="<?= htmlspecialchars($product['name']) ?> vue <?= $i + 1 ?>"
              class="gallery-main-img <?= ($outOfStock && !$hasShades) ? 'img-out-of-stock' : '' ?>">
-        <div class="zoom-hint"><i class="fas fa-search-plus"></i></div>
       </div>
+    <?php endforeach; ?>
+  </div>
 
-      <div class="gallery-dots" id="galleryDots">
-        <?php foreach ($additionalImages as $i => $img): ?>
-          <button class="gdot <?= $i === 0 ? 'active' : '' ?>" data-idx="<?= $i ?>"></button>
-        <?php endforeach; ?>
-      </div>
-    </div>
-
+  <div class="gallery-dots" id="galleryDots">
+    <?php foreach ($additionalImages as $i => $img): ?>
+      <button class="gdot <?= $i === 0 ? 'active' : '' ?>" data-idx="<?= $i ?>"></button>
+    <?php endforeach; ?>
+  </div>
+</div>
     <!-- Strip miniatures -->
     <div class="gallery-strip" id="thumbnailStrip">
       <?php foreach ($additionalImages as $i => $img): ?>
@@ -499,50 +508,108 @@ const BASE_URL       = <?= json_encode($b) ?>;
 const BASE_PRICE     = <?= json_encode($basePrice) ?>;
 const BASE_OLD_PRICE = <?= json_encode($baseOldPrice) ?>;
 const BASE_IMAGE     = <?= json_encode($additionalImages[0]) ?>;
-
-/* ═══════════════════════════════════════════════════════════
-   GALERIE — image principale
-══════════════════════════════════════════════════════════ */
-const mainImg   = document.getElementById('mainImage');
 const thumbBtns = document.querySelectorAll('#thumbnailStrip .thumb-btn');
-const gdots     = document.querySelectorAll('#galleryDots .gdot');
-
-mainImg.style.transition = 'opacity .18s ease';
-
-function setMainImage(url, idx) {
-  if (!url) return;
-  mainImg.style.opacity = '0';
-  setTimeout(() => {
-    mainImg.src          = url;
-    mainImg.style.opacity = '1';
-  }, 180);
-  thumbBtns.forEach((t, i) => t.classList.toggle('active', i === idx));
-  gdots.forEach((d, i)     => d.classList.toggle('active', i === idx));
-}
-
-thumbBtns.forEach((btn, i) => {
-  btn.addEventListener('click', () => setMainImage(btn.dataset.src, i));
-});
-gdots.forEach((d, i) => {
-  d.addEventListener('click', () => {
-    const btn = thumbBtns[i];
-    if (btn) setMainImage(btn.dataset.src, i);
-  });
-});
-
+const mainImg   = document.querySelector('#galleryTrack .gallery-slide img');
 /* ═══════════════════════════════════════════════════════════
-   ACCORDÉON DESCRIPTION
+   GALERIE CARROUSEL
 ══════════════════════════════════════════════════════════ */
-const accTrigger = document.getElementById('accTrigger');
-const accPanel   = document.getElementById('accPanel');
+(function initGallery() {
+  const track    = document.getElementById('galleryTrack');
+  const gdots    = document.querySelectorAll('#galleryDots .gdot');
+  const prevBtn  = document.getElementById('galleryPrev');
+  const nextBtn  = document.getElementById('galleryNext');
+  if (!track) return;
 
-accTrigger.addEventListener('click', () => {
-  const expanded = accTrigger.getAttribute('aria-expanded') === 'true';
-  accTrigger.setAttribute('aria-expanded', String(!expanded));
-  accPanel.style.maxHeight = expanded ? '0' : accPanel.scrollHeight + 'px';
-  accTrigger.classList.toggle('open', !expanded);
-});
+  const slides = track.querySelectorAll('.gallery-slide');
+  const total  = slides.length;
+  let current  = 0;
+  let startX   = 0, startY = 0, diffX = 0, dragging = false;
 
+  function goTo(idx, skipAnim) {
+    idx = Math.max(0, Math.min(total - 1, idx));
+    current = idx;
+
+    if (skipAnim) {
+      track.style.transition = 'none';
+      track.style.transform  = `translateX(-${idx * 100}%)`;
+      requestAnimationFrame(() => { track.style.transition = ''; });
+    } else {
+      track.style.transform = `translateX(-${idx * 100}%)`;
+    }
+
+    thumbBtns.forEach((t, i) => t.classList.toggle('active', i === idx));
+    gdots.forEach((d, i)     => d.classList.toggle('active', i === idx));
+    if (prevBtn) prevBtn.disabled = idx === 0;
+    if (nextBtn) nextBtn.disabled = idx === total - 1;
+  }
+
+  /* Flèches */
+  prevBtn?.addEventListener('click', () => goTo(current - 1));
+  nextBtn?.addEventListener('click', () => goTo(current + 1));
+
+  /* Miniatures & dots */
+  thumbBtns.forEach((btn, i) => btn.addEventListener('click', () => goTo(i)));
+  gdots.forEach((d, i) => d.addEventListener('click', () => goTo(i)));
+
+  /* ── Pointer drag (desktop + mobile) ── */
+  track.addEventListener('pointerdown', e => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    startX  = e.clientX;
+    startY  = e.clientY;
+    diffX   = 0;
+    dragging = true;
+    track.setPointerCapture(e.pointerId);
+  });
+
+  track.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    diffX = e.clientX - startX;
+    const diffY = e.clientY - startY;
+
+    /* Si scroll vertical dominant → laisser faire le navigateur */
+    if (Math.abs(diffY) > Math.abs(diffX) + 5) {
+      dragging = false;
+      track.releasePointerCapture(e.pointerId);
+      return;
+    }
+
+    e.preventDefault();
+    track.classList.add('is-dragging');
+    const pct = (diffX / track.offsetWidth) * 100;
+    const base = -(current * 100);
+    /* Résistance en bout de carrousel */
+    const resist = (current === 0 && diffX > 0) || (current === total - 1 && diffX < 0)
+      ? 0.25 : 1;
+    track.style.transition = 'none';
+    track.style.transform  = `translateX(${base + pct * resist}%)`;
+  }, { passive: false });
+
+  function endDrag() {
+    if (!dragging) return;
+    dragging = false;
+    track.classList.remove('is-dragging');
+    track.style.transition = '';
+    const threshold = track.offsetWidth * 0.18;   /* 18% de largeur = changement */
+    if      (diffX < -threshold) goTo(current + 1);
+    else if (diffX >  threshold) goTo(current - 1);
+    else                          goTo(current);   /* snap back */
+    diffX = 0;
+  }
+
+  track.addEventListener('pointerup',     endDrag);
+  track.addEventListener('pointercancel', endDrag);
+
+  /* API publique pour les teintes */
+  window.setMainImage = function(url, idx) {
+    if (!url) return;
+    if (idx >= 0 && idx < total) { goTo(idx); return; }
+    /* Teinte avec image externe : afficher dans la première slide */
+    slides[0].querySelector('img').src = url;
+    goTo(0);
+  };
+
+  goTo(0, true);
+})();
 /* ═══════════════════════════════════════════════════════════
    HELPERS PRIX / STOCK
 ══════════════════════════════════════════════════════════ */
