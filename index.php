@@ -27,22 +27,22 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="icon" type="image/png" href="<?= $b ?>/images/logofib.png">
   <!-- Meta Pixel Code -->
-<script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '1496845578585995');
-fbq('track', 'PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
-/></noscript>
-<!-- End Meta Pixel Code -->
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '1496845578585995');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
 </head>
 <body>
 
@@ -50,8 +50,27 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
 <div class="cursor-ring" id="cursorRing"></div>
 
 <?php include_once 'includes/sidebar.php'; ?>
+
+<!-- ══ BANNIÈRE LIVRAISON GRATUITE (au-dessus du header) ═══ -->
+<div class="livraison-banner" id="livraisonBanner">
+  <div class="livraison-banner-inner">
+    <span class="livraison-item">
+      <i class="fa-solid fa-truck-fast" aria-hidden="true"></i>
+      Livraison gratuite dès <strong>10 000 DA</strong>
+    </span>
+    <span class="livraison-sep" aria-hidden="true">·</span>
+    
+    <span class="livraison-sep" aria-hidden="true">·</span>
+    <span class="livraison-item">
+      <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+      Livraison dans les <strong>58 wilayas</strong>
+    </span>
+  </div>
+</div>
+
 <?php include 'includes/header.php'; ?>
 
+<!-- ══ 1. HERO SLIDER ══════════════════════════════════════ -->
 <section class="hero-slider">
   <div class="slide active">
     <picture>
@@ -61,118 +80,7 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
   </div>
 </section>
 
-<?php if (!empty($packs)): ?>
-<section class="featured-section coffrets-section" id="coffrets">
-  <div class="featured-inner">
-
-    <div class="featured-header reveal">
-      <span class="featured-eyebrow">Sélections exclusives</span>
-      <h2 class="featured-title">Coffrets</h2>
-      <div class="featured-rule"></div>
-      <p class="featured-subtitle">Tout ce qu'il vous faut en un seul écrin</p>
-    </div>
-
-    <div class="featured-track-wrapper">
-      <div class="featured-track reveal-up">
-
-        <?php foreach ($packs as $i => $p):
-          $img = $p['image_url']
-            ? (str_starts_with($p['image_url'], 'http') ? $p['image_url'] : $b . '/images/' . basename($p['image_url']))
-            : $b . '/images/placeholder.jpg';
-          $price   = number_format((float)$p['price'], 2, ',', ' ');
-          $stock   = (int)($p['stock'] ?? 1);
-          $rupture = $stock === 0;
-
-          $shadeStmt = $pdo->prepare("SELECT COUNT(*) FROM teintes WHERE product_id = ?");
-          $shadeStmt->execute([$p['id']]);
-          $hasShades = $shadeStmt->fetchColumn() > 0;
-        ?>
-
-        <article class="fp-card coffret-card" style="animation-delay:<?= $i * 0.07 ?>s">
-          <div class="fp-img-wrap">
-            <a href="<?= $b ?>/product.php?id=<?= $p['id'] ?>">
-              <img src="<?= htmlspecialchars($img) ?>"
-                   alt="<?= htmlspecialchars($p['name']) ?>" loading="lazy">
-            </a>
-            <span class="badge-coffret">Coffret</span>
-            <?php if ($rupture): ?>
-              <span class="out-of-stock-badge">Rupture</span>
-            <?php endif; ?>
-            <button
-              class="fp-wishlist add-to-wishlist"
-              aria-label="Ajouter à la wishlist"
-              data-product-id="<?= $p['id'] ?>"
-              data-name="<?= htmlspecialchars($p['name']) ?>"
-              data-price="<?= $p['price'] ?>"
-              data-image_url="<?= htmlspecialchars($img) ?>"
-            ><i class="fa-regular fa-heart"></i></button>
-          </div>
-
-          <div class="fp-info">
-            <?php if (!empty($p['categorie'])): ?>
-              <p class="product-category-label"><?= htmlspecialchars($p['categorie']) ?></p>
-            <?php endif; ?>
-            <h3 class="fp-name">
-              <a href="<?= $b ?>/product.php?id=<?= $p['id'] ?>">
-                <?= htmlspecialchars($p['name']) ?>
-              </a>
-            </h3>
-            <div class="fp-price-wrap">
-              <?php if (!empty($p['old_price']) && $p['old_price'] > $p['price']): ?>
-                <span class="fp-old-price"><?= number_format((float)$p['old_price'], 2, ',', ' ') ?> DA</span>
-                <span class="fp-price fp-price--sale"><?= $price ?> DA</span>
-                <span class="badge-solde">-<?= round((1 - $p['price'] / $p['old_price']) * 100) ?>%</span>
-              <?php else: ?>
-                <span class="fp-price"><?= $price ?> DA</span>
-              <?php endif; ?>
-            </div>
-            <div class="fp-actions add-to-cart-wrapper">
-              <input type="number" name="quantity" value="1" min="1"
-                     class="fp-qty" <?= $rupture ? 'disabled' : '' ?>>
-              <?php if ($hasShades): ?>
-                <button
-                  class="fp-cart-btn choose-shade-btn"
-                  data-product-id="<?= $p['id'] ?>"
-                  data-name="<?= htmlspecialchars($p['name']) ?>"
-                  data-price="<?= $p['price'] ?>"
-                  data-image_url="<?= htmlspecialchars($img) ?>"
-                  data-stock="<?= $stock ?>"
-                  <?= $rupture ? 'disabled' : '' ?>
-                ><i class="fa-solid fa-palette"></i>
-                  <?= $rupture ? 'Rupture de stock' : 'Choisir une teinte' ?>
-                </button>
-              <?php else: ?>
-                <button
-                  class="fp-cart-btn add-to-cart"
-                  data-product-id="<?= $p['id'] ?>"
-                  data-name="<?= htmlspecialchars($p['name']) ?>"
-                  data-price="<?= $p['price'] ?>"
-                  data-image_url="<?= htmlspecialchars($img) ?>"
-                  data-stock="<?= $stock ?>"
-                  <?= $rupture ? 'disabled' : '' ?>
-                ><i class="fa-solid fa-bag-shopping"></i>
-                  <?= $rupture ? 'Rupture de stock' : 'Ajouter' ?>
-                </button>
-              <?php endif; ?>
-            </div>
-          </div>
-        </article>
-
-        <?php endforeach; ?>
-      </div>
-    </div>
-
-    <div class="featured-footer reveal">
-     <a href="<?= $b ?>/categorie.php?categorie=Tous&pack=1" class="featured-cta">
-          <span>Voir tous les coffrets</span>
-        <i class="fa-solid fa-arrow-right"></i>
-      </a>
-    </div>
-
-  </div>
-</section>
-<div class="divider"></div>
-<?php endif; ?>
+<!-- ══ 2. NOUVEAUTÉS ═══════════════════════════════════════ -->
 <section class="featured-section nouveautes-section" id="newProducts">
   <div class="featured-inner">
 
@@ -189,7 +97,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
 
     <div class="featured-track-wrapper">
       <div class="featured-track reveal-up">
-
         <?php foreach ($newProducts as $i => $p):
           $img = $p['image_url']
             ? (str_starts_with($p['image_url'], 'http') ? $p['image_url'] : $b . '/images/' . basename($p['image_url']))
@@ -197,12 +104,12 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
           $price   = number_format((float)$p['price'], 2, ',', ' ');
           $stock   = (int)($p['stock'] ?? 1);
           $rupture = $stock === 0;
+          $livGratuite = (float)$p['price'] >= 10000;
 
           $shadeStmt = $pdo->prepare("SELECT COUNT(*) FROM teintes WHERE product_id = ?");
           $shadeStmt->execute([$p['id']]);
           $hasShades = $shadeStmt->fetchColumn() > 0;
         ?>
-
         <article class="fp-card" style="animation-delay:<?= $i * 0.07 ?>s">
           <div class="fp-img-wrap">
             <a href="<?= $b ?>/product.php?id=<?= $p['id'] ?>">
@@ -210,6 +117,9 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
                    alt="<?= htmlspecialchars($p['name']) ?>" loading="lazy">
             </a>
             <span class="badge badge-new-drop">New</span>
+            <?php if ($livGratuite): ?>
+              <span class="badge-livgratuite">Livraison offerte</span>
+            <?php endif; ?>
             <?php if ($rupture): ?>
               <span class="out-of-stock-badge">Rupture</span>
             <?php endif; ?>
@@ -222,7 +132,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
               data-image_url="<?= htmlspecialchars($img) ?>"
             ><i class="fa-regular fa-heart"></i></button>
           </div>
-
           <div class="fp-info">
             <?php if (!empty($p['categorie'])): ?>
               <p class="product-category-label"><?= htmlspecialchars($p['categorie']) ?></p>
@@ -272,7 +181,6 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
             </div>
           </div>
         </article>
-
         <?php endforeach; ?>
       </div>
     </div>
@@ -280,8 +188,8 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
     <?php endif; ?>
 
     <div class="featured-footer reveal">
-    <a href="<?= $b ?>/categorie.php?categorie=Tous" class="featured-cta">
-          <span>Voir toute la collection</span>
+      <a href="<?= $b ?>/categorie.php?categorie=Tous" class="featured-cta">
+        <span>Voir toute la collection</span>
         <i class="fa-solid fa-arrow-right"></i>
       </a>
     </div>
@@ -289,116 +197,9 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
   </div>
 </section>
 
-
-<?php if (!empty($featured)): ?>
-<section class="featured-section" id="featuredProducts">
-  <div class="featured-inner">
-
-    <div class="featured-header reveal">
-      <span class="featured-eyebrow">Durée limitée</span>
-      <h2 class="featured-title">Promotions</h2>
-      <div class="featured-rule"></div>
-      <p class="featured-subtitle">Nos offres en cours — profitez-en avant qu'il soit trop tard</p>
-    </div>
-
-    <div class="featured-track-wrapper">
-      <div class="featured-track reveal-up">
-
-        <?php foreach ($featured as $i => $p):
-          $img = $p['image_url']
-            ? (str_starts_with($p['image_url'], 'http') ? $p['image_url'] : $b . '/images/' . basename($p['image_url']))
-            : $b . '/images/placeholder.jpg';
-          $price   = number_format((float)$p['price'], 2, ',', ' ');
-          $stock   = (int)($p['stock'] ?? 1);
-          $rupture = $stock === 0;
-          $pct     = round((1 - $p['price'] / $p['old_price']) * 100);
-
-          $shadeStmt = $pdo->prepare("SELECT COUNT(*) FROM teintes WHERE product_id = ?");
-          $shadeStmt->execute([$p['id']]);
-          $hasShades = $shadeStmt->fetchColumn() > 0;
-        ?>
-
-        <article class="fp-card" style="animation-delay:<?= $i * 0.07 ?>s">
-          <div class="fp-img-wrap">
-            <a href="<?= $b ?>/product.php?id=<?= $p['id'] ?>">
-              <img src="<?= htmlspecialchars($img) ?>"
-                   alt="<?= htmlspecialchars($p['name']) ?>" loading="lazy">
-            </a>
-            <span class="badge-solde badge-solde--img">-<?= $pct ?>%</span>
-            <?php if ($rupture): ?>
-              <span class="out-of-stock-badge">Rupture</span>
-            <?php endif; ?>
-            <button
-              class="fp-wishlist add-to-wishlist"
-              aria-label="Ajouter à la wishlist"
-              data-product-id="<?= $p['id'] ?>"
-              data-name="<?= htmlspecialchars($p['name']) ?>"
-              data-price="<?= $p['price'] ?>"
-              data-image_url="<?= htmlspecialchars($img) ?>"
-            ><i class="fa-regular fa-heart"></i></button>
-          </div>
-
-          <div class="fp-info">
-            <?php if (!empty($p['categorie'])): ?>
-              <p class="product-category-label"><?= htmlspecialchars($p['categorie']) ?></p>
-            <?php endif; ?>
-            <h3 class="fp-name">
-              <a href="<?= $b ?>/product.php?id=<?= $p['id'] ?>">
-                <?= htmlspecialchars($p['name']) ?>
-              </a>
-            </h3>
-            <div class="fp-price-wrap">
-              <span class="fp-old-price"><?= number_format((float)$p['old_price'], 2, ',', ' ') ?> DA</span>
-              <span class="fp-price fp-price--sale"><?= $price ?> DA</span>
-            </div>
-            <div class="fp-actions add-to-cart-wrapper">
-              <input type="number" name="quantity" value="1" min="1"
-                     class="fp-qty" <?= $rupture ? 'disabled' : '' ?>>
-              <?php if ($hasShades): ?>
-                <button
-                  class="fp-cart-btn choose-shade-btn"
-                  data-product-id="<?= $p['id'] ?>"
-                  data-name="<?= htmlspecialchars($p['name']) ?>"
-                  data-price="<?= $p['price'] ?>"
-                  data-image_url="<?= htmlspecialchars($img) ?>"
-                  data-stock="<?= $stock ?>"
-                  <?= $rupture ? 'disabled' : '' ?>
-                ><i class="fa-solid fa-palette"></i>
-                  <?= $rupture ? 'Rupture de stock' : 'Choisir une teinte' ?>
-                </button>
-              <?php else: ?>
-                <button
-                  class="fp-cart-btn add-to-cart"
-                  data-product-id="<?= $p['id'] ?>"
-                  data-name="<?= htmlspecialchars($p['name']) ?>"
-                  data-price="<?= $p['price'] ?>"
-                  data-image_url="<?= htmlspecialchars($img) ?>"
-                  data-stock="<?= $stock ?>"
-                  <?= $rupture ? 'disabled' : '' ?>
-                ><i class="fa-solid fa-bag-shopping"></i>
-                  <?= $rupture ? 'Rupture de stock' : 'Ajouter' ?>
-                </button>
-              <?php endif; ?>
-            </div>
-          </div>
-        </article>
-
-        <?php endforeach; ?>
-      </div>
-    </div>
-
-    <div class="featured-footer reveal">
-    <a href="<?= $b ?>/categorie.php?categorie=Tous&soldes=1" class="featured-cta">
-          <span>Voir toutes les promos</span>
-        <i class="fa-solid fa-arrow-right"></i>
-      </a>
-    </div>
-
-  </div>
-</section>
 <div class="divider"></div>
-<?php endif; ?>
 
+<!-- ══ 3. CRÉE TON LOOK ════════════════════════════════════ -->
 <section class="create-look-section reveal">
   <div class="section-header">
     <h2 class="section-title">Crée ton Look</h2>
@@ -406,7 +207,7 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
   <div class="create-look">
 
     <div class="create-item reveal reveal-delay-1">
-      <a href="<?= $b ?>/categorie.php?categorie=Mascara">
+      <a href="<?= $b ?>/categorie.php?categorie=Yeux">
         <div class="create-item-bg">
           <img src="<?= $b ?>/images/cafff133fa60bc2cacd2e3562f2a95fe.jpg" alt="Yeux"
                style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
@@ -460,8 +261,9 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
   </div>
 </section>
 
+<div class="divider"></div>
 
-
+<!-- ══ 4. WORTH THE HYPE ══════════════════════════════════ -->
 <section class="worth-hype">
 
   <div class="hype-left reveal reveal-left">
@@ -484,9 +286,10 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
       <?php
       $hypeStmt = $pdo->query("SELECT * FROM products ORDER BY id ASC LIMIT 4");
       while ($product = $hypeStmt->fetch(PDO::FETCH_ASSOC)):
-        $productId = $product['id'];
-        $stock     = (int)($product['stock'] ?? 1);
-        $rupture   = $stock === 0;
+        $productId   = $product['id'];
+        $stock       = (int)($product['stock'] ?? 1);
+        $rupture     = $stock === 0;
+        $livGratuite = (float)$product['price'] >= 10000;
 
         $shadeStmt = $pdo->prepare("SELECT COUNT(*) FROM teintes WHERE product_id = ?");
         $shadeStmt->execute([$productId]);
@@ -503,6 +306,9 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
           <a href="<?= $b ?>/product.php?id=<?= $productId ?>">
             <img src="<?= htmlspecialchars($image) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
           </a>
+          <?php if ($livGratuite): ?>
+            <span class="badge-livgratuite">Livraison offerte</span>
+          <?php endif; ?>
           <?php if ($rupture): ?>
             <span class="out-of-stock-badge">Rupture</span>
           <?php endif; ?>
@@ -577,28 +383,265 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
 
 <div class="divider"></div>
 
+<!-- ══ 5. COFFRETS ════════════════════════════════════════ -->
+<?php if (!empty($packs)): ?>
+<section class="featured-section coffrets-section" id="coffrets">
+  <div class="featured-inner">
 
+    <div class="featured-header reveal">
+      <span class="featured-eyebrow">Sélections exclusives</span>
+      <h2 class="featured-title">Coffrets</h2>
+      <div class="featured-rule"></div>
+      <p class="featured-subtitle">Tout ce qu'il vous faut en un seul écrin</p>
+    </div>
+
+    <div class="featured-track-wrapper">
+      <div class="featured-track reveal-up">
+
+        <?php foreach ($packs as $i => $p):
+          $img = $p['image_url']
+            ? (str_starts_with($p['image_url'], 'http') ? $p['image_url'] : $b . '/images/' . basename($p['image_url']))
+            : $b . '/images/placeholder.jpg';
+          $price       = number_format((float)$p['price'], 2, ',', ' ');
+          $stock       = (int)($p['stock'] ?? 1);
+          $rupture     = $stock === 0;
+          $livGratuite = (float)$p['price'] >= 10000;
+
+          $shadeStmt = $pdo->prepare("SELECT COUNT(*) FROM teintes WHERE product_id = ?");
+          $shadeStmt->execute([$p['id']]);
+          $hasShades = $shadeStmt->fetchColumn() > 0;
+        ?>
+
+        <article class="fp-card coffret-card" style="animation-delay:<?= $i * 0.07 ?>s">
+          <div class="fp-img-wrap">
+            <a href="<?= $b ?>/product.php?id=<?= $p['id'] ?>">
+              <img src="<?= htmlspecialchars($img) ?>"
+                   alt="<?= htmlspecialchars($p['name']) ?>" loading="lazy">
+            </a>
+            <span class="badge-coffret">Coffret</span>
+            <?php if ($livGratuite): ?>
+              <span class="badge-livgratuite">Livraison offerte</span>
+            <?php endif; ?>
+            <?php if ($rupture): ?>
+              <span class="out-of-stock-badge">Rupture</span>
+            <?php endif; ?>
+            <button
+              class="fp-wishlist add-to-wishlist"
+              aria-label="Ajouter à la wishlist"
+              data-product-id="<?= $p['id'] ?>"
+              data-name="<?= htmlspecialchars($p['name']) ?>"
+              data-price="<?= $p['price'] ?>"
+              data-image_url="<?= htmlspecialchars($img) ?>"
+            ><i class="fa-regular fa-heart"></i></button>
+          </div>
+
+          <div class="fp-info">
+            <?php if (!empty($p['categorie'])): ?>
+              <p class="product-category-label"><?= htmlspecialchars($p['categorie']) ?></p>
+            <?php endif; ?>
+            <h3 class="fp-name">
+              <a href="<?= $b ?>/product.php?id=<?= $p['id'] ?>">
+                <?= htmlspecialchars($p['name']) ?>
+              </a>
+            </h3>
+            <div class="fp-price-wrap">
+              <?php if (!empty($p['old_price']) && $p['old_price'] > $p['price']): ?>
+                <span class="fp-old-price"><?= number_format((float)$p['old_price'], 2, ',', ' ') ?> DA</span>
+                <span class="fp-price fp-price--sale"><?= $price ?> DA</span>
+                <span class="badge-solde">-<?= round((1 - $p['price'] / $p['old_price']) * 100) ?>%</span>
+              <?php else: ?>
+                <span class="fp-price"><?= $price ?> DA</span>
+              <?php endif; ?>
+            </div>
+            <div class="fp-actions add-to-cart-wrapper">
+              <input type="number" name="quantity" value="1" min="1"
+                     class="fp-qty" <?= $rupture ? 'disabled' : '' ?>>
+              <?php if ($hasShades): ?>
+                <button
+                  class="fp-cart-btn choose-shade-btn"
+                  data-product-id="<?= $p['id'] ?>"
+                  data-name="<?= htmlspecialchars($p['name']) ?>"
+                  data-price="<?= $p['price'] ?>"
+                  data-image_url="<?= htmlspecialchars($img) ?>"
+                  data-stock="<?= $stock ?>"
+                  <?= $rupture ? 'disabled' : '' ?>
+                ><i class="fa-solid fa-palette"></i>
+                  <?= $rupture ? 'Rupture de stock' : 'Choisir une teinte' ?>
+                </button>
+              <?php else: ?>
+                <button
+                  class="fp-cart-btn add-to-cart"
+                  data-product-id="<?= $p['id'] ?>"
+                  data-name="<?= htmlspecialchars($p['name']) ?>"
+                  data-price="<?= $p['price'] ?>"
+                  data-image_url="<?= htmlspecialchars($img) ?>"
+                  data-stock="<?= $stock ?>"
+                  <?= $rupture ? 'disabled' : '' ?>
+                ><i class="fa-solid fa-bag-shopping"></i>
+                  <?= $rupture ? 'Rupture de stock' : 'Ajouter' ?>
+                </button>
+              <?php endif; ?>
+            </div>
+          </div>
+        </article>
+
+        <?php endforeach; ?>
+      </div>
+    </div>
+
+    <div class="featured-footer reveal">
+      <a href="<?= $b ?>/categorie.php?categorie=Tous&pack=1" class="featured-cta">
+        <span>Voir tous les coffrets</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+
+  </div>
+</section>
+<div class="divider"></div>
+<?php endif; ?>
+
+<!-- ══ 6. PROMOTIONS ══════════════════════════════════════ -->
+<?php if (!empty($featured)): ?>
+<section class="featured-section" id="featuredProducts">
+  <div class="featured-inner">
+
+    <div class="featured-header reveal">
+      <span class="featured-eyebrow">Durée limitée</span>
+      <h2 class="featured-title">Promotions</h2>
+      <div class="featured-rule"></div>
+      <p class="featured-subtitle">Nos offres en cours — profitez-en avant qu'il soit trop tard</p>
+    </div>
+
+    <div class="featured-track-wrapper">
+      <div class="featured-track reveal-up">
+
+        <?php foreach ($featured as $i => $p):
+          $img = $p['image_url']
+            ? (str_starts_with($p['image_url'], 'http') ? $p['image_url'] : $b . '/images/' . basename($p['image_url']))
+            : $b . '/images/placeholder.jpg';
+          $price       = number_format((float)$p['price'], 2, ',', ' ');
+          $stock       = (int)($p['stock'] ?? 1);
+          $rupture     = $stock === 0;
+          $pct         = round((1 - $p['price'] / $p['old_price']) * 100);
+          $livGratuite = (float)$p['price'] >= 10000;
+
+          $shadeStmt = $pdo->prepare("SELECT COUNT(*) FROM teintes WHERE product_id = ?");
+          $shadeStmt->execute([$p['id']]);
+          $hasShades = $shadeStmt->fetchColumn() > 0;
+        ?>
+
+        <article class="fp-card" style="animation-delay:<?= $i * 0.07 ?>s">
+          <div class="fp-img-wrap">
+            <a href="<?= $b ?>/product.php?id=<?= $p['id'] ?>">
+              <img src="<?= htmlspecialchars($img) ?>"
+                   alt="<?= htmlspecialchars($p['name']) ?>" loading="lazy">
+            </a>
+            <span class="badge-solde badge-solde--img">-<?= $pct ?>%</span>
+            <?php if ($livGratuite): ?>
+              <span class="badge-livgratuite">Livraison offerte</span>
+            <?php endif; ?>
+            <?php if ($rupture): ?>
+              <span class="out-of-stock-badge">Rupture</span>
+            <?php endif; ?>
+            <button
+              class="fp-wishlist add-to-wishlist"
+              aria-label="Ajouter à la wishlist"
+              data-product-id="<?= $p['id'] ?>"
+              data-name="<?= htmlspecialchars($p['name']) ?>"
+              data-price="<?= $p['price'] ?>"
+              data-image_url="<?= htmlspecialchars($img) ?>"
+            ><i class="fa-regular fa-heart"></i></button>
+          </div>
+
+          <div class="fp-info">
+            <?php if (!empty($p['categorie'])): ?>
+              <p class="product-category-label"><?= htmlspecialchars($p['categorie']) ?></p>
+            <?php endif; ?>
+            <h3 class="fp-name">
+              <a href="<?= $b ?>/product.php?id=<?= $p['id'] ?>">
+                <?= htmlspecialchars($p['name']) ?>
+              </a>
+            </h3>
+            <div class="fp-price-wrap">
+              <span class="fp-old-price"><?= number_format((float)$p['old_price'], 2, ',', ' ') ?> DA</span>
+              <span class="fp-price fp-price--sale"><?= $price ?> DA</span>
+            </div>
+            <div class="fp-actions add-to-cart-wrapper">
+              <input type="number" name="quantity" value="1" min="1"
+                     class="fp-qty" <?= $rupture ? 'disabled' : '' ?>>
+              <?php if ($hasShades): ?>
+                <button
+                  class="fp-cart-btn choose-shade-btn"
+                  data-product-id="<?= $p['id'] ?>"
+                  data-name="<?= htmlspecialchars($p['name']) ?>"
+                  data-price="<?= $p['price'] ?>"
+                  data-image_url="<?= htmlspecialchars($img) ?>"
+                  data-stock="<?= $stock ?>"
+                  <?= $rupture ? 'disabled' : '' ?>
+                ><i class="fa-solid fa-palette"></i>
+                  <?= $rupture ? 'Rupture de stock' : 'Choisir une teinte' ?>
+                </button>
+              <?php else: ?>
+                <button
+                  class="fp-cart-btn add-to-cart"
+                  data-product-id="<?= $p['id'] ?>"
+                  data-name="<?= htmlspecialchars($p['name']) ?>"
+                  data-price="<?= $p['price'] ?>"
+                  data-image_url="<?= htmlspecialchars($img) ?>"
+                  data-stock="<?= $stock ?>"
+                  <?= $rupture ? 'disabled' : '' ?>
+                ><i class="fa-solid fa-bag-shopping"></i>
+                  <?= $rupture ? 'Rupture de stock' : 'Ajouter' ?>
+                </button>
+              <?php endif; ?>
+            </div>
+          </div>
+        </article>
+
+        <?php endforeach; ?>
+      </div>
+    </div>
+
+    <div class="featured-footer reveal">
+      <a href="<?= $b ?>/categorie.php?categorie=Tous&soldes=1" class="featured-cta">
+        <span>Voir toutes les promos</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+
+  </div>
+</section>
+<div class="divider"></div>
+<?php endif; ?>
+
+<!-- ══ 7. TRUST ════════════════════════════════════════════ -->
 <section class="trust-section">
   <div class="trust-inner">
     <div class="trust-item">
-      <div class="trust-icon"><i class="fa-solid fa-truck-fast"></i></div>
+      <div class="trust-icon"><i class="fa-solid fa-truck-fast" aria-hidden="true"></i></div>
       <p class="trust-title">Livraison rapide</p>
-      <p class="trust-desc">Expédition sous 24h — livraison partout en Algérie en 2 à 5 jours ouvrés.</p>
+      <p class="trust-desc">Expédition sous 24h — livraison dans les <strong>58 wilayas</strong> en 2 à 5 jours ouvrés.</p>
     </div>
     <div class="trust-item">
-      <div class="trust-icon"><i class="fa-solid fa-box-open"></i></div>
+      <div class="trust-icon"><i class="fa-solid fa-money-bill-wave" aria-hidden="true"></i></div>
+      <p class="trust-title">Paiement à la livraison</p>
+      <p class="trust-desc">Vous payez uniquement à la réception. Zéro avance, zéro risque.</p>
+    </div>
+    <div class="trust-item">
+      <div class="trust-icon"><i class="fa-solid fa-box-open" aria-hidden="true"></i></div>
       <p class="trust-title">Emballage soigné</p>
-      <p class="trust-desc">Chaque commande est préparée avec soin pour arriver en parfait état.</p>
+      <p class="trust-desc">Chaque commande préparée avec soin pour arriver en parfait état.</p>
     </div>
     <div class="trust-item">
-      <div class="trust-icon"><i class="fa-brands fa-whatsapp"></i></div>
-      <p class="trust-title">Service client</p>
-      <p class="trust-desc">Une question ? Notre équipe vous répond 7j/7 via WhatsApp ou Instagram.</p>
+      <div class="trust-icon"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></div>
+      <p class="trust-title">Service client 7j/7</p>
+      <p class="trust-desc">Une question ? Notre équipe vous répond via WhatsApp ou Instagram.</p>
     </div>
   </div>
 </section>
 
-
+<!-- ══ 8. AVIS CLIENTS ════════════════════════════════════ -->
 <section class="reviews-section">
   <div class="reviews-inner">
 
@@ -625,7 +668,7 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
           <div class="review-avatar">SB</div>
           <div>
             <p class="review-name">Sara B.</p>
-            
+            <p class="review-date">Alger</p>
           </div>
         </div>
       </div>
@@ -637,7 +680,7 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
           <div class="review-avatar">LM</div>
           <div>
             <p class="review-name">Lina M.</p>
-            
+            <p class="review-date">Oran</p>
           </div>
         </div>
       </div>
@@ -649,7 +692,7 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
           <div class="review-avatar">NR</div>
           <div>
             <p class="review-name">Nour R.</p>
-            
+            <p class="review-date">Constantine</p>
           </div>
         </div>
       </div>
@@ -661,7 +704,7 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
           <div class="review-avatar">AM</div>
           <div>
             <p class="review-name">Amira M.</p>
-            
+            <p class="review-date">Annaba</p>
           </div>
         </div>
       </div>
@@ -673,7 +716,7 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
           <div class="review-avatar">RK</div>
           <div>
             <p class="review-name">Rania K.</p>
-           
+            <p class="review-date">Blida</p>
           </div>
         </div>
       </div>
@@ -685,7 +728,7 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
           <div class="review-avatar">DH</div>
           <div>
             <p class="review-name">Djamila H.</p>
-            
+            <p class="review-date">Tizi Ouzou</p>
           </div>
         </div>
       </div>
@@ -694,6 +737,14 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
   </div>
 </section>
 
+<!-- ══ WHATSAPP FLOTTANT ═══════════════════════════════════ -->
+<a href="https://wa.me/213XXXXXXXXX?text=Bonjour%2C%20j%27ai%20une%20question%20sur%20ma%20commande"
+   class="whatsapp-float"
+   target="_blank"
+   rel="noopener noreferrer"
+   aria-label="Contacter via WhatsApp">
+  <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+</a>
 
 <?php include 'includes/product_modal.php'; ?>
 
@@ -701,6 +752,7 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
 (function() {
   const dot  = document.getElementById('cursorDot');
   const ring = document.getElementById('cursorRing');
+  if (!dot || !ring) return;
   let rx = 0, ry = 0;
   document.addEventListener('mousemove', e => {
     dot.style.left  = e.clientX + 'px';
@@ -743,9 +795,11 @@ src="https://www.facebook.com/tr?id=1496845578585995&ev=PageView&noscript=1"
 (function() {
   const header     = document.querySelector('.header');
   const headerLogo = document.getElementById('headerLogo');
+  const banner     = document.getElementById('livraisonBanner');
   const onScroll   = () => {
     const scrolled = window.scrollY > 60;
     header.classList.toggle('scrolled', scrolled);
+    if (banner) banner.classList.toggle('hidden', scrolled);
     if (headerLogo) headerLogo.src = scrolled ? '/images/logofib.png' : '/images/logowhite.png';
   };
   window.addEventListener('scroll', onScroll, { passive: true });
@@ -766,11 +820,11 @@ document.addEventListener('click', e => {
     const s = document.createElement('div');
     s.className = 'sparkle';
     s.style.cssText = `
-      left: ${e.clientX}px; top: ${e.clientY}px;
-      width: ${4 + Math.random() * 6}px; height: ${4 + Math.random() * 6}px;
-      animation-duration: ${.6 + Math.random() * .8}s;
-      animation-delay: ${Math.random() * .2}s;
-      transform: translate(${(Math.random()-.5)*60}px, ${(Math.random()-.5)*60}px);
+      left:${e.clientX}px;top:${e.clientY}px;
+      width:${4+Math.random()*6}px;height:${4+Math.random()*6}px;
+      animation-duration:${.6+Math.random()*.8}s;
+      animation-delay:${Math.random()*.2}s;
+      transform:translate(${(Math.random()-.5)*60}px,${(Math.random()-.5)*60}px);
     `;
     document.body.appendChild(s);
     setTimeout(() => s.remove(), 1400);
@@ -780,9 +834,7 @@ document.addEventListener('click', e => {
 (function() {
   const el = document.getElementById('satisfiedCounter');
   if (!el) return;
-  const target = 1247;
-  const dur    = 2000;
-  const step   = 16;
+  const target = 1247, dur = 2000, step = 16;
   const inc    = Math.ceil(target / (dur / step));
   let current  = 0;
   const io = new IntersectionObserver(entries => {
@@ -795,20 +847,6 @@ document.addEventListener('click', e => {
     }, step);
   }, { threshold: 0.4 });
   io.observe(el);
-})();
-
-(function() {
-  document.querySelectorAll('.review-date--live').forEach(el => {
-    const days = parseInt(el.dataset.days, 10);
-    const span = el.querySelector('.days-ago');
-    if (!span || isNaN(days)) return;
-    if (days === 0)      span.textContent = "aujourd'hui";
-    else if (days === 1) span.textContent = 'il y a 1 jour';
-    else if (days < 7)   span.textContent = `il y a ${days} jours`;
-    else if (days < 14)  span.textContent = 'il y a 1 semaine';
-    else if (days < 30)  span.textContent = `il y a ${Math.floor(days / 7)} semaines`;
-    else                 span.textContent = `il y a ${Math.floor(days / 30)} mois`;
-  });
 })();
 </script>
 

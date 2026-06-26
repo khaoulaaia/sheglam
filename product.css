@@ -899,3 +899,21 @@ button { font-family: inherit; cursor: pointer; }
   .trust-item { font-size: 7.5px; padding: 10px 3px; }
   .similar-grid { grid-template-columns: repeat(2,1fr); gap: 10px; }
 }
+.acc-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease;
+}
+
+.acc-panel.open {
+  max-height: 600px; /* valeur suffisamment grande */
+}
+
+/* Rotation de la flèche */
+.acc-trigger[aria-expanded="true"] .acc-trigger-icon i {
+  transform: rotate(180deg);
+}
+
+.acc-trigger-icon i {
+  transition: transform 0.3s ease;
+}

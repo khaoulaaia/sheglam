@@ -255,10 +255,10 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <!-- Badge stock -->
-    <div class="info-stock-badge <?= $hasShades ? 'shade-pending' : ($outOfStock ? 'stock-out' : ($stock <= 5 ? 'stock-low' : 'stock-in')) ?>"
+    <div class="info-stock-badge <?= $hasShades ? 'stock-in' : ($outOfStock ? 'stock-out' : ($stock <= 5 ? 'stock-low' : 'stock-in')) ?>"
          id="stockBadge">
       <?php if ($hasShades): ?>
-        <i class="fas fa-palette"></i><span>Choisissez une teinte</span>
+        <i class="fas fa-check-circle"></i><span>En stock</span>
       <?php elseif ($outOfStock): ?>
         <i class="fas fa-times-circle"></i><span>Rupture de stock</span>
       <?php elseif ($stock <= 5): ?>
@@ -313,7 +313,7 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="qty-control">
           <button type="button" class="qty-btn" id="qtyMinus"><i class="fas fa-minus"></i></button>
           <input type="number" id="quantity" value="1" min="1"
-                 max="<?= $hasShades ? 1 : $stock ?>"
+                 max="<?= $hasShades ? 99 : $stock ?>"
                  <?= ($outOfStock && !$hasShades) ? 'disabled' : '' ?>>
           <button type="button" class="qty-btn" id="qtyPlus"><i class="fas fa-plus"></i></button>
         </div>
@@ -322,19 +322,18 @@ $similarProducts = $similarStmt->fetchAll(PDO::FETCH_ASSOC);
       <!-- Boutons -->
       <div class="action-btns">
         <?php if ($hasShades): ?>
-          <!-- Bouton AVEC teinte -->
+          <!-- Bouton AVEC teinte — débloqué par défaut, teinte optionnelle -->
           <button id="addWithShadeBtn"
                   class="btn-add-cart"
                   data-product-id="<?= $product['id'] ?>"
                   data-name="<?= htmlspecialchars($product['name']) ?>"
                   data-price="<?= $basePrice ?>"
-                  data-image_url="<?= htmlspecialchars($additionalImages[0]) ?>"
-                  disabled>
-            <i class="fas fa-palette"></i>
-            <span>Choisissez une teinte</span>
+                  data-image_url="<?= htmlspecialchars($additionalImages[0]) ?>">
+            <i class="fas fa-shopping-bag"></i>
+            <span>Ajouter au panier</span>
           </button>
         <?php else: ?>
-          <!-- Bouton SANS teinte — CORRECTION : classe add-to-cart ajoutée -->
+          <!-- Bouton SANS teinte -->
           <button class="btn-add-cart add-to-cart"
                   data-product-id="<?= $product['id'] ?>"
                   data-name="<?= htmlspecialchars($product['name']) ?>"
@@ -510,6 +509,7 @@ const BASE_OLD_PRICE = <?= json_encode($baseOldPrice) ?>;
 const BASE_IMAGE     = <?= json_encode($additionalImages[0]) ?>;
 const thumbBtns = document.querySelectorAll('#thumbnailStrip .thumb-btn');
 const mainImg   = document.querySelector('#galleryTrack .gallery-slide img');
+
 /* ═══════════════════════════════════════════════════════════
    GALERIE CARROUSEL
 ══════════════════════════════════════════════════════════ */
@@ -589,10 +589,10 @@ const mainImg   = document.querySelector('#galleryTrack .gallery-slide img');
     dragging = false;
     track.classList.remove('is-dragging');
     track.style.transition = '';
-    const threshold = track.offsetWidth * 0.18;   /* 18% de largeur = changement */
+    const threshold = track.offsetWidth * 0.18;
     if      (diffX < -threshold) goTo(current + 1);
     else if (diffX >  threshold) goTo(current - 1);
-    else                          goTo(current);   /* snap back */
+    else                          goTo(current);
     diffX = 0;
   }
 
@@ -610,6 +610,7 @@ const mainImg   = document.querySelector('#galleryTrack .gallery-slide img');
 
   goTo(0, true);
 })();
+
 /* ═══════════════════════════════════════════════════════════
    HELPERS PRIX / STOCK
 ══════════════════════════════════════════════════════════ */
@@ -627,14 +628,11 @@ function setPrice(price, oldPrice) {
   }
 }
 
-function setStockBadge(stock, shadeChosen) {
+function setStockBadge(stock) {
   const badge = document.getElementById('stockBadge');
   if (!badge) return;
   badge.className = 'info-stock-badge';
-  if (!shadeChosen) {
-    badge.classList.add('shade-pending');
-    badge.innerHTML = '<i class="fas fa-palette"></i><span>Choisissez une teinte</span>';
-  } else if (stock === 0) {
+  if (stock === 0) {
     badge.classList.add('stock-out');
     badge.innerHTML = '<i class="fas fa-times-circle"></i><span>Rupture de stock</span>';
   } else if (stock <= 5) {
@@ -666,7 +664,7 @@ if (qtyMinus && qtyPlus && qtyInput) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   SÉLECTEUR DE TEINTES
+   SÉLECTEUR DE TEINTES (teinte optionnelle)
 ══════════════════════════════════════════════════════════ */
 (function initShades() {
   const dotsRow   = document.getElementById('shadeDots');
@@ -674,17 +672,44 @@ if (qtyMinus && qtyPlus && qtyInput) {
   const addBtn    = document.getElementById('addWithShadeBtn');
   if (!dotsRow || !addBtn) return;
 
-  let selShade = null, selPrice = BASE_PRICE, selStock = 0, selImage = null;
+  /* État courant — null = pas de teinte choisie (autorisé) */
+  let selShade = null;
+  let selPrice = BASE_PRICE;
+  let selStock = null;   /* null = pas de teinte sélectionnée */
+  let selImage = null;
+
   const items = dotsRow.querySelectorAll('.shade-item');
 
   items.forEach(item => {
     item.addEventListener('click', () => {
 
-      // Agitation si rupture
+      /* Agitation si rupture de la teinte cliquée */
       if (parseInt(item.dataset.stock) === 0) {
         item.classList.add('shake');
         setTimeout(() => item.classList.remove('shake'), 500);
-        return; // Ne pas sélectionner une teinte en rupture
+        return;
+      }
+
+      /* Désélection si on reclique la teinte déjà active */
+      if (item.classList.contains('active')) {
+        item.classList.remove('active');
+        selShade = null;
+        selPrice = BASE_PRICE;
+        selStock = null;
+        selImage = null;
+        nameLabel.textContent = '—';
+        setPrice(BASE_PRICE, BASE_OLD_PRICE);
+        /* Restaurer badge stock de base */
+        const badge = document.getElementById('stockBadge');
+        if (badge) {
+          badge.className = 'info-stock-badge stock-in';
+          badge.innerHTML = '<i class="fas fa-check-circle"></i><span>En stock</span>';
+        }
+        /* Restaurer image de base */
+        setMainImage(BASE_IMAGE, 0);
+        if (thumbBtns[0]) thumbBtns[0].classList.add('active');
+        if (qtyInput) { qtyInput.max = 99; qtyInput.value = 1; }
+        return;
       }
 
       items.forEach(i => i.classList.remove('active'));
@@ -697,9 +722,9 @@ if (qtyMinus && qtyPlus && qtyInput) {
 
       nameLabel.textContent = selShade;
       setPrice(selPrice, BASE_OLD_PRICE);
-      setStockBadge(selStock, true);
+      setStockBadge(selStock);
 
-      // Changer image principale
+      /* Changer image principale */
       if (selImage) {
         setMainImage(selImage, -1);
         thumbBtns.forEach(t => t.classList.remove('active'));
@@ -708,9 +733,7 @@ if (qtyMinus && qtyPlus && qtyInput) {
         if (thumbBtns[0]) thumbBtns[0].classList.add('active');
       }
 
-      // Bouton + quantité
-      addBtn.disabled = false;
-      addBtn.innerHTML = '<i class="fas fa-shopping-bag"></i><span>Ajouter au panier</span>';
+      /* Quantité max selon stock teinte */
       if (qtyInput) {
         qtyInput.disabled = false;
         qtyInput.max      = selStock;
@@ -719,18 +742,20 @@ if (qtyMinus && qtyPlus && qtyInput) {
     });
   });
 
-  // ── CORRECTION : addToCart avec _originEl pour déclencher animation + badge ──
+  /* Clic "Ajouter au panier" — teinte optionnelle */
   addBtn.addEventListener('click', () => {
-    if (addBtn.disabled || !selShade) return;
-    const qty = Math.max(1, parseInt(qtyInput?.value || 1));
+    const qty         = Math.max(1, parseInt(qtyInput?.value || 1));
+    const actualPrice = selShade ? selPrice : BASE_PRICE;
+    const actualImage = (selShade && selImage) ? selImage : BASE_IMAGE;
+
     window.addToCart?.({
       productId : addBtn.dataset.productId,
       name      : addBtn.dataset.name,
-      price     : selPrice,
-      image     : selImage || BASE_IMAGE,
+      price     : actualPrice,
+      image     : actualImage,
       quantity  : qty,
-      shade     : selShade,
-      _originEl : mainImg   // ← déclenche flyToCart + bumpCartBadge
+      shade     : selShade || null,   /* null si aucune teinte choisie */
+      _originEl : mainImg
     });
   });
 })();
@@ -791,29 +816,31 @@ if (navigator.share && nativeShareBtn) {
 const buyNowBtn = document.getElementById('buyNowBtn');
 if (buyNowBtn) {
   buyNowBtn.addEventListener('click', () => {
-    const addBtn = document.getElementById('addWithShadeBtn');
+    const qty = parseInt(qtyInput?.value || 1);
+    const pId = buyNowBtn.dataset.productId;
 
-    // Si teintes disponibles et aucune sélectionnée → agiter le sélecteur
-    if (addBtn && addBtn.disabled) {
-      const sel = document.getElementById('shadeSelectorBlock');
-      sel?.classList.add('shake');
-      setTimeout(() => sel?.classList.remove('shake'), 600);
-      return;
-    }
-
-    const qty       = parseInt(qtyInput?.value || 1);
-    const pId       = buyNowBtn.dataset.productId;
+    /* Récupérer teinte sélectionnée si elle existe */
+    const addBtn    = document.getElementById('addWithShadeBtn');
     const shadeName = document.getElementById('selectedShadeName')?.textContent.replace(/^—\s*/, '').trim() || null;
-    const price     = addBtn
-                    ? parseFloat(addBtn.dataset.price   || buyNowBtn.dataset.price)
-                    : parseFloat(buyNowBtn.dataset.price);
-    const image     = (addBtn && addBtn.dataset.image_url)
-                    ? addBtn.dataset.image_url
-                    : buyNowBtn.dataset.image_url;
+    const hasShade  = shadeName && shadeName !== '—' && shadeName !== '';
 
-    const cartKey = pId + (shadeName ? '__' + shadeName : '');
-    const item    = { name: buyNowBtn.dataset.name, price, image_url: image, quantity: qty, shade: shadeName };
-    const prev    = localStorage.getItem('cart');
+    /* Prix et image : teinte si choisie, sinon base */
+    const price = hasShade
+      ? parseFloat(addBtn?.dataset?.price || buyNowBtn.dataset.price)
+      : parseFloat(buyNowBtn.dataset.price);
+    const image = (hasShade && addBtn?.dataset?.image_url)
+      ? addBtn.dataset.image_url
+      : buyNowBtn.dataset.image_url;
+
+    const cartKey = pId + (hasShade ? '__' + shadeName : '');
+    const item    = {
+      name      : buyNowBtn.dataset.name,
+      price,
+      image_url : image,
+      quantity  : qty,
+      shade     : hasShade ? shadeName : null
+    };
+    const prev = localStorage.getItem('cart');
 
     localStorage.setItem('cart', JSON.stringify({ [cartKey]: item }));
     if (typeof openCheckout === 'function') openCheckout();
@@ -832,6 +859,20 @@ if (buyNowBtn) {
     obs.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
   });
 }
+/* ═══════════════════════════════════════════════════════════
+   ACCORDÉON DESCRIPTION
+══════════════════════════════════════════════════════════ */
+(function initAccordion() {
+  const trigger = document.getElementById('accTrigger');
+  const panel   = document.getElementById('accPanel');
+  if (!trigger || !panel) return;
+
+  trigger.addEventListener('click', () => {
+    const expanded = trigger.getAttribute('aria-expanded') === 'true';
+    trigger.setAttribute('aria-expanded', !expanded);
+    panel.classList.toggle('open', !expanded);
+  });
+})();
 </script>
 
 <script src="<?= $b ?>/js/shop.js?v=<?= time() ?>"></script>
