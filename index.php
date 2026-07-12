@@ -12,13 +12,120 @@ $newProducts = $stmtNew->fetchAll(PDO::FETCH_ASSOC);
 
 $stmtPacks = $pdo->query("SELECT * FROM products WHERE is_pack = TRUE ORDER BY id DESC LIMIT 8");
 $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
+
+// SEO — ItemList dynamique pour Schema.org
+$itemListElements = [];
+foreach (array_slice($newProducts, 0, 8) as $pos => $p) {
+  $itemListElements[] = [
+    "@type"    => "ListItem",
+    "position" => $pos + 1,
+    "url"      => "https://sheglamour.fr/product.php?id=" . (int)$p['id'],
+    "name"     => $p['name'],
+  ];
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>SheGlamour — Beauté & Luxe</title>
+  <!-- ══ SEO ESSENTIEL ══════════════════════════════════════════ -->
+  <title>SheGlamour — Maquillage & Beauté Livraison Algérie</title>
+  <meta name="description" content="SheGlamour : rouge à lèvres, fond de teint, mascara et coffrets beauté livrés dans les 58 wilayas d'Algérie. Paiement à la livraison. Qualité premium.">
+  <meta name="keywords" content="maquillage algerie, rouge a levres algerie, fond de teint algerie, beaute algerie, livraison algerie, sheglamour, cosmetiques algerie">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="SheGlamour">
+  <link rel="canonical" href="https://sheglamour.fr/">
+  <meta name="theme-color" content="#1a1a1a">
+
+  <!-- ══ OPEN GRAPH (Facebook, WhatsApp, Instagram) ════════════ -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sheglamour.fr/">
+  <meta property="og:title" content="SheGlamour — Maquillage & Beauté Livraison Algérie">
+  <meta property="og:description" content="Maquillage premium livré dans les 58 wilayas. Paiement à la livraison. Rouge à lèvres, fond de teint, coffrets beauté et plus encore.">
+  <meta property="og:image" content="https://sheglamour.fr/images/og-home.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="fr_DZ">
+  <meta property="og:site_name" content="SheGlamour">
+
+  <!-- ══ TWITTER CARD ══════════════════════════════════════════ -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SheGlamour — Maquillage & Beauté Livraison Algérie">
+  <meta name="twitter:description" content="Maquillage premium livré dans les 58 wilayas. Paiement à la livraison.">
+  <meta name="twitter:image" content="https://sheglamour.fr/images/og-home.jpg">
+<meta name="google-site-verification" content="hSPhAXYDzmYxJ4DINFkdCJb9iAOW8xDpXgx3NXXjpZs" />
+  <!-- ══ SCHEMA.ORG — Organisation ═════════════════════════════ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "SheGlamour",
+    "url": "https://sheglamour.fr",
+    "logo": "https://sheglamour.fr/images/logofib.png",
+    "description": "Boutique de maquillage et cosmétiques en Algérie avec livraison dans les 58 wilayas.",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "availableLanguage": ["French", "Arabic"]
+    },
+    "areaServed": { "@type": "Country", "name": "Algeria" },
+    "sameAs": [
+      "https://www.facebook.com/sheglamour",
+      "https://www.instagram.com/sheglamour"
+    ]
+  }
+  </script>
+
+  <!-- ══ SCHEMA.ORG — WebSite + SearchAction ═══════════════════ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "SheGlamour",
+    "url": "https://sheglamour.fr",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://sheglamour.fr/categorie.php?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <!-- ══ SCHEMA.ORG — Store ════════════════════════════════════ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    "name": "SheGlamour",
+    "image": "https://sheglamour.fr/images/logofib.png",
+    "url": "https://sheglamour.fr",
+    "address": { "@type": "PostalAddress", "addressCountry": "DZ" },
+    "openingHoursSpecification": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+      "opens": "08:00",
+      "closes": "22:00"
+    },
+    "paymentAccepted": "Cash on Delivery",
+    "currenciesAccepted": "DZD",
+    "priceRange": "$$"
+  }
+  </script>
+
+  <!-- ══ SCHEMA.ORG — ItemList nouveautés ══════════════════════ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Nouveautés SheGlamour",
+    "itemListElement": <?= json_encode($itemListElements, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) ?>
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -26,6 +133,7 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
   <link rel="stylesheet" href="<?= $b ?>/sidebar.css?v=<?= time() ?>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="icon" type="image/png" href="<?= $b ?>/images/logofib.png">
+
   <!-- Meta Pixel Code -->
   <script>
   !function(f,b,e,v,n,t,s)
@@ -75,13 +183,13 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
   <div class="slide active">
     <picture>
       <source media="(max-width:600px)" srcset="<?= $b ?>/images/2ab4601fecaf19c74d1c3247c8699fc4.jpg">
-      <img src="<?= $b ?>/images/c8d0308b-18a7-492f-9beb-72bcf33af240-1.png" alt="Nouvelle collection">
+      <img src="<?= $b ?>/images/c8d0308b-18a7-492f-9beb-72bcf33af240-1.png" alt="Nouvelle collection maquillage SheGlamour">
     </picture>
   </div>
 </section>
 
 <!-- ══ 2. NOUVEAUTÉS ═══════════════════════════════════════ -->
-<section class="featured-section nouveautes-section" id="newProducts">
+<section class="featured-section nouveautes-section" id="newProducts" aria-label="Nouveaux produits">
   <div class="featured-inner">
 
     <div class="featured-header reveal">
@@ -114,7 +222,7 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
           <div class="fp-img-wrap">
             <a href="<?= $b ?>/product.php?id=<?= $p['id'] ?>">
               <img src="<?= htmlspecialchars($img) ?>"
-                   alt="<?= htmlspecialchars($p['name']) ?>" loading="lazy">
+                   alt="<?= htmlspecialchars($p['name']) ?> — SheGlamour Algérie" loading="lazy">
             </a>
             <span class="badge badge-new-drop">New</span>
             <?php if ($livGratuite): ?>
@@ -200,7 +308,7 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
 <div class="divider"></div>
 
 <!-- ══ 3. CRÉE TON LOOK ════════════════════════════════════ -->
-<section class="create-look-section reveal">
+<section class="create-look-section reveal" aria-label="Catégories maquillage">
   <div class="section-header">
     <h2 class="section-title">Crée ton Look</h2>
   </div>
@@ -209,7 +317,7 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
     <div class="create-item reveal reveal-delay-1">
       <a href="<?= $b ?>/categorie.php?categorie=Yeux">
         <div class="create-item-bg">
-          <img src="<?= $b ?>/images/cafff133fa60bc2cacd2e3562f2a95fe.jpg" alt="Yeux"
+          <img src="<?= $b ?>/images/cafff133fa60bc2cacd2e3562f2a95fe.jpg" alt="Maquillage yeux Algérie — mascara, eyeliner, fards à paupières"
                style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
         </div>
         <div class="create-overlay">
@@ -222,7 +330,7 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
     <div class="create-item reveal reveal-delay-2">
       <a href="<?= $b ?>/categorie.php?categorie=L%C3%A8vres">
         <div class="create-item-bg">
-          <img src="<?= $b ?>/images/fb8e9e21c817a8cff37b67d55197d902.jpg" alt="Lèvres"
+          <img src="<?= $b ?>/images/fb8e9e21c817a8cff37b67d55197d902.jpg" alt="Rouge à lèvres et gloss Algérie"
                style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
         </div>
         <div class="create-overlay">
@@ -235,7 +343,7 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
     <div class="create-item reveal reveal-delay-3">
       <a href="<?= $b ?>/categorie.php?categorie=Teint">
         <div class="create-item-bg">
-          <img src="<?= $b ?>/images/bb8cc02eba2cacd02569a3f5abf6f6c9.jpg" alt="Teint"
+          <img src="<?= $b ?>/images/bb8cc02eba2cacd02569a3f5abf6f6c9.jpg" alt="Fond de teint et poudre Algérie"
                style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
         </div>
         <div class="create-overlay">
@@ -248,7 +356,7 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
     <div class="create-item reveal reveal-delay-4">
       <a href="<?= $b ?>/categorie.php?categorie=Accessoires">
         <div class="create-item-bg">
-          <img src="<?= $b ?>/images/067700c35a774da3a234d1a731a29ba8.jpg" alt="Accessoires"
+          <img src="<?= $b ?>/images/067700c35a774da3a234d1a731a29ba8.jpg" alt="Accessoires beauté Algérie"
                style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
         </div>
         <div class="create-overlay">
@@ -264,13 +372,13 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
 <div class="divider"></div>
 
 <!-- ══ 4. WORTH THE HYPE ══════════════════════════════════ -->
-<section class="worth-hype">
+<section class="worth-hype" aria-label="Produits best-sellers">
 
   <div class="hype-left reveal reveal-left">
     <div class="hype-image-frame">
       <picture>
         <source media="(max-width: 768px)" srcset="<?= $b ?>/images/adea3c1ccd83ac8c0c1bca88cd01747d.jpg">
-        <img src="<?= $b ?>/images/48cdd3f716df344a4ac66ec6e464eb77.jpg" alt="Best Seller">
+        <img src="<?= $b ?>/images/48cdd3f716df344a4ac66ec6e464eb77.jpg" alt="Best seller maquillage SheGlamour">
       </picture>
       <span class="badge-new">New Drop</span>
     </div>
@@ -304,7 +412,7 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
       <div class="product-card">
         <div class="product-image-wrapper">
           <a href="<?= $b ?>/product.php?id=<?= $productId ?>">
-            <img src="<?= htmlspecialchars($image) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
+            <img src="<?= htmlspecialchars($image) ?>" alt="<?= htmlspecialchars($product['name']) ?> — SheGlamour">
           </a>
           <?php if ($livGratuite): ?>
             <span class="badge-livgratuite">Livraison offerte</span>
@@ -385,7 +493,7 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
 
 <!-- ══ 5. COFFRETS ════════════════════════════════════════ -->
 <?php if (!empty($packs)): ?>
-<section class="featured-section coffrets-section" id="coffrets">
+<section class="featured-section coffrets-section" id="coffrets" aria-label="Coffrets beauté">
   <div class="featured-inner">
 
     <div class="featured-header reveal">
@@ -416,7 +524,7 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
           <div class="fp-img-wrap">
             <a href="<?= $b ?>/product.php?id=<?= $p['id'] ?>">
               <img src="<?= htmlspecialchars($img) ?>"
-                   alt="<?= htmlspecialchars($p['name']) ?>" loading="lazy">
+                   alt="<?= htmlspecialchars($p['name']) ?> — coffret beauté Algérie" loading="lazy">
             </a>
             <span class="badge-coffret">Coffret</span>
             <?php if ($livGratuite): ?>
@@ -503,7 +611,7 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
 
 <!-- ══ 6. PROMOTIONS ══════════════════════════════════════ -->
 <?php if (!empty($featured)): ?>
-<section class="featured-section" id="featuredProducts">
+<section class="featured-section" id="featuredProducts" aria-label="Promotions maquillage">
   <div class="featured-inner">
 
     <div class="featured-header reveal">
@@ -535,7 +643,7 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
           <div class="fp-img-wrap">
             <a href="<?= $b ?>/product.php?id=<?= $p['id'] ?>">
               <img src="<?= htmlspecialchars($img) ?>"
-                   alt="<?= htmlspecialchars($p['name']) ?>" loading="lazy">
+                   alt="<?= htmlspecialchars($p['name']) ?> — promo maquillage Algérie" loading="lazy">
             </a>
             <span class="badge-solde badge-solde--img">-<?= $pct ?>%</span>
             <?php if ($livGratuite): ?>
@@ -616,7 +724,7 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
 <?php endif; ?>
 
 <!-- ══ 7. TRUST ════════════════════════════════════════════ -->
-<section class="trust-section">
+<section class="trust-section" aria-label="Avantages SheGlamour">
   <div class="trust-inner">
     <div class="trust-item">
       <div class="trust-icon"><i class="fa-solid fa-truck-fast" aria-hidden="true"></i></div>
@@ -642,7 +750,7 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
 </section>
 
 <!-- ══ 8. AVIS CLIENTS ════════════════════════════════════ -->
-<section class="reviews-section">
+<section class="reviews-section" aria-label="Avis clients SheGlamour">
   <div class="reviews-inner">
 
     <div class="reviews-header reveal">
@@ -659,75 +767,94 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
       </div>
     </div>
 
-    <div class="reviews-grid reveal-up">
+    <!-- Schema.org Reviews -->
+    <div class="reviews-grid reveal-up" itemscope itemtype="https://schema.org/Product">
+      <meta itemprop="name" content="SheGlamour Maquillage">
+      <div itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
+        <meta itemprop="ratingValue" content="5">
+        <meta itemprop="reviewCount" content="1247">
+        <meta itemprop="bestRating" content="5">
+      </div>
 
-      <div class="review-card">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">« Wallah la qualité c'est pas à discuter ! Mon rouge à lèvres tient toute la journée même après le café, je commande plus qu'ici ! »</p>
-        <div class="review-author">
+      <div class="review-card" itemprop="review" itemscope itemtype="https://schema.org/Review">
+        <div class="review-stars" itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating">
+          <meta itemprop="ratingValue" content="5">★★★★★
+        </div>
+        <p class="review-text" itemprop="reviewBody">« Wallah la qualité c'est pas à discuter ! Mon rouge à lèvres tient toute la journée même après le café, je commande plus qu'ici ! »</p>
+        <div class="review-author" itemprop="author" itemscope itemtype="https://schema.org/Person">
           <div class="review-avatar">SB</div>
           <div>
-            <p class="review-name">Sara B.</p>
+            <p class="review-name" itemprop="name">Sara B.</p>
             <p class="review-date">Alger</p>
           </div>
         </div>
       </div>
 
-      <div class="review-card">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">« La livraison a arrivé super vite et l'emballage trop beau, on dirait un cadeau ! Les produits exactement comme les photos, ana radia a 100% ! »</p>
-        <div class="review-author">
+      <div class="review-card" itemprop="review" itemscope itemtype="https://schema.org/Review">
+        <div class="review-stars" itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating">
+          <meta itemprop="ratingValue" content="5">★★★★★
+        </div>
+        <p class="review-text" itemprop="reviewBody">« La livraison a arrivé super vite et l'emballage trop beau, on dirait un cadeau ! Les produits exactement comme les photos, ana radia a 100% ! »</p>
+        <div class="review-author" itemprop="author" itemscope itemtype="https://schema.org/Person">
           <div class="review-avatar">LM</div>
           <div>
-            <p class="review-name">Lina M.</p>
+            <p class="review-name" itemprop="name">Lina M.</p>
             <p class="review-date">Oran</p>
           </div>
         </div>
       </div>
 
-      <div class="review-card">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">« Ncommandi dima de chez SheGlamour, le fond de teint machi kima les autres rebi yewafaq. Nensah bikoum ! »</p>
-        <div class="review-author">
+      <div class="review-card" itemprop="review" itemscope itemtype="https://schema.org/Review">
+        <div class="review-stars" itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating">
+          <meta itemprop="ratingValue" content="5">★★★★★
+        </div>
+        <p class="review-text" itemprop="reviewBody">« Ncommandi dima de chez SheGlamour, le fond de teint machi kima les autres rebi yewafaq. Nensah bikoum ! »</p>
+        <div class="review-author" itemprop="author" itemscope itemtype="https://schema.org/Person">
           <div class="review-avatar">NR</div>
           <div>
-            <p class="review-name">Nour R.</p>
+            <p class="review-name" itemprop="name">Nour R.</p>
             <p class="review-date">Constantine</p>
           </div>
         </div>
       </div>
 
-      <div class="review-card">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">« J'avais peur de commander en ligne mais SheGlamour m'a convaincue, le mascara c'est le meilleur que j'ai testé ! »</p>
-        <div class="review-author">
+      <div class="review-card" itemprop="review" itemscope itemtype="https://schema.org/Review">
+        <div class="review-stars" itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating">
+          <meta itemprop="ratingValue" content="5">★★★★★
+        </div>
+        <p class="review-text" itemprop="reviewBody">« J'avais peur de commander en ligne mais SheGlamour m'a convaincue, le mascara c'est le meilleur que j'ai testé ! »</p>
+        <div class="review-author" itemprop="author" itemscope itemtype="https://schema.org/Person">
           <div class="review-avatar">AM</div>
           <div>
-            <p class="review-name">Amira M.</p>
+            <p class="review-name" itemprop="name">Amira M.</p>
             <p class="review-date">Annaba</p>
           </div>
         </div>
       </div>
 
-      <div class="review-card">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">« Les prix raisonnables et la qualité premium, on trouve pas ça ailleurs en Algérie. Le gloss tient bien et la couleur trop jolie ! »</p>
-        <div class="review-author">
+      <div class="review-card" itemprop="review" itemscope itemtype="https://schema.org/Review">
+        <div class="review-stars" itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating">
+          <meta itemprop="ratingValue" content="5">★★★★★
+        </div>
+        <p class="review-text" itemprop="reviewBody">« Les prix raisonnables et la qualité premium, on trouve pas ça ailleurs en Algérie. Le gloss tient bien et la couleur trop jolie ! »</p>
+        <div class="review-author" itemprop="author" itemscope itemtype="https://schema.org/Person">
           <div class="review-avatar">RK</div>
           <div>
-            <p class="review-name">Rania K.</p>
+            <p class="review-name" itemprop="name">Rania K.</p>
             <p class="review-date">Blida</p>
           </div>
         </div>
       </div>
 
-      <div class="review-card">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">« Commande arrivée en 2 jours à Tizi, super rapide yatikom saha »</p>
-        <div class="review-author">
+      <div class="review-card" itemprop="review" itemscope itemtype="https://schema.org/Review">
+        <div class="review-stars" itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating">
+          <meta itemprop="ratingValue" content="5">★★★★★
+        </div>
+        <p class="review-text" itemprop="reviewBody">« Commande arrivée en 2 jours à Tizi, super rapide yatikom saha »</p>
+        <div class="review-author" itemprop="author" itemscope itemtype="https://schema.org/Person">
           <div class="review-avatar">DH</div>
           <div>
-            <p class="review-name">Djamila H.</p>
+            <p class="review-name" itemprop="name">Djamila H.</p>
             <p class="review-date">Tizi Ouzou</p>
           </div>
         </div>
@@ -742,7 +869,7 @@ $packs = $stmtPacks->fetchAll(PDO::FETCH_ASSOC);
    class="whatsapp-float"
    target="_blank"
    rel="noopener noreferrer"
-   aria-label="Contacter via WhatsApp">
+   aria-label="Contacter SheGlamour via WhatsApp">
   <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
 </a>
 

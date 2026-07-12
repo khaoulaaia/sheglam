@@ -1,0 +1,15 @@
+# robots.txt — sheglamour.fr
+User-agent: *
+Allow: /
+
+# Pages admin et techniques à exclure
+Disallow: /admin/
+Disallow: /includes/
+Disallow: /api/
+Disallow: /checkout.php
+Disallow: /order-confirm.php
+Disallow: /?add_to_cart=
+Disallow: /?remove=
+
+# Sitemap
+Sitemap: https://sheglamour.fr/sitemap.php
