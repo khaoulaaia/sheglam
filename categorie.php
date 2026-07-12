@@ -507,7 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <?php include 'includes/product_modal.php'; ?>
 <script src="<?= $b ?>/js/shop.js?v=<?= time() ?>"></script>
-<script src="/js/checkout.js?v=2" defer></script>
+<script src="/js/checkout.js?v=3" defer></script>
 <?php include 'includes/footer.php'; ?>
 </body>
 </html>

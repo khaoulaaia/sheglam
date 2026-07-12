@@ -979,7 +979,7 @@ document.addEventListener('click', e => {
 
 <script>const BASE_URL = "<?= $b ?>";</script>
 <script src="<?= $b ?>/js/shop.js?v=<?= time() ?>"></script>
-<script src="/js/checkout.js?v=2" defer></script>
+<script src="/js/checkout.js?v=3" defer></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     document.body.style.visibility = 'visible';

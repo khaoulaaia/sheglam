@@ -214,6 +214,24 @@
         font-weight: 700; font-size: 16px; color: #440B19;
         font-family: 'Cormorant Garamond', Georgia, serif; letter-spacing: .04em;
       }
+      .sg-order-subtotal-line {
+        display: flex; justify-content: space-between; padding: 6px 0;
+        font-size: 13px; color: #6e1a2e;
+      }
+      .sg-delivery-price-box {
+        margin-top: 4px; padding: 14px 16px; background: rgba(68,11,25,.05);
+        border: 1px solid rgba(68,11,25,.15);
+      }
+      .sg-delivery-price-box .sg-order-subtotal-line span:last-child { color: #440B19; font-weight: 600; }
+      .sg-delivery-price-total {
+        display: flex; justify-content: space-between; padding: 10px 0 0;
+        margin-top: 6px; border-top: 1px solid rgba(68,11,25,.15);
+        font-weight: 700; font-size: 15px; color: #440B19;
+        font-family: 'Cormorant Garamond', Georgia, serif; letter-spacing: .04em;
+      }
+      .sg-delivery-price-hint {
+        font-size: 11px; color: rgba(68,11,25,.5); margin-top: 4px;
+      }
       .sg-form { display: flex; flex-direction: column; gap: 16px; }
       .sg-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
       .sg-field label {
@@ -245,6 +263,8 @@
       .sg-payment-option input[type="radio"] { width: auto; accent-color: #440B19; }
       .sg-payment-option-label { flex: 1; font-size: 14px; font-weight: 500; color: #440B19; }
       .sg-payment-option-icon { font-size: 22px; }
+      .sg-payment-option-price { font-size: 13px; font-weight: 700; color: #440B19; white-space: nowrap; }
+      .sg-payment-option.disabled { opacity: .4; cursor: not-allowed; pointer-events: none; }
       .sg-checkout-footer {
         padding: 20px 28px; border-top: 1px solid rgba(68,11,25,.12); flex-shrink: 0;
         display: flex; flex-direction: column; gap: 10px; background: #F5F1EE;
@@ -403,7 +423,7 @@
         <h3>Votre commande (${items.length} article${items.length > 1 ? "s" : ""})</h3>
         ${itemsHTML}
         <div class="sg-order-total">
-          <span>Total</span>
+          <span>Sous-total</span>
           <span>${total.toFixed(2)} DA</span>
         </div>
       </div>`;
@@ -442,7 +462,15 @@
           <label>Wilaya *</label>
           <select id="sg-wilaya">
             <option value="">— Choisir —</option>
-            ${WILAYAS.map((w) => `<option value="${w}" ${saved.wilaya === w ? "selected" : ""}>${w}</option>`).join("")}
+            ${WILAYAS.map((w) => `<option value="${w.code}" ${saved.wilayaCode === w.code ? "selected" : ""}>${w.name} (${w.code})</option>`).join("")}
+          </select>
+          <div class="sg-field-error">Champ requis</div>
+        </div>
+        <div class="sg-field" id="field-deliveryMode">
+          <label>Mode de livraison *</label>
+          <select id="sg-deliveryMode">
+            <option value="domicile" ${saved.deliveryMode === "domicile" ? "selected" : ""}>Livraison à domicile</option>
+            <option value="stopDesk" ${saved.deliveryMode === "stopDesk" ? "selected" : ""}>Retrait Stop Desk</option>
           </select>
           <div class="sg-field-error">Champ requis</div>
         </div>
@@ -455,6 +483,7 @@
           <label>Note (optionnel)</label>
           <textarea id="sg-note" rows="2" placeholder="Instructions de livraison...">${saved.note || ""}</textarea>
         </div>
+        <div class="sg-delivery-price-box" id="sg-delivery-price-box"></div>
       </div>`;
 
     footer.innerHTML = `
@@ -463,6 +492,47 @@
 
     document.getElementById("sg-to-payment").onclick   = () => { if (validateShipping()) renderStep(3); };
     document.getElementById("sg-back-summary").onclick = () => renderStep(1);
+
+    document.getElementById("sg-wilaya").addEventListener("change", updateDeliveryPriceBox);
+    document.getElementById("sg-deliveryMode").addEventListener("change", updateDeliveryPriceBox);
+    updateDeliveryPriceBox();
+  }
+
+  // ---- APERÇU LIVE DU PRIX DE LIVRAISON (étape Livraison) ----
+  function getCartSubtotal() {
+    const cart = getCart();
+    let subtotal = 0;
+    Object.values(cart).forEach((i) => (subtotal += i.price * i.quantity));
+    return subtotal;
+  }
+
+  function updateDeliveryPriceBox() {
+    const box = document.getElementById("sg-delivery-price-box");
+    if (!box) return;
+
+    const wilayaCode = document.getElementById("sg-wilaya")?.value || "";
+    const mode       = document.getElementById("sg-deliveryMode")?.value || "domicile";
+    const subtotal   = getCartSubtotal();
+
+    if (!wilayaCode) {
+      box.innerHTML = `<div class="sg-delivery-price-hint">Choisissez une wilaya pour voir les frais de livraison.</div>`;
+      return;
+    }
+
+    const fee   = getDeliveryFee(wilayaCode, mode);
+    const total = subtotal + fee;
+    const modeLabel = mode === "stopDesk" ? "Stop Desk" : "Domicile";
+
+    box.innerHTML = `
+      <div class="sg-order-subtotal-line">
+        <span>Sous-total</span><span>${subtotal.toFixed(2)} DA</span>
+      </div>
+      <div class="sg-order-subtotal-line">
+        <span>Livraison (${modeLabel})</span><span>${fee.toFixed(2)} DA</span>
+      </div>
+      <div class="sg-delivery-price-total">
+        <span>Total</span><span>${total.toFixed(2)} DA</span>
+      </div>`;
   }
 
   function validateShipping() {
@@ -491,10 +561,23 @@
     });
 
     if (valid) {
-      data.note          = document.getElementById("sg-note")?.value || "";
-      orderData.shipping = data;
+      const wilayaCode      = document.getElementById("sg-wilaya")?.value || "";
+      const wilayaMatch      = WILAYAS.find((w) => w.code === wilayaCode);
+      data.wilayaCode        = wilayaCode;
+      data.wilaya            = wilayaMatch ? wilayaMatch.name : "";
+      data.deliveryMode      = document.getElementById("sg-deliveryMode")?.value || "domicile";
+      data.note              = document.getElementById("sg-note")?.value || "";
+      data.deliveryFee       = getDeliveryFee(wilayaCode, data.deliveryMode);
+      orderData.shipping     = data;
     }
     return valid;
+  }
+
+  // ---- FRAIS DE LIVRAISON ----
+  function getDeliveryFee(wilayaCode, mode) {
+    const tarif = TARIFS_LIVRAISON[wilayaCode];
+    if (!tarif) return 0;
+    return mode === "stopDesk" ? tarif.stopDesk : tarif.domicile;
   }
 
   // ---- ETAPE 3 : PAIEMENT ----
@@ -551,15 +634,25 @@
 
   function buildMiniSummary() {
     const cart = getCart();
-    let total  = 0;
-    Object.values(cart).forEach((i) => (total += i.price * i.quantity));
+    let subtotal  = 0;
+    Object.values(cart).forEach((i) => (subtotal += i.price * i.quantity));
     const s = orderData.shipping || {};
+    const deliveryFee = s.deliveryFee || 0;
+    const total = subtotal + deliveryFee;
+    const modeLabel = s.deliveryMode === "stopDesk" ? "Stop Desk" : "Domicile";
     return `
       <div style="font-size:13px;color:#6e1a2e;line-height:1.8">
         <div><strong style="color:#440B19">Livraison :</strong> ${s.firstName || ""} ${s.lastName || ""}</div>
         <div><strong style="color:#440B19">Tél :</strong> ${s.phone || ""}</div>
-        <div><strong style="color:#440B19">Wilaya :</strong> ${s.wilaya || ""}</div>
+        <div><strong style="color:#440B19">Wilaya :</strong> ${s.wilaya || ""} (${s.wilayaCode || ""})</div>
+        <div><strong style="color:#440B19">Mode :</strong> ${modeLabel}</div>
         <div><strong style="color:#440B19">Adresse :</strong> ${s.address || ""}</div>
+        <div class="sg-order-subtotal-line">
+          <span>Sous-total</span><span>${subtotal.toFixed(2)} DA</span>
+        </div>
+        <div class="sg-order-subtotal-line">
+          <span>Livraison (${modeLabel})</span><span>${deliveryFee.toFixed(2)} DA</span>
+        </div>
         <div style="margin-top:12px;font-size:16px;font-weight:700;color:#440B19;font-family:'Cormorant Garamond',Georgia,serif;letter-spacing:.04em">
           Total : ${total.toFixed(2)} DA
         </div>
@@ -578,13 +671,18 @@
 
     const cart  = getCart();
     const items = Object.values(cart);
-    let total   = 0;
-    items.forEach((i) => (total += i.price * i.quantity));
+    let subtotal   = 0;
+    items.forEach((i) => (subtotal += i.price * i.quantity));
+
+    const deliveryFee = (orderData.shipping && orderData.shipping.deliveryFee) || 0;
+    const total = subtotal + deliveryFee;
 
     const order = {
       order_id:       generateOrderId(),
       status:         "pending",
       payment_method: orderData.payment_method || "cash",
+      subtotal:       parseFloat(subtotal.toFixed(2)),
+      delivery_fee:   parseFloat(deliveryFee.toFixed(2)),
       total:          parseFloat(total.toFixed(2)),
       shipping:       orderData.shipping,
       items: items.map((item) => ({
@@ -686,20 +784,128 @@
   }
 
   // ===================================================
-  // 10. WILAYAS D'ALGERIE
+  // 10. WILAYAS D'ALGERIE (code + nom)
   // ===================================================
   const WILAYAS = [
-    "Adrar","Chlef","Laghouat","Oum El Bouaghi","Batna","Béjaïa","Biskra",
-    "Béchar","Blida","Bouira","Tamanrasset","Tébessa","Tlemcen","Tiaret",
-    "Tizi Ouzou","Alger","Djelfa","Jijel","Sétif","Saïda","Skikda",
-    "Sidi Bel Abbès","Annaba","Guelma","Constantine","Médéa","Mostaganem",
-    "M'Sila","Mascara","Ouargla","Oran","El Bayadh","Illizi","Bordj Bou Arréridj",
-    "Boumerdès","El Tarf","Tindouf","Tissemsilt","El Oued","Khenchela",
-    "Souk Ahras","Tipaza","Mila","Aïn Defla","Naâma","Aïn Témouchent",
-    "Ghardaïa","Relizane","Timimoun","Bordj Badji Mokhtar","Ouled Djellal",
-    "Béni Abbès","In Salah","In Guezzam","Touggourt","Djanet",
-    "El M'Ghair","El Meniaa",
+    { code: "1",  name: "Adrar" },
+    { code: "2",  name: "Chlef" },
+    { code: "3",  name: "Laghouat" },
+    { code: "4",  name: "Oum El Bouaghi" },
+    { code: "5",  name: "Batna" },
+    { code: "6",  name: "Béjaïa" },
+    { code: "7",  name: "Biskra" },
+    { code: "8",  name: "Béchar" },
+    { code: "9",  name: "Blida" },
+    { code: "10", name: "Bouira" },
+    { code: "11", name: "Tamanrasset" },
+    { code: "12", name: "Tébessa" },
+    { code: "13", name: "Tlemcen" },
+    { code: "14", name: "Tiaret" },
+    { code: "15", name: "Tizi Ouzou" },
+    { code: "16", name: "Alger" },
+    { code: "17", name: "Djelfa" },
+    { code: "18", name: "Jijel" },
+    { code: "19", name: "Sétif" },
+    { code: "20", name: "Saïda" },
+    { code: "21", name: "Skikda" },
+    { code: "22", name: "Sidi Bel Abbès" },
+    { code: "23", name: "Annaba" },
+    { code: "24", name: "Guelma" },
+    { code: "25", name: "Constantine" },
+    { code: "26", name: "Médéa" },
+    { code: "27", name: "Mostaganem" },
+    { code: "28", name: "M'Sila" },
+    { code: "29", name: "Mascara" },
+    { code: "30", name: "Ouargla" },
+    { code: "31", name: "Oran" },
+    { code: "32", name: "El Bayadh" },
+    { code: "33", name: "Illizi" },
+    { code: "34", name: "Bordj Bou Arréridj" },
+    { code: "35", name: "Boumerdès" },
+    { code: "36", name: "El Tarf" },
+    { code: "37", name: "Tindouf" },
+    { code: "38", name: "Tissemsilt" },
+    { code: "39", name: "El Oued" },
+    { code: "40", name: "Khenchela" },
+    { code: "41", name: "Souk Ahras" },
+    { code: "42", name: "Tipaza" },
+    { code: "43", name: "Mila" },
+    { code: "44", name: "Aïn Defla" },
+    { code: "45", name: "Naâma" },
+    { code: "46", name: "Aïn Témouchent" },
+    { code: "47", name: "Ghardaïa" },
+    { code: "48", name: "Relizane" },
+    { code: "49", name: "Timimoun" },
+    { code: "50", name: "Bordj Badji Mokhtar" },
+    { code: "51", name: "Ouled Djellal" },
+    { code: "52", name: "Béni Abbès" },
+    { code: "53", name: "In Salah" },
+    { code: "54", name: "In Guezzam" },
+    { code: "55", name: "Touggourt" },
+    { code: "57", name: "El M'Ghair" },
+    { code: "58", name: "El Menia" },
   ];
+
+  // ===================================================
+  // 10bis. TARIFS DE LIVRAISON (par code wilaya)
+  // ===================================================
+  const TARIFS_LIVRAISON = {
+    "16": { domicile: 500,  stopDesk: 250  },
+    "35": { domicile: 500,  stopDesk: 300  },
+    "9":  { domicile: 550,  stopDesk: 250  },
+    "42": { domicile: 550,  stopDesk: 250  },
+    "15": { domicile: 600,  stopDesk: 300  },
+    "10": { domicile: 650,  stopDesk: 300  },
+    "26": { domicile: 650,  stopDesk: 250  },
+    "2":  { domicile: 700,  stopDesk: 350  },
+    "6":  { domicile: 700,  stopDesk: 350  },
+    "14": { domicile: 700,  stopDesk: 350  },
+    "19": { domicile: 700,  stopDesk: 350  },
+    "25": { domicile: 700,  stopDesk: 350  },
+    "31": { domicile: 700,  stopDesk: 350  },
+    "4":  { domicile: 750,  stopDesk: 350  },
+    "5":  { domicile: 750,  stopDesk: 350  },
+    "13": { domicile: 750,  stopDesk: 350  },
+    "18": { domicile: 750,  stopDesk: 350  },
+    "21": { domicile: 750,  stopDesk: 350  },
+    "22": { domicile: 750,  stopDesk: 350  },
+    "23": { domicile: 750,  stopDesk: 350  },
+    "27": { domicile: 750,  stopDesk: 350  },
+    "28": { domicile: 750,  stopDesk: 350  },
+    "29": { domicile: 750,  stopDesk: 350  },
+    "34": { domicile: 750,  stopDesk: 350  },
+    "38": { domicile: 750,  stopDesk: 350  },
+    "41": { domicile: 750,  stopDesk: 350  },
+    "43": { domicile: 750,  stopDesk: 350  },
+    "44": { domicile: 750,  stopDesk: 350  },
+    "46": { domicile: 750,  stopDesk: 350  },
+    "48": { domicile: 750,  stopDesk: 350  },
+    "12": { domicile: 800,  stopDesk: 350  },
+    "20": { domicile: 800,  stopDesk: 350  },
+    "24": { domicile: 800,  stopDesk: 350  },
+    "36": { domicile: 800,  stopDesk: 350  },
+    "40": { domicile: 800,  stopDesk: 350  },
+    "7":  { domicile: 900,  stopDesk: 350  },
+    "51": { domicile: 900,  stopDesk: 350  },
+    "3":  { domicile: 1000, stopDesk: 500  },
+    "17": { domicile: 1000, stopDesk: 500  },
+    "30": { domicile: 1000, stopDesk: 500  },
+    "39": { domicile: 1000, stopDesk: 500  },
+    "47": { domicile: 1000, stopDesk: 500  },
+    "55": { domicile: 1000, stopDesk: 500  },
+    "57": { domicile: 1000, stopDesk: 500  },
+    "58": { domicile: 1000, stopDesk: 500  },
+    "8":  { domicile: 1100, stopDesk: 600  },
+    "32": { domicile: 1100, stopDesk: 600  },
+    "45": { domicile: 1100, stopDesk: 600  },
+    "52": { domicile: 1100, stopDesk: 600  },
+    "1":  { domicile: 1400, stopDesk: 700  },
+    "37": { domicile: 1400, stopDesk: 600  },
+    "49": { domicile: 1400, stopDesk: 700  },
+    "11": { domicile: 1850, stopDesk: 1000 },
+    "53": { domicile: 1850, stopDesk: 1000 },
+    "33": { domicile: 2000, stopDesk: 1000 },
+  };
 
   // ===================================================
   // 11. INIT

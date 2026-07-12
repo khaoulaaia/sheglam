@@ -40,7 +40,7 @@
 
 <!-- Overlay -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
-<script src="/js/checkout.js" defer></script>
+<script src="<?= $b ?>/js/checkout.js?v=3<?= time() ?>"></script>
 
 <script>
 // =============================================================================

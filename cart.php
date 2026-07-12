@@ -840,7 +840,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 <!-- shop.js et checkout.js chargés après notre init -->
 <script src="<?= $b ?>/js/shop.js?v=<?= time() ?>"></script>
-<script src="<?= $b ?>/js/checkout.js?v=2<?= time() ?>"></script>
+<script src="<?= $b ?>/js/checkout.js?v=3<?= time() ?>"></script>
 
 <?php include 'includes/footer.php'; ?>
 </body>

@@ -446,7 +446,6 @@ echo '<span class="discount-badge">-' . discountPercent($PRICE_OLD, $PRICE_PROMO
 echo '</div>';
 echo '<span class="price-old">' . priceTag($PRICE_OLD) . '</span>';
 echo '</div>';
-echo '<span class="price-note">التوصيل مشمول</span>';
 echo '</div>';
 echo '<button class="btn-hero" onclick="document.getElementById(\'order\').scrollIntoView({behavior:\'smooth\'})">اطلبيها الآن &larr;</button>';
 echo '</div>';
